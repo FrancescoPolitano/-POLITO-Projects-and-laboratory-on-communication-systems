@@ -27,6 +27,9 @@ namespace FEZ {
         /// <summary>The Button module using socket 14 of the mainboard.</summary>
         private Gadgeteer.Modules.GHIElectronics.Button button;
         
+        /// <summary>The LED Strip module using socket 12 of the mainboard.</summary>
+        private Gadgeteer.Modules.GHIElectronics.LEDStrip ledStrip;
+        
         /// <summary>This property provides access to the Mainboard API. This is normally not necessary for an end user program.</summary>
         protected new static GHIElectronics.Gadgeteer.FEZSpiderII Mainboard {
             get {
@@ -53,6 +56,7 @@ namespace FEZ {
             this.ethernetJ11D = new GTM.GHIElectronics.EthernetJ11D(7);
             this.camera = new GTM.GHIElectronics.Camera(3);
             this.button = new GTM.GHIElectronics.Button(14);
+            this.ledStrip = new GTM.GHIElectronics.LEDStrip(12);
         }
     }
 }

@@ -11,6 +11,7 @@ namespace ServerFEZ
         public const int PACKET_SIZE = 1400;
         public const int PORT_TCP = 8989;
         public const string IP_LOCAL = "192.168.100.1";
+        public const string DOOR_ID = "ABCDEFGH";
         public enum EVALUATION { ACCEPT, REJECT, NOCODE }
     }
 }

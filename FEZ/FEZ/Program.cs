@@ -20,19 +20,25 @@ namespace FEZ
 {
     public partial class Program
     {
+        //TODO remove button
         void ProgramStarted()
         {
+            Debug.Print("PROGRAM_STARTEDDDDDDDDDDDDDDDDDDD");
+            camera.CameraConnected += Camera_CameraConnected;
+            camera.CameraDisconnected += Camera_CameraDisconnected;
+            camera.PictureCaptured += Camera_PictureCaptured;
+            camera.CurrentPictureResolution = Camera.PictureResolution.Resolution176x144;
             ethernetJ11D.UseThisNetworkInterface();
             ethernetJ11D.NetworkUp += EthernetJ11D_NetworkUp;
             ethernetJ11D.NetworkDown += EthernetJ11D_NetworkDown;
             button.ButtonPressed += Button_ButtonPressed;
-            camera.PictureCaptured += Camera_PictureCaptured;
             new Thread(RunWebServer).Start();
+
         }
+
 
         private void Camera_PictureCaptured(Camera sender, GT.Picture e)
         {
-            Debug.Print("Picture taken");
             byte[] image = e.PictureData;
             int pictureSize = image.Length;
             Debug.Print("Send picture");
@@ -51,8 +57,6 @@ namespace FEZ
                 if (pictureSize - sent > Constants.PACKET_SIZE)
                     sent += sockSender.Send(image, sent, Constants.PACKET_SIZE, SocketFlags.None);
                 else sent += sockSender.Send(image, sent, pictureSize - sent, SocketFlags.None);
-                if (sent == pictureSize)
-                    Debug.Print("FINISHED");
             }
 
             byte[] responseFromServer = new byte[Constants.ACCEPT.Length];
@@ -79,17 +83,22 @@ namespace FEZ
 
             sockSender.Close();
             Debug.Print("sent " + sent);
+            Thread.Sleep(500);
             camera.TakePicture();
         }
 
         private void Button_ButtonPressed(Button sender, Button.ButtonState state)
         {
-            camera.TakePicture();
+            if (camera.CameraReady)
+            {
+                Debug.Print("CAMERA READY");
+                camera.TakePicture();
+            }
+            else Debug.Print("CAMERA NOT READY");
         }
 
         private void Camera_CameraConnected(Camera sender, EventArgs e)
         {
-            camera.CurrentPictureResolution = Camera.PictureResolution.Resolution176x144;
             Debug.Print("Camera connessa");
         }
 
@@ -115,8 +124,20 @@ namespace FEZ
         private void EthernetJ11D_NetworkUp(GTM.Module.NetworkModule sender, GTM.Module.NetworkModule.NetworkState state)
         {
             Debug.Print("Network is up!");
-            camera.CameraDisconnected += Camera_CameraDisconnected;
-            camera.CameraConnected += Camera_CameraConnected;
+            Thread.Sleep(500);
+            while (!camera.CameraReady)
+            {
+                Debug.Print("dormo un po'");
+                Thread.Sleep(30);
+            }
+            Debug.Print("READYYYYYYYYYYYY");
+            camera.TakePicture();
+
+        }
+
+        private void disconnected(GHI.Usb.Host.BaseDevice.DisconnectedEventHandler d, Microsoft.SPOT.EventArgs e)
+        {
+            Debug.Print("DEVICE DISCONNECTED");
         }
     }
 }

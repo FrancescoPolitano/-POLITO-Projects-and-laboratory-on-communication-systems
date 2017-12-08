@@ -6,6 +6,10 @@ using System.Drawing.Imaging;
 using ZXing;
 using System.Text;
 using System.IO;
+using Newtonsoft.Json;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Net.Http.Headers;
 
 namespace ServerFEZ
 {
@@ -32,6 +36,8 @@ namespace ServerFEZ
                 Console.WriteLine("Waiting for picture...");
                 Socket handler = listener.Accept();
                 Console.WriteLine("FEZ CONNECTED");
+                Console.WriteLine("handler " + handler.Blocking);
+                handler.Blocking = true;
                 receiveFromFez(handler);
             }
         }
@@ -39,27 +45,51 @@ namespace ServerFEZ
         private void receiveFromFez(Socket handler)
         {
             //TODO change
-            handler.ReceiveTimeout = 0;
-            handler.SendTimeout = 0;
-            int received = 0, sent = 0;
-            byte[] pictureByteSize = new byte[sizeof(int)];
-            received = handler.Receive(pictureByteSize, 0, sizeof(int), SocketFlags.None);
-            int pictureSize = BitConverter.ToInt32(pictureByteSize, 0);
-            Console.WriteLine("PICTURE SIZE {0} ", pictureSize);
-            byte[] pictureData = new byte[pictureSize];
-            received = 0;
+            byte[] pictureData;
+            int pictureSize = 0, received = 0, sent = 0; ;
             SocketError error;
-            while (received < pictureSize)
+            try
             {
-                if (pictureSize - received > Constants.PACKET_SIZE)
-                    received += handler.Receive(pictureData, received, Constants.PACKET_SIZE, SocketFlags.None, out error);
-                else received += handler.Receive(pictureData, received, pictureSize - received, SocketFlags.None, out error);
+                handler.ReceiveTimeout = 0;
+                handler.SendTimeout = 0;
+
+                byte[] pictureByteSize = new byte[sizeof(int)];
+
+                received = handler.Receive(pictureByteSize, 0, sizeof(int), SocketFlags.None, out error);
+                if (error == SocketError.Shutdown || error == SocketError.ConnectionReset)
+                {
+                    Console.WriteLine("errore " + error.ToString());
+                    handler.Close();
+                    return;
+                }
+                pictureSize = BitConverter.ToInt32(pictureByteSize, 0);
+                Console.WriteLine("PICTURE SIZE {0} ", pictureSize);
+                pictureData = new byte[pictureSize];
+                received = 0;
+
+                while (received < pictureSize)
+                {
+                    if (pictureSize - received > Constants.PACKET_SIZE)
+                        received += handler.Receive(pictureData, received, Constants.PACKET_SIZE, SocketFlags.None, out error);
+                    else received += handler.Receive(pictureData, received, pictureSize - received, SocketFlags.None, out error);
+                    //if (received == 0 && received != pictureSize)
+                    //    return;
+                    if (error == SocketError.Shutdown || error == SocketError.ConnectionReset)
+                    {
+                        Console.WriteLine("errore " + error.ToString());
+                        handler.Close();
+                        return;
+                    }
+                }
+            }
+            catch (SocketException s)
+            {
+                handler.Close();
+                Console.WriteLine("SOCKET CLOSED EXCEPTION");
+                Console.WriteLine("errore " + s.Message);
+                return;
             }
             Console.WriteLine("PictureSize: {0},received {1} ", pictureSize, received);
-
-            //CONVERSION WITH ZXING
-            //REQUEST TO SERVERWEB
-            //RESPONSE FROM SERVERWEB
 
             Bitmap bitmap;
             using (var ms = new MemoryStream(pictureData))
@@ -81,7 +111,34 @@ namespace ServerFEZ
             //Console.WriteLine($"Barcode format: {barcodeResult?.BarcodeFormat}");
             //responseToFEZ = Encoding.UTF8.GetBytes(Constants.EVALUATION.REJECT.ToString());
             //responseToFEZ = Encoding.UTF8.GetBytes(Constants.EVALUATION.NOCODE.ToString());
-            sent = handler.Send(responseToFEZ, 0, responseToFEZ.Length, SocketFlags.None);
+
+
+            //CONTACT WEBSERVER
+            //HttpClient client = new HttpClient();
+            //HttpResponseMessage response = client.GetAsync("http://192.168.1.163:8082/RestfulService/resources/auth/1/3").Result;
+            //if (response.IsSuccessStatusCode)
+            //{
+            //    string str = response.Content.ReadAsStringAsync().Result;
+            //    Console.WriteLine("str {0}", str);
+            //}
+
+            try
+            {
+                sent = handler.Send(responseToFEZ, 0, responseToFEZ.Length, SocketFlags.None, out error);
+                if (error == SocketError.Shutdown || error == SocketError.ConnectionReset)
+                {
+                    Console.WriteLine("blabla");
+                    Console.WriteLine("errore " + error.ToString());
+                    handler.Close();
+                    return;
+                }
+            }
+            catch (SocketException e)
+            {
+                handler.Close();
+                Console.Write("quiquiq");
+                return;
+            }
             handler.Close();
             Image x = (Bitmap)((new ImageConverter()).ConvertFrom(pictureData));
             x.Save(@"C:\Users\Cristiano\Desktop\image.jpeg", ImageFormat.Jpeg);

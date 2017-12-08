@@ -53,8 +53,8 @@ namespace FEZ {
         
         private void InitializeModules() {
             this.usbClientEDP = new GTM.GHIElectronics.USBClientEDP(1);
-            this.ethernetJ11D = new GTM.GHIElectronics.EthernetJ11D(7);
             this.camera = new GTM.GHIElectronics.Camera(3);
+            this.ethernetJ11D = new GTM.GHIElectronics.EthernetJ11D(7);
             this.button = new GTM.GHIElectronics.Button(14);
             this.ledStrip = new GTM.GHIElectronics.LEDStrip(12);
         }

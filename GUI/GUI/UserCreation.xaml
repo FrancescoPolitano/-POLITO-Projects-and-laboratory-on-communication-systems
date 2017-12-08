@@ -1,0 +1,61 @@
+﻿<Controls:MetroWindow
+        xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+        x:Class="GUI.UserCreation"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GUI"
+        mc:Ignorable="d"
+        Title="UserCreation" Height="450" Width="400">
+    <Grid Background="AliceBlue">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="Name" />
+            <TextBox Name="Name" Grid.Row="1" FontSize="16"/>
+            <TextBlock  Grid.Row="2" Text="Surname"  />
+            <TextBox Name="Surname" Grid.Row="3" FontSize="16"/>
+        </Grid>
+        <Grid Grid.Row="1" Grid.Column="0" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="Role" />
+            <TextBox Grid.Row="1"  Name="Role" />
+        </Grid>
+        <Button Grid.Row="2" Grid.Column="0" Name="Confirm" Content="Confirm" Click="Confirm_Click" />
+        <Button Grid.Row="2" Grid.Column="1" Name="Cancel" Content="Cancel" Click="Cancel_Click" />
+        <Button Grid.Row="1" Grid.Column="1" Name="ChoosePic" Content="Choose a picture" Click="ChoosePic_Click" />
+        <Image Grid.Row="0" Grid.Column="1" Name="imageBox" Source="F:\Downloads\Farmer.png" Margin="10" />
+    </Grid>
+    <Window.Resources>
+        <Style TargetType="Button" BasedOn="{StaticResource MetroButton}">
+            <Setter Property="Margin" Value="15" />
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+    </Window.Resources>
+</Controls:MetroWindow>
+    

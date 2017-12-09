@@ -17,7 +17,7 @@ import com.google.gson.Gson;
 
 import javassist.compiler.ast.Visitor;
 
-//Sets the base url
+//Sets the bae url
 @Path("/resources")
 public class Resources {
 	public Resources() throws SQLException {

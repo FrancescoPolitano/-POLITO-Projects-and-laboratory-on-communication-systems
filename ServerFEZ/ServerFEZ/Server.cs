@@ -45,6 +45,9 @@ namespace ServerFEZ
         private void receiveFromFez(Socket handler)
         {
             //TODO change
+
+
+
             byte[] pictureData;
             int pictureSize = 0, received = 0, sent = 0; ;
             SocketError error;

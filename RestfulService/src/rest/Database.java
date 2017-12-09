@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Database {
 	static Connection conn;
@@ -54,9 +55,9 @@ public class Database {
 		try {
 			if (conn != null) {
 				Statement stmt = (Statement) conn.createStatement();
-//				stmt.executeQuery("select  a.* from employes a ");
-				stmt.executeQuery("SELECT e.*, l.Name, max(a.TimeS)\r\n" + "from employes e , locals l, accesses a \r\n" +
-						"where a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal\r\n" + "GROUP BY e.SerialNumber");
+				// stmt.executeQuery("select a.* from employes a ");
+				stmt.executeQuery("SELECT e.*, l.Name, max(a.TimeS)\r\n" + "from employes e , locals l, accesses a \r\n"
+						+ "where a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal\r\n" + "GROUP BY e.SerialNumber");
 				ResultSet rs = stmt.getResultSet();
 				while (rs.next()) {
 					int serial = rs.getInt("SerialNumber");
@@ -68,11 +69,11 @@ public class Database {
 					Employee temp = new Employee(serial, name, surname, auth, position);
 					list.add(temp);
 				}
-				stmt.executeQuery("SELECT e.* from employes e\r\n" + 
-						"where e.SerialNumber not  in(SELECT e.SerialNumber from employes e , locals l, accesses a \r\n" + 
-						"						where a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal GROUP BY e.SerialNumber)\r\n" + 
-						"");
-				 rs = stmt.getResultSet();
+				stmt.executeQuery("SELECT e.* from employes e\r\n"
+						+ "where e.SerialNumber not  in(SELECT e.SerialNumber from employes e , locals l, accesses a \r\n"
+						+ "						where a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal GROUP BY e.SerialNumber)\r\n"
+						+ "");
+				rs = stmt.getResultSet();
 				while (rs.next()) {
 					int serial = rs.getInt("SerialNumber");
 					String name = rs.getString("Name");
@@ -83,10 +84,10 @@ public class Database {
 					Employee temp = new Employee(serial, name, surname, auth, position);
 					list.add(temp);
 
+				}
+				return list;
 			}
-			return list;
-		} 
-		}catch (SQLException ex) {
+		} catch (SQLException ex) {
 			System.out.println("Error: access problem while loading!");
 			System.exit(2);
 		}
@@ -100,7 +101,7 @@ public class Database {
 				Statement stmt = (Statement) conn.createStatement();
 				stmt.executeQuery("SELECT e.*, l.Name, a.TimeS\r\n" + "from employes e , locals l, accesses a \r\n"
 						+ "where a.TimeS= (select max(TimeS) from accesses a where a.IdEmployee='" + id + "') \r\n"
-						+ "and a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal\r\n" + "");
+						+ "and a.IdEmployee=e.SerialNumber and l.Result='true' and l.Id=a.IdLocal\r\n" + "");
 				ResultSet rs = stmt.getResultSet();
 				while (rs.next()) {
 					int serial = rs.getInt("SerialNumber");
@@ -165,14 +166,46 @@ public class Database {
 		try {
 			if (conn != null) {
 				Statement stmt = (Statement) conn.createStatement();
-				stmt.executeQuery("DELETE FROM employes  WHERE SerialNumber='" + id + "'");
+				stmt.executeUpdate("DELETE FROM employes  WHERE SerialNumber='" + id + "'");
 				return true;
 			}
 
 		} catch (SQLException ex) {
-			System.out.println("Error: access problem while loading!");
-			System.exit(2);
+			System.out.println(ex.getMessage());
+			return false;
 		}
 		return false;
+
 	}
+
+	public static String newCode(String id) {
+
+		try {
+			if (conn != null) {
+				Statement stmt = (Statement) conn.createStatement();
+				String newCode = randomCodeGen();
+				stmt.executeUpdate(
+						"UPDATE auth SET Code='" + newCode + "' WHERE IdEmployee='" + id + "'");
+				return newCode;
+			}
+
+		} catch (SQLException ex) {
+			System.out.println(ex.getMessage());
+			return null;
+		}
+		return null;
+
+	}
+
+	private static String randomCodeGen() {
+		char[] chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
+		Random random = new Random();
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < 12; i++) {
+			char c = chars[random.nextInt(chars.length)];
+			sb.append(c);
+		}
+		return sb.toString();
+	}
+
 }

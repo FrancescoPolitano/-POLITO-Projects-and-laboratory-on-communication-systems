@@ -66,6 +66,17 @@ public class Resources {
 		return Response.ok().build();	
 		}
 	
+	
+	// revoke a user QRCode and obtain a new one
+		@POST
+		@Path("users/new_code")	
+		public Response codeRestoration(String id) {
+					
+			//TODO return the qrcode image
+			return Response.ok(Database.newCode(id)	).build();	
+			}
+		
+		
 	// delete an user
 		@DELETE
 		@Path("users/{id}")	

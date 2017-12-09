@@ -72,8 +72,6 @@ namespace ServerFEZ
                     if (pictureSize - received > Constants.PACKET_SIZE)
                         received += handler.Receive(pictureData, received, Constants.PACKET_SIZE, SocketFlags.None, out error);
                     else received += handler.Receive(pictureData, received, pictureSize - received, SocketFlags.None, out error);
-                    //if (received == 0 && received != pictureSize)
-                    //    return;
                     if (error == SocketError.Shutdown || error == SocketError.ConnectionReset)
                     {
                         Console.WriteLine("errore " + error.ToString());
@@ -127,7 +125,6 @@ namespace ServerFEZ
                 sent = handler.Send(responseToFEZ, 0, responseToFEZ.Length, SocketFlags.None, out error);
                 if (error == SocketError.Shutdown || error == SocketError.ConnectionReset)
                 {
-                    Console.WriteLine("blabla");
                     Console.WriteLine("errore " + error.ToString());
                     handler.Close();
                     return;
@@ -136,7 +133,6 @@ namespace ServerFEZ
             catch (SocketException e)
             {
                 handler.Close();
-                Console.Write("quiquiq");
                 return;
             }
             handler.Close();
@@ -144,7 +140,7 @@ namespace ServerFEZ
             x.Save(@"C:\Users\Cristiano\Desktop\image.jpeg", ImageFormat.Jpeg);
         }
 
-        private IPEndPoint localEndPoint;
-        private Socket listener;
+        private IPEndPoint localEndPoint = null;
+        private Socket listener = null;
     }
 }

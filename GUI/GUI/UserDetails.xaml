@@ -1,0 +1,50 @@
+﻿<Window x:Class="GUI.UserDetails"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GUI"
+        mc:Ignorable="d"
+        Title="UserDetails" Height="350" Width="450">
+    <Grid Name="OuterGrid" >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Row="0" Grid.Column="0"  Name="InnerGrid">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Name="Name" Text="{Binding Name, StringFormat='Name: {0}'}" />
+            <TextBlock Grid.Row="1" Name="Surname" Text="{Binding Surname, StringFormat='Surname: {0}'}" />
+            <TextBlock Grid.Row="2" Name="Role" Text="{Binding AuthLevel, StringFormat='AuthLevel: {0}'}" />
+            <TextBlock Grid.Row="3" Name="Serial" Text="{Binding Serial, StringFormat='Serial: {0}'}" />
+            <TextBlock Grid.Row="4" Name="CurrentPosition" Text="{Binding CurrentPosition, StringFormat='CurrentPosition: {0}'}" />
+            <Grid.Resources>
+                <Style TargetType="TextBlock">
+                    <Setter Property="FontSize" Value="16" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                    <Setter Property="Margin" Value="5,0" />
+                    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                </Style>
+            </Grid.Resources>
+        </Grid>
+        <Image Grid.Row="0" Grid.Column="1" Source="{Binding PathPhoto}" Stretch="Fill"/>
+        <Button Grid.Row="1" Grid.Column="0" Name="History" Content="History" Click="History_Click" />
+        <Button Grid.Row="1" Grid.Column="1" Name="modify" Content="Modify" Click="modify_Click" />
+    </Grid>
+    <Window.Resources>
+        <Style TargetType="Button" BasedOn="{StaticResource MetroButton}">
+            <Setter Property="Margin" Value="15" />
+        </Style>
+    </Window.Resources>
+    
+</Window>

@@ -36,8 +36,6 @@ namespace ServerFEZ
                 Console.WriteLine("Waiting for picture...");
                 Socket handler = listener.Accept();
                 Console.WriteLine("FEZ CONNECTED");
-                Console.WriteLine("handler " + handler.Blocking);
-                handler.Blocking = true;
                 receiveFromFez(handler);
             }
         }
@@ -45,9 +43,6 @@ namespace ServerFEZ
         private void receiveFromFez(Socket handler)
         {
             //TODO change
-
-
-
             byte[] pictureData;
             int pictureSize = 0, received = 0, sent = 0; ;
             SocketError error;
@@ -66,7 +61,6 @@ namespace ServerFEZ
                     return;
                 }
                 pictureSize = BitConverter.ToInt32(pictureByteSize, 0);
-                Console.WriteLine("PICTURE SIZE {0} ", pictureSize);
                 pictureData = new byte[pictureSize];
                 received = 0;
 
@@ -101,11 +95,25 @@ namespace ServerFEZ
             byte[] responseToFEZ = new byte[Constants.EVALUATION.ACCEPT.ToString().Length];
             var barcodeReader = new BarcodeReader();
             //var barcodeBitmap = (Bitmap)Bitmap.FromFile(@"C:\Users\Cristiano\Desktop\jpeg.jpg");
+
             var barcodeResult = barcodeReader.Decode(bitmap);
-            if (barcodeResult != null)
-                responseToFEZ = Encoding.UTF8.GetBytes(Constants.EVALUATION.ACCEPT.ToString());
-            else
-                responseToFEZ = Encoding.UTF8.GetBytes(Constants.EVALUATION.NOCODE.ToString());
+            if (barcodeResult != null && barcodeResult.BarcodeFormat == BarcodeFormat.QR_CODE)
+            {
+                HttpClient client = new HttpClient();
+                HttpResponseMessage response = client.GetAsync("http://192.168.1.171:8082/RestfulService/resources/auth/" + Constants.DOOR_ID + "/" + barcodeResult.Text).Result;
+                Console.WriteLine("RESPONSE CODE {0} ", response.StatusCode);
+                if (response.IsSuccessStatusCode)
+                {
+                    string str = response.Content.ReadAsStringAsync().Result;
+                    Console.WriteLine("str {0}", str);
+                    if (String.Compare(str, "true") == 0)
+                        responseToFEZ = Encoding.UTF8.GetBytes(Constants.EVALUATION.ACCEPT.ToString());
+                    else if (String.Compare(str, "true") == 0)
+                        responseToFEZ = Encoding.UTF8.GetBytes(Constants.EVALUATION.REJECT.ToString());
+                }
+                else responseToFEZ = Encoding.UTF8.GetBytes(Constants.EVALUATION.NOCODE.ToString());
+            }
+            else responseToFEZ = Encoding.UTF8.GetBytes(Constants.EVALUATION.NOCODE.ToString());
 
 
             //Console.WriteLine($"Decoded barcode text: {barcodeResult?.Text}");
@@ -113,15 +121,6 @@ namespace ServerFEZ
             //responseToFEZ = Encoding.UTF8.GetBytes(Constants.EVALUATION.REJECT.ToString());
             //responseToFEZ = Encoding.UTF8.GetBytes(Constants.EVALUATION.NOCODE.ToString());
 
-
-            //CONTACT WEBSERVER
-            //HttpClient client = new HttpClient();
-            //HttpResponseMessage response = client.GetAsync("http://192.168.1.163:8082/RestfulService/resources/auth/1/3").Result;
-            //if (response.IsSuccessStatusCode)
-            //{
-            //    string str = response.Content.ReadAsStringAsync().Result;
-            //    Console.WriteLine("str {0}", str);
-            //}
 
             try
             {

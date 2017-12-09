@@ -20,10 +20,9 @@ namespace FEZ
 {
     public partial class Program
     {
-        //TODO remove button
         void ProgramStarted()
         {
-            Debug.Print("PROGRAM_STARTEDDDDDDDDDDDDDDDDDDD");
+            Debug.Print("PROGRAM STARTED");
             camera.CameraConnected += Camera_CameraConnected;
             camera.CameraDisconnected += Camera_CameraDisconnected;
             camera.PictureCaptured += Camera_PictureCaptured;
@@ -31,9 +30,7 @@ namespace FEZ
             ethernetJ11D.UseThisNetworkInterface();
             ethernetJ11D.NetworkUp += EthernetJ11D_NetworkUp;
             ethernetJ11D.NetworkDown += EthernetJ11D_NetworkDown;
-            button.ButtonPressed += Button_ButtonPressed;
             new Thread(RunWebServer).Start();
-
         }
 
 
@@ -41,7 +38,7 @@ namespace FEZ
         {
             byte[] image = e.PictureData;
             int pictureSize = image.Length;
-            Debug.Print("Send picture");
+            //Debug.Print("Send picture");
             IPEndPoint remoteEP = new IPEndPoint(IPAddress.Parse(Constants.IP_SERVER), Constants.PORT_TCP);
             Socket sockSender = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             sockSender.Connect(remoteEP);
@@ -66,35 +63,24 @@ namespace FEZ
             if (String.Compare(responseString, Constants.ACCEPT) == 0)
             {
                 //TURN ON GREEN LIGHT
-                Debug.Print("GREEN");
+                //Debug.Print("GREEN");
                 ledStrip.SetBitmask(3);
             }
             else if (String.Compare(responseString, Constants.REJECT) == 0)
             {
                 //TURN ON RED LIGHT
-                Debug.Print("RED");
+                //Debug.Print("RED");
             }
             else if (String.Compare(responseString, Constants.NOCODE) == 0)
             {
                 //CONTINUE TO LOOP
-                Debug.Print("NOQRCODE");
+                //Debug.Print("NOQRCODE");
                 ledStrip.SetBitmask(96);
             }
 
             sockSender.Close();
-            Debug.Print("sent " + sent);
-            Thread.Sleep(500);
+            //Debug.Print("sent " + sent);
             camera.TakePicture();
-        }
-
-        private void Button_ButtonPressed(Button sender, Button.ButtonState state)
-        {
-            if (camera.CameraReady)
-            {
-                Debug.Print("CAMERA READY");
-                camera.TakePicture();
-            }
-            else Debug.Print("CAMERA NOT READY");
         }
 
         private void Camera_CameraConnected(Camera sender, EventArgs e)
@@ -112,7 +98,7 @@ namespace FEZ
             while (ethernetJ11D.IsNetworkUp == false)
             {
                 Debug.Print("Waiting...");
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
             }
         }
 
@@ -127,17 +113,11 @@ namespace FEZ
             Thread.Sleep(500);
             while (!camera.CameraReady)
             {
-                Debug.Print("dormo un po'");
+                Debug.Print("SLEEP");
                 Thread.Sleep(30);
             }
             Debug.Print("READYYYYYYYYYYYY");
             camera.TakePicture();
-
-        }
-
-        private void disconnected(GHI.Usb.Host.BaseDevice.DisconnectedEventHandler d, Microsoft.SPOT.EventArgs e)
-        {
-            Debug.Print("DEVICE DISCONNECTED");
         }
     }
 }

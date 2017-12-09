@@ -168,12 +168,17 @@
 			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/franc/Desktop/mysql-connector-java-5.1.45-bin.jar">
+	<classpathentry kind="lib" path="C:/Users/franc/Documents/GitKraken/ProjectsAndLaboratories/-POLITO-Projects-and-laboratory-on-communication-systems/RestfulService/gson-2.6.2.jar">
 		<attributes>
 			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/franc/Desktop/gson-2.6.2.jar">
+	<classpathentry kind="lib" path="C:/Users/franc/Documents/GitKraken/ProjectsAndLaboratories/-POLITO-Projects-and-laboratory-on-communication-systems/RestfulService/mysql-connector-java-5.1.45-bin.jar">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/franc/Documents/GitKraken/ProjectsAndLaboratories/-POLITO-Projects-and-laboratory-on-communication-systems/RestfulService/zxing.jar">
 		<attributes>
 			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
 		</attributes>

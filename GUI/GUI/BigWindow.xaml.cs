@@ -23,6 +23,7 @@ namespace GUI
     /// </summary>
     public partial class BigWindow : MetroWindow
     {
+      
         public BigWindow()
         {
             InitializeComponent();
@@ -33,12 +34,18 @@ namespace GUI
             UserList.Add(new User("Giorgio", "Mastrota", "USER", "ACASA", "F:\\Downloads\\Farmer.png", 11));
             UserList.Add(new User("Giorgio", "Mastrota", "USER", "ACASA", "F:\\Downloads\\Farmer2.png", 12));
             UserList.Add(new User("Giorgio", "Mastrota", "USER", "ACASA", "F:\\Downloads\\Farmer2.png", 13));
+            //foreach (User user in App.userList)
+            //{
+            //    if (String.IsNullOrEmpty(user.PathPhoto))
+            //        user.PathPhoto = "F:\\Downloads\\Farmer.png";
+            //    UserList.Add(user);
+            //}
 
             Users.ItemsSource = UserList;
         }
 
-        internal ObservableCollection<User> UserList { get => userList; set => userList = value; }
-        private ObservableCollection<User> userList;
+        public static ObservableCollection<User> UserList { get => userList; set => userList = value; }
+        private static ObservableCollection<User> userList;
 
         private void newUser_Click(object sender, RoutedEventArgs e)
         {
@@ -71,7 +78,7 @@ namespace GUI
                 User user = item.DataContext as User;
                 UserDetails uD = new UserDetails(user);
                 uD.ShowDialog();
-                
+
 
             }
 

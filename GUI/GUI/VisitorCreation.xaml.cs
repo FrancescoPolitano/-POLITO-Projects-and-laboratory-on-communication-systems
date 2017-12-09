@@ -16,14 +16,22 @@ using MahApps.Metro.Controls.Dialogs;
 
 namespace GUI
 {
+
     /// <summary>
     /// Interaction logic for VisitorCreation.xaml
     /// </summary>
     public partial class VisitorCreation : MetroWindow
     {
+        private Visitor myVisitor = new Visitor();
+
+        internal Visitor MyVisitor { get => myVisitor; set => myVisitor = value; }
+
         public VisitorCreation()
         {
             InitializeComponent();
+            myGrid.DataContext = MyVisitor;
+            CalendarDateRange cdr = new CalendarDateRange(DateTime.MinValue, DateTime.Today);
+            DatePick.BlackoutDates.Add(cdr);
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
@@ -46,23 +54,29 @@ namespace GUI
                 this.ShowModalMessageExternal("Ops", "Insert a valid surname");
                 return;
             }
-            if (String.IsNullOrEmpty(ExpiryDate.Text))
+            if (String.IsNullOrEmpty(DatePick.Text))
             {
                 //errore data
                 this.ShowModalMessageExternal("Ops", "Insert a valid expiryDate");
                 return;
             }
-            //TODO condizione per verificare se la data è già passata
-            //else if ()
+               
+        
 
-            Visitor v = new Visitor(Name.Text, Surname.Text, Motivation.Text, ExpiryDate.Text);
-            if (await RestClient.CreateVisitor(v))
+            //TODO capire perchè il binding non funziona bene
+            myVisitor.ExpiryDate = DatePick.Text;
+
+            if (await RestClient.CreateVisitor(myVisitor))
             {
                 //stampare successo
+                MessageBox.Show("Successo");
+                Close();
             }
             else
             {
                 //stampare fallimento
+                MessageBox.Show("Fallimento");
+                Close();
             }
 
 

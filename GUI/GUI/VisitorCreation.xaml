@@ -8,7 +8,7 @@
         xmlns:local="clr-namespace:GUI"
         mc:Ignorable="d"
         Title="VisitorCreation" Height="450" Width="400" Background="AliceBlue">
-    <Grid Margin="10">
+    <Grid Name="myGrid" Margin="10" DataContext="MyVisitor">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
@@ -25,9 +25,9 @@
         <TextBlock Grid.Row="0" Text="Name" />
         <TextBlock Grid.Row="2" Text="Surname" />
         <TextBlock Grid.Row="6" Text="Motivation" />
-        <TextBox Name="Name" Grid.Row="1" />
-        <TextBox Name="Surname" Grid.Row="3" />
-        <TextBox Name="Motivation" Grid.Row="7" VerticalAlignment="Stretch" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" AcceptsReturn="True"/>
+        <TextBox Name="Name" Grid.Row="1" Text="{Binding Name}" />
+        <TextBox Name="Surname" Grid.Row="3" Text="{Binding Surname}" />
+        <TextBox Name="Motivation" Grid.Row="7" VerticalAlignment="Stretch" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" Text="{Binding Motivation}"/>
         <Grid Grid.Row="8">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -38,7 +38,7 @@
         </Grid>
 
         <TextBlock Text="Choose an expiration date"  Grid.Row="4" />
-        <DatePicker Name="ExpiryDate"  Grid.Row="5" FontSize="16" Height="40" VerticalContentAlignment="Center" VerticalAlignment="Center" Margin="5"/>
+        <DatePicker Name="DatePick"  Grid.Row="5" FontSize="16" Height="40" VerticalContentAlignment="Center" VerticalAlignment="Center" Margin="5"/>
     </Grid>
     <Window.Resources>
         <Style TargetType="TextBlock">

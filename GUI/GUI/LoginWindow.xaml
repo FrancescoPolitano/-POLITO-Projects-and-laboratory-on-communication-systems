@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:GUI"
         mc:Ignorable="d"
         Title="LoginWindow" Height="300" Width="350" FontSize="16" BorderThickness="0" GlowBrush="Black">
-    <Grid>
+    <Grid Background="AliceBlue">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
@@ -23,7 +23,7 @@
         </StackPanel>
         <StackPanel Grid.Row="3">
             <TextBlock FontSize="16" FontWeight="Bold" Text="Password"  VerticalAlignment="Center" Margin="5,0"/>
-            <PasswordBox />
+            <PasswordBox Margin="5"/>
         </StackPanel>
         <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>

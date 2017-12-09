@@ -22,7 +22,7 @@ namespace GUI
             string result = await this.ShowInputAsync("Changing Role", "Please choose a new role", new MetroDialogSettings());
             if (!string.IsNullOrEmpty(result))
             {
-                User.Role = result;
+                User.AuthLevel = result;
                 text.Text = result;
                 //    bool change = RestClient.RoleChange(User).Result;
                 //TODO aggiungere qualche cosa qua 

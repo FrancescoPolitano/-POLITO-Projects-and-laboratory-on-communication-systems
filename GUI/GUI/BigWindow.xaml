@@ -11,7 +11,7 @@
         >
     <TabControl Width="Auto">
         <TabItem Header="Management">
-            <Grid Background="Aqua">
+            <Grid Background="AliceBlue">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
@@ -28,7 +28,7 @@
             </Grid>
         </TabItem>
         <TabItem Header="Users">
-            <Grid Background="#FFEAEAEA">
+            <Grid Background="AliceBlue">
                 <ListView Name="Users" ItemsSource="{Binding UserList}" Width="Auto" Height="Auto" >
                     <ListView.ItemTemplate>
                         <DataTemplate>
@@ -42,7 +42,7 @@
                                 </Grid.ColumnDefinitions>
                                 <Ellipse Grid.Column ="0" Width="64" Height="64">
                                     <Ellipse.Fill>
-                                        <ImageBrush ImageSource="{Binding ImagePath}" Stretch="Fill" />
+                                        <ImageBrush ImageSource="{Binding PathPhoto}" Stretch="Fill" />
                                     </Ellipse.Fill>
                                 </Ellipse>
                                 <TextBlock Text="{Binding Name}" Grid.Column="1" Margin="3" VerticalAlignment="Center"/>

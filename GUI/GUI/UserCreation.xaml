@@ -8,7 +8,7 @@
         xmlns:local="clr-namespace:GUI"
         mc:Ignorable="d"
         Title="UserCreation" Height="450" Width="400">
-    <Grid Background="AliceBlue">
+    <Grid Name="myGrid" Background="AliceBlue" DataContext="User">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
@@ -26,22 +26,22 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Text="Name" />
-            <TextBox Name="Name" Grid.Row="1" FontSize="16"/>
+            <TextBox Name="Name" Grid.Row="1" FontSize="16" Text="{Binding Name}"/>
             <TextBlock  Grid.Row="2" Text="Surname"  />
-            <TextBox Name="Surname" Grid.Row="3" FontSize="16"/>
+            <TextBox Name="Surname" Grid.Row="3" FontSize="16" Text="{Binding Surname}"/>
         </Grid>
         <Grid Grid.Row="1" Grid.Column="0" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Text="Role" />
-            <TextBox Grid.Row="1"  Name="Role" />
+            <TextBlock Grid.Row="0" Text="Authorization Level" />
+            <TextBox Grid.Row="1"  Name="Role" Text="{Binding AuthLevel}" />
         </Grid>
         <Button Grid.Row="2" Grid.Column="0" Name="Confirm" Content="Confirm" Click="Confirm_Click" />
         <Button Grid.Row="2" Grid.Column="1" Name="Cancel" Content="Cancel" Click="Cancel_Click" />
         <Button Grid.Row="1" Grid.Column="1" Name="ChoosePic" Content="Choose a picture" Click="ChoosePic_Click" />
-        <Image Grid.Row="0" Grid.Column="1" Name="imageBox" Source="F:\Downloads\Farmer.png" Margin="10" />
+        <Image Grid.Row="0" Grid.Column="1" Name="imageBox" Source="{Binding PathPhoto}" Margin="10" />
     </Grid>
     <Window.Resources>
         <Style TargetType="Button" BasedOn="{StaticResource MetroButton}">

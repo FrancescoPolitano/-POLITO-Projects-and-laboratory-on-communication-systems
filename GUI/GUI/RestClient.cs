@@ -29,7 +29,19 @@ namespace GUI
         private static readonly HttpClient client = new HttpClient();
 
         //method for getting all users
-
+        public static async Task<List<User>> GetAllUsers()
+        {
+            string json = String.Empty;
+            HttpResponseMessage response =  client.GetAsync("http://192.168.1.171:8082/RestfulService/resources/users").Result;
+            if (response.IsSuccessStatusCode)
+            {
+                json = await response.Content.ReadAsStringAsync();
+                List<User> userList = new List<User>();
+                userList = JsonConvert.DeserializeObject<List<User>>(json);
+                return userList;
+            }
+            return null;
+        }
 
 
         //method to create a new user
@@ -37,7 +49,7 @@ namespace GUI
         {
             string json = JsonConvert.SerializeObject(u);
             var content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
-            HttpResponseMessage response =  await client.PostAsync("someuri", content );
+            HttpResponseMessage response =  await client.PostAsync("http://192.168.1.171:8082/RestfulService/createUsers", content );
             if (response.IsSuccessStatusCode)
                 return true;
             else
@@ -49,7 +61,7 @@ namespace GUI
         {
             string json = JsonConvert.SerializeObject(v);
             var content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync("someuri", content);
+            HttpResponseMessage response = await client.PostAsync("http://192.168.1.171:8082/RestfulService/createVisitors", content);
             if (response.IsSuccessStatusCode)
                 return true;
             else
@@ -57,11 +69,11 @@ namespace GUI
         }
 
         //TODO method to GET a list of users from the service
-        public static async Task<User> GetUsers()
+        public static async Task<User> GetSingleUser(string id)
         {
             //only works for 1 guy, how to get more than one?
             string json = String.Empty;
-            HttpResponseMessage response = await client.GetAsync("someuri");
+            HttpResponseMessage response = await client.GetAsync("http://192.168.1.171:8082/RestfulService/resources/users/"+id);
             if (response.IsSuccessStatusCode)
                 json = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<User>(json);

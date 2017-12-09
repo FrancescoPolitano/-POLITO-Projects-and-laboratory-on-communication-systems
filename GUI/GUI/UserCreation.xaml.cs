@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -23,9 +24,15 @@ namespace GUI
     /// </summary>
     public partial class UserCreation : MetroWindow
     {
+        User user = new User();
+
+        public User User { get => user; set => user = value; }
+
         public UserCreation()
         {
             InitializeComponent();
+            User.PathPhoto = "F:\\Downloads\\farmer.png";
+            myGrid.DataContext = User;
         }
 
         private async void Confirm_Click(object sender, RoutedEventArgs e)
@@ -48,16 +55,20 @@ namespace GUI
                 this.ShowModalMessageExternal("Ops", "Insert a valid role");
                 return;
             }
-            
 
-            User user = new User(Name.Text, Surname.Text, Role.Text, null,null);
+            BigWindow.UserList.Add(user);
             if (await RestClient.CreateUser(user))
             {
                 //stampare successo
+                System.Windows.MessageBox.Show("Successo");
+                Close();
+
             }
             else
             {
                 //stampare fallimento
+                System.Windows.MessageBox.Show("fallimento");
+                Close();
             }
         }
 
@@ -68,7 +79,19 @@ namespace GUI
 
         private void ChoosePic_Click(object sender, RoutedEventArgs e)
         {
+            // Create an instance of the open file dialog box.
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
 
+            // Set filter options and filter index.
+            openFileDialog1.Filter = "Images (*.png,*.jpg,*.jpeg) | *.png;*.jpg;*.jpeg |All Files (*.*)|*.*";
+            openFileDialog1.FilterIndex = 1;
+            openFileDialog1.Multiselect = false;
+
+            // Call the ShowDialog method to show the dialog box.
+            if ( openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                User.PathPhoto = openFileDialog1.FileName;
+            }
         }
     }
 }

@@ -3,15 +3,15 @@ package rest;
 import java.sql.Date;
 
 public class Visitor {
-	private String name, surname, notes;
-	private Date expirationDate;
+	private String name, surname, causal;
+	private String expiration;
 	
-	public Visitor(String name, String surname, String notes, Date expirationDate) {
-		super();
+	public Visitor(String name, String surname, String notes, String expiration) {
+		
 		this.name = name;
 		this.surname = surname;
-		this.notes = notes;
-		this.expirationDate = expirationDate;
+		this.causal = notes;
+		this.expiration = expiration;
 	}
 	public String getName() {
 		return name;
@@ -26,15 +26,15 @@ public class Visitor {
 		this.surname = surname;
 	}
 	public String getNotes() {
-		return notes;
+		return causal;
 	}
 	public void setNotes(String notes) {
-		this.notes = notes;
+		this.causal = notes;
 	}
-	public Date getExpirationDate() {
-		return expirationDate;
+	public String getExpirationDate() {
+		return expiration;
 	}
-	public void setExpirationDate(Date expirationDate) {
-		this.expirationDate = expirationDate;
+	public void setExpirationDate(String expiration) {
+		this.expiration = expiration;
 	}
 }

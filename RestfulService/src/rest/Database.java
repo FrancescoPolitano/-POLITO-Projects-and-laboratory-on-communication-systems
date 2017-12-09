@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Random;
@@ -184,8 +185,7 @@ public class Database {
 			if (conn != null) {
 				Statement stmt = (Statement) conn.createStatement();
 				String newCode = randomCodeGen();
-				stmt.executeUpdate(
-						"UPDATE auth SET Code='" + newCode + "' WHERE IdEmployee='" + id + "'");
+				stmt.executeUpdate("UPDATE auth SET Code='" + newCode + "' WHERE IdEmployee='" + id + "'");
 				return newCode;
 			}
 
@@ -207,5 +207,80 @@ public class Database {
 		}
 		return sb.toString();
 	}
+	
+	
+	
+	public static ArrayList<Local> getAllLocals(){
+		ArrayList<Local> locals = new ArrayList<Local>();
+		try {
+			if (conn != null) {
+				Statement stmt = (Statement) conn.createStatement();
+				stmt.executeQuery("SELECT * from locals");
+				ResultSet rs = stmt.getResultSet();
+				while (rs.next()) {
+					String id = rs.getString("Id");
+					String authGrade = rs.getString("AuthGrade");
+					String name = rs.getString("Name");
+					locals.add(new Local(id,name,authGrade));
+				}
+			}
+		} catch (SQLException ex) {
+			System.out.println("Error: access problem while loading!");
+			System.out.println("ECCEZIONE "+ex.getMessage());
+			return null;
+		}
+		return locals;
+	}
+	
+	public static String createVisitor(Visitor visitor)  {
+		String code = randomCodeGen();
+		Integer visitorId=null;
+		try {
 
+			if (conn != null) {
+				Statement stmt = (Statement) conn.createStatement();
+				stmt.executeUpdate("INSERT into visitors (Name, Surname, Causal, expiration) values" + " ('"
+						+ visitor.getName() + "', '" + visitor.getSurname() + "', '" + visitor.getNotes() + "', '"
+						+ visitor.getExpirationDate() + "')",  Statement.RETURN_GENERATED_KEYS);
+
+				try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+					if (generatedKeys.next()) {
+						visitorId = generatedKeys.getInt(1);
+
+						stmt.executeUpdate("INSERT into auth (IdEmployee, Code) values" + " ('" + visitorId + "', '"
+								+ code + "')");
+					}
+				} catch (SQLIntegrityConstraintViolationException ex) {
+					System.out.println(ex.getMessage());
+					code = randomCodeGen();
+					if(visitorId!=null)
+					stmt.executeUpdate(
+							"INSERT into auth (IdEmployee, Code) values" + " ('" + visitorId + "', '" + code + "')");
+				}
+			}
+			return code;
+
+		} catch ( SQLException ex) {
+			System.out.println(ex.getMessage());
+			return "error";
+		}
+
+	}
+	public static int createNewLocal(Local local) {
+		try {
+			if(conn != null) {
+				Statement stmt = (Statement) conn.createStatement();
+				stmt.executeUpdate("INSERT into locals (Id, AuthGrade, Name) values ('"+local.getIdLocal()+ "', '"+local.getAuthGrade()+"', '"+local.getName()+"' )");
+			}
+		}
+		catch(SQLIntegrityConstraintViolationException ex) {
+			System.out.println("SQLException "+ex.getMessage());
+			return -1;
+		}
+		catch(SQLException ex) {
+			System.out.println("SQLException "+ex.getMessage());
+			return -2;
+		}
+		return 0;
+	}
 }

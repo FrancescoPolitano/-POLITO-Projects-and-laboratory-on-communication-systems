@@ -1,20 +1,20 @@
 package rest;
 
 public class Local {
-	private char[] IdLocal;
-	private String name;
+
+	private String name, idLocal;
 	private String authGrade;
 	
-	public Local(char[] id,String name, String authGrade) {
-		this.IdLocal=id;
+	public Local(String id,String name, String authGrade) {
+		this.idLocal=id;
 		this.name=name;
 		this.authGrade=authGrade;
 	}
-	public char[] getIdLocal() {
-		return IdLocal;
+	public String getIdLocal() {
+		return idLocal;
 	}
-	public void setIdLocal(char[] idLocal) {
-		IdLocal = idLocal;
+	public void setIdLocal(String idLocal) {
+		idLocal = idLocal;
 	}
 	public String getName() {
 		return name;

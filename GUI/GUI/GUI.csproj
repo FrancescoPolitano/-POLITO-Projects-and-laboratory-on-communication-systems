@@ -67,6 +67,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="History.xaml.cs">
+      <DependentUpon>History.xaml</DependentUpon>
+    </Compile>
     <Compile Include="QRCode.xaml.cs">
       <DependentUpon>QRCode.xaml</DependentUpon>
     </Compile>
@@ -85,6 +88,10 @@
     <Compile Include="VisitorCreation.xaml.cs">
       <DependentUpon>VisitorCreation.xaml</DependentUpon>
     </Compile>
+    <Page Include="History.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="LoginWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

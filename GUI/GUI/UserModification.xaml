@@ -16,7 +16,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <TextBlock Name="text" Text="{Binding Surname, StringFormat='Modifying data for {0}'}" Grid.Row="0" />
-        <Button Grid.Row="1" Name="RoleChange" Content="Change role" Click="RoleChange_Click" />
+        <Button Grid.Row="1" Name="RoleChange" Content="Change Authorization Level" Click="RoleChange_Click" />
         <Button Grid.Row="2" Name="QRChange"  Content="Change QRCode" Click="QRChange_Click" />
         <Button Grid.Row="3" Name="BlockUser" Content="Block user" Click="BlockUser_Click" />
     </Grid>

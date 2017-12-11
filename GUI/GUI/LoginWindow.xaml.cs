@@ -27,8 +27,27 @@ namespace GUI
 
         private void Confirm_Click(object sender, RoutedEventArgs e)
         {
-            PageChange();
-            Close();
+            if (String.IsNullOrEmpty(username.Text))
+            {
+                errors.Text = "Username is empty";
+                return;
+            }
+            if (String.IsNullOrEmpty(password.Password))
+            {
+                errors.Text = "Password is empty";
+                return;
+            }
+
+            if (RestClient.Login(username.Text, password.Password).Result)
+            {
+                PageChange();
+                Close();
+            }
+            else
+            {
+                errors.Text = "Something is wrong, retry";
+                return;
+            }
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)

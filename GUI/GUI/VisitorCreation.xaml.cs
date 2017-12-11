@@ -65,19 +65,23 @@ namespace GUI
 
             //TODO capire perchè il binding non funziona bene
             myVisitor.ExpiryDate = DatePick.Text;
-
-            if (await RestClient.CreateVisitor(myVisitor))
-            {
-                //stampare successo
-                MessageBox.Show("Successo");
-                Close();
-            }
-            else
-            {
-                //stampare fallimento
-                MessageBox.Show("Fallimento");
-                Close();
-            }
+            //TODO questo va spostato quando ci sono le query
+            QRCode qr = new QRCode(@"F:\Downloads\qrcode.jpg");
+            qr.ShowDialog();
+            Close();
+            //if (await RestClient.CreateVisitor(myVisitor))
+            //{
+            //    //stampare successo
+            //    MessageBox.Show("Successo");
+            //    //Mostrare QR temporaneo
+            //    Close();
+            //}
+            //else
+            //{
+            //    //stampare fallimento
+            //    MessageBox.Show("Fallimento");
+            //    Close();
+            //}
 
 
         }

@@ -57,19 +57,23 @@ namespace GUI
             }
 
             BigWindow.UserList.Add(user);
-            if (await RestClient.CreateUser(user))
-            {
-                //stampare successo
-                System.Windows.MessageBox.Show("Successo");
-                Close();
+            QRCode qr = new QRCode(@"F:\Downloads\qrcode.jpg");
+            qr.ShowDialog();
+            Close();
+            //if (await RestClient.CreateUser(user))
+            //{
+            //    //stampare successo
+            //    System.Windows.MessageBox.Show("Successo");
+            //Mostrare QR temporaneo
+            //    Close();
 
-            }
-            else
-            {
-                //stampare fallimento
-                System.Windows.MessageBox.Show("fallimento");
-                Close();
-            }
+            //}
+            //else
+            //{
+            //    //stampare fallimento
+            //    System.Windows.MessageBox.Show("fallimento");
+            //    Close();
+            //}
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)

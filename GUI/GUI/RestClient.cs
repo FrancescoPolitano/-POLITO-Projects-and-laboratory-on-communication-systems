@@ -32,7 +32,8 @@ namespace GUI
         public static async Task<List<User>> GetAllUsers()
         {
             string json = String.Empty;
-            HttpResponseMessage response =  client.GetAsync("http://192.168.1.171:8082/RestfulService/resources/users").Result;
+            //TODO why this and not await?
+            HttpResponseMessage response =   client.GetAsync("http://192.168.1.171:8082/RestfulService/resources/users").Result;
             if (response.IsSuccessStatusCode)
             {
                 json = await response.Content.ReadAsStringAsync();
@@ -113,6 +114,20 @@ namespace GUI
                 return true;
             else
                 return false;
+        }
+
+
+        public static async Task<bool> Login(string username,string password)
+        {
+
+            HttpResponseMessage response = client.GetAsync("http://192.168.1.171:8082/RestfulService/login" + "/username=" + username + "password=" + password).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                string result = await response.Content.ReadAsStringAsync();
+                if (String.Compare(result, "OK") == 0)
+                    return true;
+            }
+            return false;
         }
 
         

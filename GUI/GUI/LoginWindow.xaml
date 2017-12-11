@@ -16,14 +16,14 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <TextBlock FontWeight="Bold" Grid.Row="0" Text="Welcome!" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        <TextBlock FontWeight="Bold" Grid.Row="1" Text="Please log in" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <TextBlock Name="errors" FontWeight="Bold" Grid.Row="1" Text="Please log in" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         <StackPanel Grid.Row="2">
             <TextBlock FontSize="16" FontWeight="Bold" Text="Username"  VerticalAlignment="Center" Margin="5,0" />
-            <TextBox />
+            <TextBox Name="username"/>
         </StackPanel>
         <StackPanel Grid.Row="3">
             <TextBlock FontSize="16" FontWeight="Bold" Text="Password"  VerticalAlignment="Center" Margin="5,0"/>
-            <PasswordBox Margin="5"/>
+            <PasswordBox Margin="5" Name="password"/>
         </StackPanel>
         <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>

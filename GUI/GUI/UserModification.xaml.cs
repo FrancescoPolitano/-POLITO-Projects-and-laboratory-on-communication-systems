@@ -19,7 +19,7 @@ namespace GUI
 
         private async void RoleChange_Click(object sender, RoutedEventArgs e)
         {
-            string result = await this.ShowInputAsync("Changing Role", "Please choose a new role", new MetroDialogSettings());
+            string result = await this.ShowInputAsync("Changing Authorization level", "Please insert a new Authorhization Level", new MetroDialogSettings());
             if (!string.IsNullOrEmpty(result))
             {
                 User.AuthLevel = result;
@@ -34,6 +34,9 @@ namespace GUI
         private void QRChange_Click(object sender, RoutedEventArgs e)
         {
             this.ShowModalMessageExternal("ChangingQRCode", "A new QRCode is being generated");
+            QRCode qr = new QRCode(@"F:\Downloads\qrcode.jpg");
+            qr.ShowDialog();
+            //TODO chiedere e mostrare QR nuovo
         }
 
         private void BlockUser_Click(object sender, RoutedEventArgs e)

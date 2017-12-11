@@ -20,8 +20,13 @@ namespace FEZ
 {
     public partial class Program
     {
+
+        private IPEndPoint remoteEP;
+        private Socket sockSender = null;
+
         void ProgramStarted()
         {
+            remoteEP = new IPEndPoint(IPAddress.Parse(Constants.IP_SERVER), Constants.PORT_TCP);
             Debug.Print("PROGRAM STARTED");
             camera.CameraConnected += Camera_CameraConnected;
             camera.CameraDisconnected += Camera_CameraDisconnected;
@@ -30,37 +35,29 @@ namespace FEZ
             ethernetJ11D.UseThisNetworkInterface();
             ethernetJ11D.NetworkUp += EthernetJ11D_NetworkUp;
             ethernetJ11D.NetworkDown += EthernetJ11D_NetworkDown;
-            new Thread(RunWebServer).Start();
+            new Thread(connectionChecking).Start();
         }
 
 
         private void Camera_PictureCaptured(Camera sender, GT.Picture e)
         {
-            Socket sockSender = null;
             try
             {
-                Debug.Print("PICTURE TAKEN");
                 byte[] image = e.PictureData;
                 Debug.Print("FOTO ACQUISITA");
                 int pictureSize = image.Length;
-                //Debug.Print("Send picture");
-                IPEndPoint remoteEP = new IPEndPoint(IPAddress.Parse(Constants.IP_SERVER), Constants.PORT_TCP);
-                sockSender = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                sockSender.Connect(remoteEP);
                 //TODO CHANGE
                 sockSender.ReceiveTimeout = 0;
                 sockSender.SendTimeout = 0;
                 int sent = 0, received = 0;
                 sent = sockSender.Send(BitConverter.GetBytes(pictureSize), 0, sizeof(int), SocketFlags.None);
                 sent = 0;
-                //TODO handle socket exception
                 Debug.Print("MANDO FOTO");
                 while (sent < pictureSize)
                 {
                     if (pictureSize - sent > Constants.PACKET_SIZE)
                         sent += sockSender.Send(image, sent, Constants.PACKET_SIZE, SocketFlags.None);
                     else sent += sockSender.Send(image, sent, pictureSize - sent, SocketFlags.None);
-                    Thread.Sleep(30);
                 }
                 Debug.Print("FOTO FINITA");
 
@@ -70,35 +67,57 @@ namespace FEZ
                 string responseString = new string(Encoding.UTF8.GetChars(responseFromServer));
                 if (String.Compare(responseString, Constants.ACCEPT) == 0)
                 {
-                    //TURN ON GREEN LIGHT
                     //Debug.Print("GREEN");
                     ledStrip.SetBitmask(3);
                 }
                 else if (String.Compare(responseString, Constants.REJECT) == 0)
                 {
-                    //TURN ON RED LIGHT
                     //Debug.Print("RED");
                 }
                 else if (String.Compare(responseString, Constants.NOCODE) == 0)
                 {
-                    //CONTINUE TO LOOP
                     //Debug.Print("NOQRCODE");
                     ledStrip.SetBitmask(96);
+                    Thread.Sleep(100);
+                    ledStrip.TurnAllLedsOff();
                 }
             }
             catch (SocketException ex)
             {
-                Debug.Print(ex.Message);
+                Debug.Print("Exception " + ex.Message);
                 sockSender.Close();
-                Camera_PictureCaptured(sender, e);
+                connectionChecking();
             }
-            sockSender.Close();
-
-            //Debug.Print("sent " + sent);
-            Thread.Sleep(300);
-            camera.TakePicture();
-            Thread.Sleep(300);
+            finally
+            {
+                Thread.Sleep(300);
+                if (camera.CameraReady)
+                    camera.TakePicture();
+            }
         }
+
+        private void connectionChecking()
+        {
+            while (ethernetJ11D.IsNetworkUp == false)
+            {
+                Debug.Print("Waiting...");
+                Thread.Sleep(1000);
+            }
+            while (!camera.CameraReady)
+            {
+                Debug.Print("CAMERA NOT READY");
+                Thread.Sleep(30);
+            }
+            sockSender = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            sockSender.Connect(remoteEP);
+            camera.TakePicture();
+        }
+
+
+
+
+
+
 
         private void Camera_CameraConnected(Camera sender, EventArgs e)
         {
@@ -110,15 +129,6 @@ namespace FEZ
             Debug.Print("Camera disconnessa");
         }
 
-        private void RunWebServer()
-        {
-            while (ethernetJ11D.IsNetworkUp == false)
-            {
-                Debug.Print("Waiting...");
-                Thread.Sleep(500);
-            }
-        }
-
         private void EthernetJ11D_NetworkDown(GTM.Module.NetworkModule sender, GTM.Module.NetworkModule.NetworkState state)
         {
             Debug.Print("Network is down!");
@@ -127,13 +137,6 @@ namespace FEZ
         private void EthernetJ11D_NetworkUp(GTM.Module.NetworkModule sender, GTM.Module.NetworkModule.NetworkState state)
         {
             Debug.Print("Network is up!");
-            while (!camera.CameraReady)
-            {
-                Debug.Print("SLEEP");
-                Thread.Sleep(30);
-            }
-            Debug.Print("READYYYYYYYYYYYY");
-            camera.TakePicture();
         }
     }
 }

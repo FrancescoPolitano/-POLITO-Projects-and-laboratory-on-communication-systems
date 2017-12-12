@@ -1,5 +1,9 @@
 package rest;
 
+/**
+ * Class that represents the relevant zones delimited by electronic doors
+ *
+ */
 public class Local {
 
 	private String name, idLocal;
@@ -14,7 +18,7 @@ public class Local {
 		return idLocal;
 	}
 	public void setIdLocal(String idLocal) {
-		idLocal = idLocal;
+		this.idLocal = idLocal;
 	}
 	public String getName() {
 		return name;

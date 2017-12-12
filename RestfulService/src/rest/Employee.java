@@ -1,14 +1,17 @@
 package rest;
 
+/**
+ * Class that represents an employee, his unique features and his last known position
+ *
+ */
 public class Employee {
 	private String name, surname, id , authLevel, currentPosition;
-	private String pathPhoto;
+	private String Photo;
 	private int serial;
 	
 	public Employee() {}
 	
 	public Employee(String name, String surname, String authLevel) {
-		this.serial=serial;
 		this.name=name;
 		this.surname=surname;
 		this.authLevel=authLevel;
@@ -46,12 +49,12 @@ public class Employee {
 		this.authLevel = authLevel;
 	}
 
-	public String getPathPhoto() {
-		return pathPhoto;
+	public String getPhoto() {
+		return Photo;
 	}
 
-	public void setPathPhoto(String pathPhoto) {
-		this.pathPhoto = pathPhoto;
+	public void setPhoto(String Photo) {
+		this.Photo = Photo;
 	}
 
 	public int getSerial() {

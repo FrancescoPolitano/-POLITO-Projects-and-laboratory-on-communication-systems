@@ -1,5 +1,6 @@
 package rest;
 
+import java.awt.image.BufferedImage;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -56,7 +57,6 @@ public class Database {
 		try {
 			if (conn != null) {
 				Statement stmt = (Statement) conn.createStatement();
-				// stmt.executeQuery("select a.* from employes a ");
 				stmt.executeQuery("SELECT e.*, l.Name, max(a.TimeS)\r\n" + "from employes e , locals l, accesses a \r\n"
 						+ "where a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal\r\n" + "GROUP BY e.SerialNumber");
 				ResultSet rs = stmt.getResultSet();
@@ -180,37 +180,26 @@ public class Database {
 	}
 
 	public static String newCode(String id) {
-
+		String image = null;
 		try {
 			if (conn != null) {
 				Statement stmt = (Statement) conn.createStatement();
-				String newCode = randomCodeGen();
+				String newCode = Utils.randomCodeGen();
 				stmt.executeUpdate("UPDATE auth SET Code='" + newCode + "' WHERE IdEmployee='" + id + "'");
-				return newCode;
+				image=Utils.writeQRCode(newCode);
+				return image;
 			}
 
 		} catch (SQLException ex) {
 			System.out.println(ex.getMessage());
 			return null;
 		}
-		return null;
+		return image;
 
 	}
 
-	private static String randomCodeGen() {
-		char[] chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
-		Random random = new Random();
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < 12; i++) {
-			char c = chars[random.nextInt(chars.length)];
-			sb.append(c);
-		}
-		return sb.toString();
-	}
-	
-	
-	
-	public static ArrayList<Local> getAllLocals(){
+
+	public static ArrayList<Local> getAllLocals() {
 		ArrayList<Local> locals = new ArrayList<Local>();
 		try {
 			if (conn != null) {
@@ -221,27 +210,27 @@ public class Database {
 					String id = rs.getString("Id");
 					String authGrade = rs.getString("AuthGrade");
 					String name = rs.getString("Name");
-					locals.add(new Local(id,name,authGrade));
+					locals.add(new Local(id, name, authGrade));
 				}
 			}
 		} catch (SQLException ex) {
 			System.out.println("Error: access problem while loading!");
-			System.out.println("ECCEZIONE "+ex.getMessage());
+			System.out.println("ECCEZIONE " + ex.getMessage());
 			return null;
 		}
 		return locals;
 	}
-	
-	public static String createVisitor(Visitor visitor)  {
-		String code = randomCodeGen();
-		Integer visitorId=null;
+
+	public static String createVisitor(Visitor visitor) {
+		String code = Utils.randomCodeGen();
+		Integer visitorId = null;
 		try {
 
 			if (conn != null) {
 				Statement stmt = (Statement) conn.createStatement();
 				stmt.executeUpdate("INSERT into visitors (Name, Surname, Causal, expiration) values" + " ('"
 						+ visitor.getName() + "', '" + visitor.getSurname() + "', '" + visitor.getNotes() + "', '"
-						+ visitor.getExpirationDate() + "')",  Statement.RETURN_GENERATED_KEYS);
+						+ visitor.getExpirationDate() + "')", Statement.RETURN_GENERATED_KEYS);
 
 				try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
 					if (generatedKeys.next()) {
@@ -252,35 +241,82 @@ public class Database {
 					}
 				} catch (SQLIntegrityConstraintViolationException ex) {
 					System.out.println(ex.getMessage());
-					code = randomCodeGen();
-					if(visitorId!=null)
-					stmt.executeUpdate(
-							"INSERT into auth (IdEmployee, Code) values" + " ('" + visitorId + "', '" + code + "')");
+					code = Utils.randomCodeGen();
+					if (visitorId != null)
+						stmt.executeUpdate("INSERT into auth (IdEmployee, Code) values" + " ('" + visitorId + "', '"
+								+ code + "')");
 				}
 			}
-			return code;
+			return 	Utils.writeQRCode(code);
 
-		} catch ( SQLException ex) {
+
+		} catch (SQLException ex) {
 			System.out.println(ex.getMessage());
 			return "error";
 		}
 
 	}
+
 	public static int createNewLocal(Local local) {
 		try {
-			if(conn != null) {
+			if (conn != null) {
 				Statement stmt = (Statement) conn.createStatement();
-				stmt.executeUpdate("INSERT into locals (Id, AuthGrade, Name) values ('"+local.getIdLocal()+ "', '"+local.getAuthGrade()+"', '"+local.getName()+"' )");
+				stmt.executeUpdate("INSERT into locals (Id, AuthGrade, Name) values ('" + local.getIdLocal() + "', '"
+						+ local.getAuthGrade() + "', '" + local.getName() + "' )");
 			}
-		}
-		catch(SQLIntegrityConstraintViolationException ex) {
-			System.out.println("SQLException "+ex.getMessage());
+		} catch (SQLIntegrityConstraintViolationException ex) {
+			System.out.println("SQLException " + ex.getMessage());
 			return -1;
-		}
-		catch(SQLException ex) {
-			System.out.println("SQLException "+ex.getMessage());
+		} catch (SQLException ex) {
+			System.out.println("SQLException " + ex.getMessage());
 			return -2;
 		}
 		return 0;
+	}
+
+	public static EmployeeResponseClass createEmployee(Employee temp) {
+		String code = Utils.randomCodeGen();
+		Integer employeeId = null;
+		try {
+
+			if (conn != null) {
+				Statement stmt = (Statement) conn.createStatement();
+				stmt.executeUpdate(
+						"INSERT into employes (Name, Surname, AuthGrade) values" + " ('" + temp.getName() + "', '"
+								+ temp.getSurname() + "', '" + temp.getAuthLevel() + "')",
+						Statement.RETURN_GENERATED_KEYS);
+
+				try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+					if (generatedKeys.next()) {
+						employeeId = generatedKeys.getInt(1);
+
+						stmt.executeUpdate("INSERT into auth (IdEmployee, Code) values" + " ('" + employeeId + "', '"
+								+ code + "')");
+						stmt.executeUpdate("INSERT into photos (IdEmployee, Photo) values" + " ('" + employeeId + "', '"
+								+ temp.getPhoto() + "')");
+					}
+				} catch (SQLIntegrityConstraintViolationException ex) {
+					System.out.println(ex.getMessage());
+					code = Utils.randomCodeGen();
+					if (employeeId != null)
+						stmt.executeUpdate("INSERT into auth (IdEmployee, Code) values" + " ('" + employeeId + "', '"
+								+ code + "')");
+				}
+
+				catch (SQLException ex) {
+					System.out.println(ex.getMessage());
+					return null;
+				}
+				if (employeeId != null) {
+					temp.setSerial(employeeId);
+				} else
+					return null;
+
+			}
+		} catch (SQLException ex) {
+			System.out.println(ex.getMessage());
+			return null;
+		}
+		return new EmployeeResponseClass(temp,Utils.writeQRCode(code));
 	}
 }

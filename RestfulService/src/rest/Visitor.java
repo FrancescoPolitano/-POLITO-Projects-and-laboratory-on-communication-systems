@@ -1,7 +1,10 @@
 package rest;
 
-import java.sql.Date;
 
+/**
+ * Class that wraps the entity "Visitor", a temporary host granted a QRcode for a short period
+ *
+ */
 public class Visitor {
 	private String name, surname, causal;
 	private String expiration;

@@ -12,8 +12,8 @@ public class Access {
 	private Timestamp time;
 	private Boolean result;
 	
-	
-	
+	public Access() {}
+
 	public Access(String employeeId, String employeeName, String employeeSurname, String localName, Timestamp time,
 			Boolean result) {
 		this.employeeId = employeeId;

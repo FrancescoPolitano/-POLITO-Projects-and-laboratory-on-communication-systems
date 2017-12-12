@@ -58,7 +58,7 @@ public class Resources {
 	@Path("users")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response newEmployee(String employee) throws SQLException {
-		Employee temp = new Gson().fromJson(employee, Employee.class);
+		EmployeeRequestClass temp = new Gson().fromJson(employee, EmployeeRequestClass.class);
 		EmployeeResponseClass newEmployee = Database.createEmployee(temp);
 		if (newEmployee == null)
 			return Response.status(801).entity("We're in big trubles").build();
@@ -135,7 +135,9 @@ public class Resources {
 	@Path("query")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response complexQuery(String parameters) throws SQLException {
-		
+		ComplexQuery query = new Gson().fromJson(parameters, ComplexQuery.class);
+
+		Database.makeQuery(query);
 	//TODO NON FA NIENTE
 		return Response.ok().build();
 	}

@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -184,9 +185,16 @@ public class Database {
 		try {
 			if (conn != null) {
 				Statement stmt = (Statement) conn.createStatement();
-				String newCode = Utils.randomCodeGen();
+				ResultSet rs;
+				String newCode;
+				do {
+					newCode = Utils.randomCodeGen();
+					stmt.executeQuery("SELECT COUNT(*) as total FROM auth WHERE Code='" + newCode + "'");
+					rs = stmt.getResultSet();
+					rs.first();
+				} while (rs.getInt("total") == 1);
 				stmt.executeUpdate("UPDATE auth SET Code='" + newCode + "' WHERE IdEmployee='" + id + "'");
-				image=Utils.writeQRCode(newCode);
+				image = Utils.writeQRCode(newCode);
 				return image;
 			}
 
@@ -197,7 +205,6 @@ public class Database {
 		return image;
 
 	}
-
 
 	public static ArrayList<Local> getAllLocals() {
 		ArrayList<Local> locals = new ArrayList<Local>();
@@ -222,7 +229,6 @@ public class Database {
 	}
 
 	public static String createVisitor(Visitor visitor) {
-		String code = Utils.randomCodeGen();
 		Integer visitorId = null;
 		try {
 
@@ -236,24 +242,26 @@ public class Database {
 					if (generatedKeys.next()) {
 						visitorId = generatedKeys.getInt(1);
 
+						ResultSet rs;
+						String code;
+						do {
+							code = Utils.randomCodeGen();
+							stmt.executeQuery("SELECT COUNT(*) as total FROM auth WHERE Code='" + code + "'");
+							rs = stmt.getResultSet();
+							rs.first();
+						} while (rs.getInt("total") == 1);
+
 						stmt.executeUpdate("INSERT into auth (IdEmployee, Code) values" + " ('" + visitorId + "', '"
 								+ code + "')");
 					}
-				} catch (SQLIntegrityConstraintViolationException ex) {
-					System.out.println(ex.getMessage());
-					code = Utils.randomCodeGen();
-					if (visitorId != null)
-						stmt.executeUpdate("INSERT into auth (IdEmployee, Code) values" + " ('" + visitorId + "', '"
-								+ code + "')");
 				}
+
 			}
-			return 	Utils.writeQRCode(code);
-
-
 		} catch (SQLException ex) {
 			System.out.println(ex.getMessage());
 			return "error";
 		}
+		return null;
 
 	}
 
@@ -274,41 +282,39 @@ public class Database {
 		return 0;
 	}
 
-	public static EmployeeResponseClass createEmployee(Employee temp) {
-		String code = Utils.randomCodeGen();
+	public static EmployeeResponseClass createEmployee(EmployeeRequestClass temp) {
 		Integer employeeId = null;
+		String code = null;
 		try {
 
 			if (conn != null) {
 				Statement stmt = (Statement) conn.createStatement();
-				stmt.executeUpdate(
-						"INSERT into employes (Name, Surname, AuthGrade) values" + " ('" + temp.getName() + "', '"
-								+ temp.getSurname() + "', '" + temp.getAuthLevel() + "')",
-						Statement.RETURN_GENERATED_KEYS);
+				stmt.executeUpdate("INSERT into employes (Name, Surname, AuthGrade) values" + " ('"
+						+ temp.getEmployee().getName() + "', '" + temp.getEmployee().getSurname() + "', '"
+						+ temp.getEmployee().getAuthLevel() + "')", Statement.RETURN_GENERATED_KEYS);
 
 				try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
 					if (generatedKeys.next()) {
 						employeeId = generatedKeys.getInt(1);
+						temp.employee.setPhoto(Utils.StoreEmployeePhoto(temp.getPhoto(), employeeId));
+
+						ResultSet rs;
+						do {
+							code = Utils.randomCodeGen();
+							stmt.executeQuery("SELECT COUNT(*) as total FROM auth WHERE Code='" + code + "'");
+							rs = stmt.getResultSet();
+							rs.first();
+						} while (rs.getInt("total") == 1);
 
 						stmt.executeUpdate("INSERT into auth (IdEmployee, Code) values" + " ('" + employeeId + "', '"
 								+ code + "')");
 						stmt.executeUpdate("INSERT into photos (IdEmployee, Photo) values" + " ('" + employeeId + "', '"
-								+ temp.getPhoto() + "')");
+								+ temp.getEmployee().getPhoto() + "')");
 					}
-				} catch (SQLIntegrityConstraintViolationException ex) {
-					System.out.println(ex.getMessage());
-					code = Utils.randomCodeGen();
-					if (employeeId != null)
-						stmt.executeUpdate("INSERT into auth (IdEmployee, Code) values" + " ('" + employeeId + "', '"
-								+ code + "')");
 				}
 
-				catch (SQLException ex) {
-					System.out.println(ex.getMessage());
-					return null;
-				}
 				if (employeeId != null) {
-					temp.setSerial(employeeId);
+					temp.getEmployee().setSerial(employeeId);
 				} else
 					return null;
 
@@ -317,6 +323,38 @@ public class Database {
 			System.out.println(ex.getMessage());
 			return null;
 		}
-		return new EmployeeResponseClass(temp,Utils.writeQRCode(code));
+
+		return new EmployeeResponseClass(temp.getEmployee(), Utils.writeQRCode(code));
+	}
+
+	public static ArrayList<Access> makeQuery(ComplexQuery query) {
+		ResultSet results;
+		ArrayList<Access> accessResults = new ArrayList<Access>();
+		try {
+			if (conn != null) {
+				Statement stmt = (Statement) conn.createStatement();
+				stmt.executeQuery(query.toValidSQLQuery());
+				results = stmt.getResultSet();
+
+				Access temp;
+
+				while (results.next()) {
+
+					temp = new Access();
+					temp.setEmployeeId(results.getString("e.SerialNumber"));
+					temp.setEmployeeName(results.getString("e.Name"));
+					temp.setEmployeeSurname(results.getString("e.Surname"));
+					temp.setLocalName(results.getString("l.Name"));
+					temp.setTime(results.getTimestamp("a.TimeS"));
+					temp.setResult(results.getBoolean("a.Result"));
+					accessResults.add(temp);
+
+				}
+			}
+		} catch (SQLException ex) {
+			System.out.println(ex.getMessage());
+			return null;
+		}
+		return accessResults;
 	}
 }

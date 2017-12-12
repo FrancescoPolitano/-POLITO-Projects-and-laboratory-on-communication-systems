@@ -23,10 +23,13 @@ namespace GUI
     /// </summary>
     public partial class History : MetroWindow
     {
-        private ObservableCollection<String> users = new ObservableCollection<string>();
-        private ObservableCollection<String> rooms = new ObservableCollection<string>();
-        private ObservableCollection<String> listUsers = new ObservableCollection<string>();
-        private ObservableCollection<String> listRooms = new ObservableCollection<string>();
+        private ObservableCollection<string> users = new ObservableCollection<string>();
+        private ObservableCollection<string> rooms = new ObservableCollection<string>();
+        private ObservableCollection<string> listUsers = new ObservableCollection<string>();
+        private ObservableCollection<string> listRooms = new ObservableCollection<string>();
+        private ObservableCollection<string> contenuto = new ObservableCollection<string>();
+
+        public ObservableCollection<string> Contenuto { get => contenuto; set => contenuto = value; }
 
         public History()
         {
@@ -50,44 +53,51 @@ namespace GUI
             Rooms.ItemsSource = rooms;
             SelectedEmployees.ItemsSource = listUsers;
             SelectedRooms.ItemsSource = listRooms;
+            listContent.ItemsSource = Contenuto;
         }
 
         private void Users_CLICK(object sender, MouseButtonEventArgs e)
         {
             StackPanel sp = sender as StackPanel;
             string utente = sp.DataContext.ToString();
+            if (listUsers.Contains(utente))
+                return;
             if (String.Compare(utente, "Tutti") == 0)
             {
                 listUsers.Clear();
                 listUsers.Add(utente);
+
             }
-            if (listUsers.Contains(utente))
-                return;
             else
             {
                 if (listUsers.Contains("Tutti"))
                     listUsers.Remove("Tutti");
                 listUsers.Add(sp.DataContext.ToString());
             }
+            requestData();
+
         }
 
         private void Room_click(object sender, MouseButtonEventArgs e)
         {
             StackPanel sp = sender as StackPanel;
             string stanza = sp.DataContext.ToString();
+            if (listRooms.Contains(stanza))
+                return;
             if (String.Compare(stanza, "Tutte") == 0)
             {
                 listRooms.Clear();
                 listRooms.Add(stanza);
             }
-            if (listRooms.Contains(stanza))
-                return;
+
             else
             {
                 if (listRooms.Contains("Tutte"))
                     listRooms.Remove("Tutte");
                 listRooms.Add(sp.DataContext.ToString());
             }
+            requestData();
+
         }
 
         private void MenuItem_Click_Employees(object sender, RoutedEventArgs e)
@@ -114,18 +124,15 @@ namespace GUI
 
         private void fromDate_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
-            DateTime t  = DateTime.MaxValue;
+            DateTime t = DateTime.MaxValue;
             t = toDate.SelectedDate ?? t;
             DateTime from = DateTime.MaxValue;
             from = fromDate.SelectedDate ?? from;
             if (DateTime.Compare(t, from) < 0)
-            {
                 this.ShowModalMessageExternal("Ops", "The \"from\" date cannot be after the \"to\" date");
-                if (DateTime.Compare(t, DateTime.MaxValue) == 0)
-                    fromDate.SelectedDate = DateTime.Now;
-                else
-                    fromDate.SelectedDate = t;
-            }
+            else
+                requestData();
+
 
         }
 
@@ -136,10 +143,32 @@ namespace GUI
             DateTime from = DateTime.MinValue;
             from = fromDate.SelectedDate ?? from;
             if (DateTime.Compare(t, from) < 0)
-            {
                 this.ShowModalMessageExternal("Ops", "The \"to\" date cannot be before the \"from\" date");
-                toDate.SelectedDate = DateTime.Now;
-            }
+            else
+                requestData();
+
+        }
+
+
+        private async void requestData()
+        {
+            List<String> result;
+            if (listRooms.Count == 0)
+                listRooms.Add("Tutte");
+            if (listUsers.Count == 0)
+                listUsers.Add("Tutti");
+            DateTime? t = null;
+            t = fromDate.SelectedDate ?? t;
+            DateTime? t1 = null;
+            t1 = toDate.SelectedDate ?? t1;
+            if (DateTime.Compare(t1 ?? DateTime.MinValue, t ?? DateTime.MinValue) < 0)
+                result = await RestClient.GetHistory(new List<string>(listUsers), new List<string>(listRooms), null, null);
+            else
+                result = await RestClient.GetHistory(new List<string>(listUsers), new List<string>(listRooms), t.ToString(), t1.ToString());
+            if (result != null)
+                foreach (string s in result)
+                    Contenuto.Add(s);
+            // Contenuto.Add("puppe selvagge");
         }
     }
 }

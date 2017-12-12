@@ -28,6 +28,7 @@ namespace GUI
         public QRCode(string path)
         {
             InitializeComponent();
+            //TODO capire se funziona uguale senza la variabile qua
             Path = path;
             myGrid.DataContext = Path;
         }

@@ -33,14 +33,20 @@ namespace GUI
 
         private void QRChange_Click(object sender, RoutedEventArgs e)
         {
-            this.ShowModalMessageExternal("ChangingQRCode", "A new QRCode is being generated");
-            QRCode qr = new QRCode(@"F:\Downloads\qrcode.jpg");
-            qr.ShowDialog();
             //TODO chiedere e mostrare QR nuovo
+            this.ShowModalMessageExternal("ChangingQRCode", "A new QRCode is being generated");
+            if (RestClient.QRCodeChange(user.Serial.ToString()))
+            {
+                QRCode qr = new QRCode(@"F:\Downloads\qrcode.jpg");
+                qr.ShowDialog();
+            }
+            else
+                this.ShowModalMessageExternal("Ops", "An error occurred while changing the code");
         }
 
         private void BlockUser_Click(object sender, RoutedEventArgs e)
         {
+            //TODO something with user ID and a date
             MessageBox.Show("Niente ancora non l'ho fatto");
         }
 

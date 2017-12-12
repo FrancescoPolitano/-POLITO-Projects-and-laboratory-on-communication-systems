@@ -80,10 +80,17 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Nome" Grid.Column="0" />
-                        <TextBlock Text="stanza" Grid.Column="1" />
-                        <TextBlock Text="accesso" Grid.Column="2" />
+
+                        <TextBlock Text="Id" Grid.Column="0" />
+                        <TextBlock Text="Nome" Grid.Column="1" />
+                        <TextBlock Text="Cognome" Grid.Column="2" />
+                        <TextBlock Text="stanza" Grid.Column="3" />
+                        <TextBlock Text="orario" Grid.Column="4" />
+                        <TextBlock Text="vero/falso" Grid.Column="5" />
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>

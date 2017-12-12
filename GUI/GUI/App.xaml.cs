@@ -17,12 +17,14 @@ namespace GUI
         UserCreation uc;
         VisitorCreation vc;
         public static List<User> userList = new List<User>();
+        public static List<Room> roomList = new List<Room>();
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             BigWindow.CreateUser += CreateUser;
             LoginWindow.PageChange += LoginWindow_PageChange;
-            //userList = RestClient.GetAllUsers().Result;
+            //userList = RestClient.GetAllUsers();
+            //roomList = RestClient.GetAllRooms();
             //if (userList != null)
             //    foreach (User user in userList)
             //        Console.WriteLine("nome {0} cognome {1} ruolo {2} serial {3} currentPosition {4}", user.Name, user.Surname, user.AuthLevel, user.Serial, user.CurrentPosition);

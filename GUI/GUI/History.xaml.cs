@@ -27,9 +27,9 @@ namespace GUI
         private ObservableCollection<string> rooms = new ObservableCollection<string>();
         private ObservableCollection<string> listUsers = new ObservableCollection<string>();
         private ObservableCollection<string> listRooms = new ObservableCollection<string>();
-        private ObservableCollection<string> contenuto = new ObservableCollection<string>();
+        private ObservableCollection<Access> contenuto = new ObservableCollection<Access>();
 
-        public ObservableCollection<string> Contenuto { get => contenuto; set => contenuto = value; }
+        public ObservableCollection<Access> Contenuto { get => contenuto; set => contenuto = value; }
 
         public History()
         {
@@ -37,12 +37,18 @@ namespace GUI
             CalendarDateRange cdr = new CalendarDateRange(DateTime.Today.AddDays(1), DateTime.MaxValue);
             fromDate.BlackoutDates.Add(cdr);
             toDate.BlackoutDates.Add(cdr);
+            if (App.userList != null)
+                foreach(User user in App.userList)
+                    users.Add(user.Name + " " + user.Surname + " " + user.Serial);
+            if (App.roomList != null)
+                foreach (Room room in App.roomList)
+                    rooms.Add(room.Name);
             users.Add("Tutti");
-            users.Add("Tremigliozzi 2");
-            users.Add("Palazzi 4");
-            users.Add("Politano 1");
-            users.Add("Nazzaro 5");
-            users.Add("Basile 9");
+            users.Add("Gianmaria Tremigliozzi 2");
+            users.Add("Cristiano Palazzi 4");
+            users.Add("Francesco Politano 1");
+            users.Add("Alfredo Nazzaro 5");
+            users.Add("Gabriele Basile 9");
             rooms.Add("Tutte");
             rooms.Add("Laboratorio");
             rooms.Add("Cancello");
@@ -152,23 +158,40 @@ namespace GUI
 
         private async void requestData()
         {
-            List<String> result;
+            List<Access> result;
             if (listRooms.Count == 0)
                 listRooms.Add("Tutte");
             if (listUsers.Count == 0)
                 listUsers.Add("Tutti");
-            DateTime? t = null;
-            t = fromDate.SelectedDate ?? t;
-            DateTime? t1 = null;
-            t1 = toDate.SelectedDate ?? t1;
-            if (DateTime.Compare(t1 ?? DateTime.MinValue, t ?? DateTime.MinValue) < 0)
-                result = await RestClient.GetHistory(new List<string>(listUsers), new List<string>(listRooms), null, null);
-            else
-                result = await RestClient.GetHistory(new List<string>(listUsers), new List<string>(listRooms), t.ToString(), t1.ToString());
+          
+            result =  RestClient.GetHistory(createArrays(fromDate.SelectedDate,toDate.SelectedDate));
             if (result != null)
-                foreach (string s in result)
-                    Contenuto.Add(s);
-            // Contenuto.Add("puppe selvagge");
+                foreach (Access acc in result)
+                    Contenuto.Add(acc);
+        }
+
+        private ComplexQuery createArrays(DateTime? t, DateTime? t1)
+        {
+            ComplexQuery qr = new ComplexQuery();
+            List<string> temp = new List<string>();
+            foreach (string st in listUsers)
+            {
+                if (String.IsNullOrEmpty(st))
+                    continue;
+                if (String.Compare(st, "Tutti") == 0)
+                {
+                    temp.Add(st);
+                    continue;
+                }
+                temp.Add(st.Substring(st.LastIndexOf(" ")));
+            }
+            qr.Users = temp;
+            qr.Rooms = new List<string>(listRooms);
+            if (t != null)
+                qr.Initial = t ?? DateTime.MinValue;
+            if (t1 != null)
+                qr.End = t1 ?? DateTime.MaxValue;
+            return qr;
         }
     }
 }

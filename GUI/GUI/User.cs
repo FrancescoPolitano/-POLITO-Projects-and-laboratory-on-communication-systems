@@ -15,17 +15,17 @@ namespace GUI
 
         public User() { }
 
-        public User(string name, string surname, string role, string curPos, string imgPath)
+        public User(string name, string surname, string level, string curPos, string imgPath)
         {
             Name = name;
             Surname = surname;
-            AuthLevel = role;
+            AuthLevel = level;
             if (!String.IsNullOrEmpty(imgPath))
                 PathPhoto = imgPath;
             CurrentPosition = curPos;
         }
 
-        public User(string name, string surname, string role, string curPos, string imgPath, int serial) : this(name, surname, role, curPos, imgPath)
+        public User(string name, string surname, string level, string curPos, string imgPath, int serial) : this(name, surname, level, curPos, imgPath)
         {
             Serial = serial;
         }

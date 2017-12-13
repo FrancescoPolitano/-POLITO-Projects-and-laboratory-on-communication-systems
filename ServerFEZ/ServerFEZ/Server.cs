@@ -6,12 +6,7 @@ using System.Drawing.Imaging;
 using ZXing;
 using System.Text;
 using System.IO;
-using Newtonsoft.Json;
 using System.Net.Http;
-using System.Threading.Tasks;
-using System.Net.Http.Headers;
-using System.Threading;
-using System.Diagnostics;
 
 namespace ServerFEZ
 {
@@ -67,14 +62,13 @@ namespace ServerFEZ
                     pictureSize = BitConverter.ToInt32(pictureByteSize, 0);
                     pictureData = new byte[pictureSize];
                     received = 0;
-                    int i = 0;
 
                     while (received < pictureSize)
                     {
                         if (pictureSize - received > Constants.PACKET_SIZE)
                             received += handler.Receive(pictureData, received, Constants.PACKET_SIZE, SocketFlags.None, out error);
                         else received += handler.Receive(pictureData, received, pictureSize - received, SocketFlags.None, out error);
-                        i++;
+
                         if (error != SocketError.Success)
                         {
                             Console.WriteLine("errore " + error.ToString());
@@ -83,9 +77,6 @@ namespace ServerFEZ
                         }
                     }
 
-                    Console.WriteLine("IIIIIIIIIIIII " + i);
-                    i = 0;
-
                     Console.WriteLine("PictureSize: {0},received {1} ", pictureSize, received);
 
                     Bitmap bitmap;
@@ -93,29 +84,30 @@ namespace ServerFEZ
                     bitmap = new Bitmap(ms);
 
                     byte[] responseToFEZ = new byte[Constants.EVALUATION.ACCEPT.ToString().Length];
-                    //var barcodeReader = new BarcodeReader();
-                    ////var barcodeBitmap = (Bitmap)Bitmap.FromFile(@"C:\Users\Cristiano\Desktop\jpeg.jpg");
 
-                    //var barcodeResult = barcodeReader.Decode(bitmap);
-                    //if (barcodeResult != null && barcodeResult.BarcodeFormat == BarcodeFormat.QR_CODE)
-                    //{
-                    //    HttpClient client = new HttpClient();
-                    //    HttpResponseMessage response = client.GetAsync("http://192.168.1.171:8082/RestfulService/resources/auth/" + Constants.DOOR_ID + "/" + barcodeResult.Text).Result;
-                    //    Console.WriteLine("RESPONSE CODE {0} ", response.StatusCode);
-                    //    if (response.IsSuccessStatusCode)
-                    //    {
-                    //        string str = response.Content.ReadAsStringAsync().Result;
-                    //        Console.WriteLine("str {0}", str);
-                    //        if (String.Compare(str, "true") == 0)
-                    //            responseToFEZ = Encoding.UTF8.GetBytes(Constants.EVALUATION.ACCEPT.ToString());
-                    //        else if (String.Compare(str, "true") == 0)
-                    //            responseToFEZ = Encoding.UTF8.GetBytes(Constants.EVALUATION.REJECT.ToString());
-                    //    }
-                    //    else responseToFEZ = Encoding.UTF8.GetBytes(Constants.EVALUATION.NOCODE.ToString());
-                    //}
-                    //else responseToFEZ = Encoding.UTF8.GetBytes(Constants.EVALUATION.NOCODE.ToString());
 
-                    responseToFEZ = Encoding.UTF8.GetBytes(Constants.EVALUATION.NOCODE.ToString());
+                    var barcodeReader = new BarcodeReader();
+                    //var barcodeBitmap = (Bitmap)Bitmap.FromFile(@"C:\Users\Cristiano\Desktop\jpeg.jpg");
+
+                    var barcodeResult = barcodeReader.Decode(bitmap);
+                    if (barcodeResult != null && barcodeResult.BarcodeFormat == BarcodeFormat.QR_CODE)
+                    {
+                        HttpClient client = new HttpClient();
+                        HttpResponseMessage response = client.GetAsync("http://192.168.1.171:8082/RestfulService/resources/auth/" + Constants.DOOR_ID + "/" + barcodeResult.Text).Result;
+                        Console.WriteLine("RESPONSE CODE {0} ", response.StatusCode);
+                        if (response.IsSuccessStatusCode)
+                        {
+                            string str = response.Content.ReadAsStringAsync().Result;
+                            Console.WriteLine("str {0}", str);
+                            if (String.Compare(str, "true") == 0)
+                                responseToFEZ = Encoding.UTF8.GetBytes(Constants.EVALUATION.ACCEPT.ToString());
+                            else if (String.Compare(str, "true") == 0)
+                                responseToFEZ = Encoding.UTF8.GetBytes(Constants.EVALUATION.REJECT.ToString());
+                        }
+                        else responseToFEZ = Encoding.UTF8.GetBytes(Constants.EVALUATION.NOCODE.ToString());
+                    }
+                    else responseToFEZ = Encoding.UTF8.GetBytes(Constants.EVALUATION.NOCODE.ToString());
+
                     //Console.WriteLine($"Decoded barcode text: {barcodeResult?.Text}");
                     //Console.WriteLine($"Barcode format: {barcodeResult?.BarcodeFormat}");
                     //responseToFEZ = Encoding.UTF8.GetBytes(Constants.EVALUATION.REJECT.ToString());
@@ -131,6 +123,7 @@ namespace ServerFEZ
                         return;
                     }
 
+                    bitmap.Save(@"C:\Users\Cristiano\Desktop\image.jpeg", ImageFormat.Jpeg);
                 }
                 catch (ArgumentException ae)
                 {
@@ -145,8 +138,6 @@ namespace ServerFEZ
                 }
 
             }
-            //Image x = (Bitmap)((new ImageConverter()).ConvertFrom(pictureData));
-            //x.Save(@"C:\Users\Cristiano\Desktop\image.jpeg", ImageFormat.Jpeg);
         }
 
         private IPEndPoint localEndPoint = null;

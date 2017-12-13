@@ -67,16 +67,14 @@ namespace FEZ
                 string responseString = new string(Encoding.UTF8.GetChars(responseFromServer));
                 if (String.Compare(responseString, Constants.ACCEPT) == 0)
                 {
-                    //Debug.Print("GREEN");
+                    //TODO CHANGE LED BEHAVIOUR
                     ledStrip.SetBitmask(3);
                 }
                 else if (String.Compare(responseString, Constants.REJECT) == 0)
                 {
-                    //Debug.Print("RED");
                 }
                 else if (String.Compare(responseString, Constants.NOCODE) == 0)
                 {
-                    //Debug.Print("NOQRCODE");
                     ledStrip.SetBitmask(96);
                     Thread.Sleep(100);
                     ledStrip.TurnAllLedsOff();
@@ -90,6 +88,7 @@ namespace FEZ
             }
             finally
             {
+                //TODO TUNING SLEEP
                 Thread.Sleep(300);
                 if (camera.CameraReady)
                     camera.TakePicture();
@@ -103,20 +102,32 @@ namespace FEZ
                 Debug.Print("Waiting...");
                 Thread.Sleep(1000);
             }
+
+
+            while (true)
+            {
+                sockSender = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                sockSender.Connect(remoteEP);
+                IPEndPoint ipEndPoint = sockSender.RemoteEndPoint as IPEndPoint;
+                if (String.Compare(ipEndPoint.Address.ToString(), remoteEP.Address.ToString()) == 0
+                    && ipEndPoint.Port == remoteEP.Port)
+                    break;
+                Debug.Print("ASPETTO IL SERVER");
+                sockSender.Close();
+                ledStrip.SetBitmask(28);
+                Thread.Sleep(30);
+            }
+
+            ledStrip.TurnAllLedsOff();
+
             while (!camera.CameraReady)
             {
                 Debug.Print("CAMERA NOT READY");
                 Thread.Sleep(30);
             }
-            sockSender = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            sockSender.Connect(remoteEP);
+
             camera.TakePicture();
         }
-
-
-
-
-
 
 
         private void Camera_CameraConnected(Camera sender, EventArgs e)

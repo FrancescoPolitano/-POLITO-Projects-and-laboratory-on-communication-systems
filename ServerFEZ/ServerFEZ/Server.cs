@@ -30,7 +30,7 @@ namespace ServerFEZ
             listener.Listen(1);
             while (true)
             {
-                Console.WriteLine("Waiting for picture...");
+                Console.WriteLine("Waiting for connection...");
                 Socket handler = listener.Accept();
                 Console.WriteLine("FEZ CONNECTED");
                 receiveFromFez(handler);
@@ -101,17 +101,15 @@ namespace ServerFEZ
                             Console.WriteLine("str {0}", str);
                             if (String.Compare(str, "true") == 0)
                                 responseToFEZ = Encoding.UTF8.GetBytes(Constants.EVALUATION.ACCEPT.ToString());
-                            else if (String.Compare(str, "true") == 0)
+                            else if (String.Compare(str, "false") == 0)
                                 responseToFEZ = Encoding.UTF8.GetBytes(Constants.EVALUATION.REJECT.ToString());
                         }
                         else responseToFEZ = Encoding.UTF8.GetBytes(Constants.EVALUATION.NOCODE.ToString());
                     }
                     else responseToFEZ = Encoding.UTF8.GetBytes(Constants.EVALUATION.NOCODE.ToString());
 
-                    //Console.WriteLine($"Decoded barcode text: {barcodeResult?.Text}");
-                    //Console.WriteLine($"Barcode format: {barcodeResult?.BarcodeFormat}");
-                    //responseToFEZ = Encoding.UTF8.GetBytes(Constants.EVALUATION.REJECT.ToString());
-                    //responseToFEZ = Encoding.UTF8.GetBytes(Constants.EVALUATION.NOCODE.ToString());
+                    Console.WriteLine($"Decoded barcode text: {barcodeResult?.Text}");
+                    Console.WriteLine($"Barcode format: {barcodeResult?.BarcodeFormat}");
 
 
                     sent = handler.Send(responseToFEZ, 0, responseToFEZ.Length, SocketFlags.None, out error);
@@ -125,16 +123,16 @@ namespace ServerFEZ
 
                     bitmap.Save(@"C:\Users\Cristiano\Desktop\image.jpeg", ImageFormat.Jpeg);
                 }
-                catch (ArgumentException ae)
-                {
-                    Console.WriteLine("errore " + ae.Message);
-                }
                 catch (SocketException s)
                 {
                     handler.Close();
                     Console.WriteLine("SOCKET CLOSED EXCEPTION");
                     Console.WriteLine("errore " + s.Message);
                     return;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("errore " + e.Message);
                 }
 
             }

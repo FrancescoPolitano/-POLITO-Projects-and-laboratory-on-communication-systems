@@ -60,30 +60,26 @@ namespace GUI
                 this.ShowModalMessageExternal("Ops", "Insert a valid expiryDate");
                 return;
             }
-               
-        
-
-            //TODO capire perchè il binding non funziona bene
-            myVisitor.ExpiryDate = DatePick.Text;
-            //TODO questo va spostato quando ci sono le query
-            QRCode qr = new QRCode(@"F:\Downloads\qrcode.jpg");
-            qr.ShowDialog();
-            Close();
-            //if (await RestClient.CreateVisitor(myVisitor))
-            //{
-            //    //stampare successo
-            //    MessageBox.Show("Successo");
-            //    //Mostrare QR temporaneo
-            //    Close();
-            //}
-            //else
-            //{
-            //    //stampare fallimento
-            //    MessageBox.Show("Fallimento");
-            //    Close();
-            //}
 
 
+            
+            myVisitor.Expiration = String.Format("{0:yyyy-MM-dd HH:mm:ss}", DatePick.SelectedDate);
+            Console.WriteLine("Puppe");
+            //TODO CHANGE : cambiare valore di ritorno, per prendere il path del QR code nuovo
+            string QRcodeNew = await RestClient.CreateVisitor(myVisitor);
+            if (!String.IsNullOrEmpty(QRcodeNew))
+            {
+                string urlll = Constants.IPREMOTE + QRcodeNew;
+                QRCode qr = new QRCode(urlll);
+                qr.ShowDialog();
+                Close();
+            }
+            else
+            {
+                //stampare fallimento
+                this.ShowModalMessageExternal("Ops", "Error while creating this visitor");
+                Close();
+            }
         }
 
         private void Cancel_Click_1(object sender, RoutedEventArgs e)

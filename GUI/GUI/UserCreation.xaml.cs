@@ -24,13 +24,14 @@ namespace GUI
     /// </summary>
     public partial class UserCreation : MetroWindow
     {
-        User user = new User();
+        Employee user = new Employee();
 
-        public User User { get => user; set => user = value; }
+        public Employee User { get => user; set => user = value; }
 
         public UserCreation()
         {
             InitializeComponent();
+            //TODO mettere un placeholder vero
             User.PathPhoto = "F:\\Downloads\\farmer.png";
             myGrid.DataContext = User;
         }
@@ -61,10 +62,8 @@ namespace GUI
                 this.ShowModalMessageExternal("Ops", "Error creating the user");
             else
             {
-                App.userList.Add(erc.User);
-                //TODO controllare se è passato per riferimento o per parametro
-                //BigWindow.UserList.Add(erc.User);
-                QRCode qr = new QRCode(erc.QrCodeString);
+                App.userList.Add(erc.Employee);
+                QRCode qr = new QRCode(Constants.IPREMOTE + erc.QrCodeString);
                 qr.ShowDialog();
             }
             Close();

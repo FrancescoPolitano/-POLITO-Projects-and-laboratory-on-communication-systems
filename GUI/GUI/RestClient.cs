@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using System.Windows;
 
 namespace GUI
 {
@@ -26,19 +28,20 @@ namespace GUI
         //    }
         //}
 
-        private static string myRest = "http://192.168.1.171:8082/RestfulService";
+        private static string myRest = Constants.myRest;
 
         private static readonly HttpClient client = new HttpClient();
 
         //method for getting all users
-        public static List<User> GetAllUsers()
+        public static List<Employee> GetAllUsers()
         {
             string json = String.Empty;
             //TODO why this and not await?
-            HttpResponseMessage response = client.GetAsync(myRest + "/resources/users").Result;
+            HttpResponseMessage response = client.GetAsync(myRest + "/users/employees").Result;
+
             if (response.IsSuccessStatusCode)
             {
-                return JsonConvert.DeserializeObject<List<User>>(response.Content.ReadAsStringAsync().Result);
+                return JsonConvert.DeserializeObject<List<Employee>>(response.Content.ReadAsStringAsync().Result);
             }
             return null;
         }
@@ -48,7 +51,7 @@ namespace GUI
         {
             string json = String.Empty;
             //TODO why this and not await? + CHANGE LOCALS WITH ROOMS
-            HttpResponseMessage response = client.GetAsync(myRest + "/resources/locals").Result;
+            HttpResponseMessage response = client.GetAsync(myRest + "/locals").Result;
             if (response.IsSuccessStatusCode)
             {
                 return JsonConvert.DeserializeObject<List<Room>>(response.Content.ReadAsStringAsync().Result);
@@ -58,15 +61,20 @@ namespace GUI
 
 
         //method to create a new user
-        public static EmployeeResponseClass CreateUser(User u)
+        public static EmployeeResponseClass CreateUser(Employee u)
         {
-            EmployeeRequestClass eRC = new EmployeeRequestClass();
-            eRC.User = u;
-            eRC.Photo = File.ReadAllBytes(u.PathPhoto);
+            EmployeeRequestClass eRC = new EmployeeRequestClass
+            {
+                Employee = u,
+                Photo = File.ReadAllBytes(u.PathPhoto)
+            };
 
             string json = JsonConvert.SerializeObject(eRC);
-            var content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = client.PostAsync(myRest + "/users", content).Result;
+            Console.WriteLine(json);
+
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = client.PostAsync(myRest + "/users/employees", content).Result;
             //TODO change the return parameter
             if (response.IsSuccessStatusCode)
                 return JsonConvert.DeserializeObject<EmployeeResponseClass>(response.Content.ReadAsStringAsync().Result);
@@ -74,46 +82,47 @@ namespace GUI
         }
 
         //method to create a visitor
-        public static async Task<bool> CreateVisitor(Visitor v)
+        //TODO test this
+        public static async Task<string> CreateVisitor(Visitor v)
         {
             string json = JsonConvert.SerializeObject(v);
-            var content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync(myRest + "/createVisitors", content);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PostAsync(myRest + "/users/visitors", content);
             if (response.IsSuccessStatusCode)
-                return true;
+                return response.Content.ReadAsStringAsync().Result;
             else
-                return false;
+                return String.Empty;
         }
 
         //TODO method to GET a list of users from the service
-        public static async Task<User> GetSingleUser(string id)
+        public static async Task<Employee> GetSingleUser(string id)
         {
             //only works for 1 guy, how to get more than one?
             string json = String.Empty;
-            HttpResponseMessage response = await client.GetAsync(myRest + "/resources/users/" + id);
+            HttpResponseMessage response = await client.GetAsync(myRest + "/users/" + id);
             if (response.IsSuccessStatusCode)
                 json = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<User>(json);
+            return JsonConvert.DeserializeObject<Employee>(json);
         }
 
         //method to block accesses from user 
-        public static async Task<bool> BlockAccess(User u)
+        public static async Task<bool> BlockAccess(Employee u)
         {
             string json = JsonConvert.SerializeObject(u);
-            var content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync(myRest + "/resources/users/block", content);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PostAsync(myRest + "/users/block", content);
             if (response.IsSuccessStatusCode)
                 return true;
             else
                 return false;
         }
-
+        //TODO chiedere la query corretta e il parametro da passare
         //method to ask for a change of role
-        public static async Task<bool> RoleChange(User u)
+        public static async Task<bool> RoleChange(Employee u)
         {
             string json = JsonConvert.SerializeObject(u);
-            var content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync(myRest + "/resources/users/changeRole", content);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await client.PostAsync(myRest + "/users/changeRole", content);
             if (response.IsSuccessStatusCode)
                 return true;
             else
@@ -121,15 +130,15 @@ namespace GUI
         }
 
         //method to ask for a change in QRcode
-        public static  bool QRCodeChange(string id)
+        public static string QRCodeChange(string id)
         {
-          
+
             var content = new StringContent(id, Encoding.UTF8, "application/json");
-            HttpResponseMessage response =  client.PostAsync(myRest + "/resources/users/new_code", content).Result;
+            HttpResponseMessage response = client.PostAsync(myRest + "/users/new_code", content).Result;
             if (response.IsSuccessStatusCode)
-                return true;
+                return response.Content.ReadAsStringAsync().Result;
             else
-                return false;
+                return String.Empty;
         }
 
 
@@ -150,8 +159,9 @@ namespace GUI
         public static List<Access> GetHistory(ComplexQuery q)
         {
             string json = JsonConvert.SerializeObject(q);
-            var content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = client.PostAsync(myRest + "/resources/query", content).Result;
+            Console.WriteLine(json);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = client.PostAsync(myRest + "/query", content).Result;
             if (response.IsSuccessStatusCode)
                 return JsonConvert.DeserializeObject<List<Access>>(response.Content.ReadAsStringAsync().Result);
             return null;

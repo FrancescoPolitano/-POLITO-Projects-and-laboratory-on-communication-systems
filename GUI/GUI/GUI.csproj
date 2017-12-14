@@ -70,7 +70,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Access.cs" />
+    <Compile Include="ByteArrayConverter.cs" />
     <Compile Include="ComplexQuery.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="EmployeeRequestClass.cs" />
     <Compile Include="EmployeeResponseClass.cs" />
     <Compile Include="History.xaml.cs">
@@ -87,7 +89,7 @@
       <DependentUpon>UserModification.xaml</DependentUpon>
     </Compile>
     <Compile Include="RestClient.cs" />
-    <Compile Include="User.cs" />
+    <Compile Include="Employee.cs" />
     <Compile Include="UserCreation.xaml.cs">
       <DependentUpon>UserCreation.xaml</DependentUpon>
     </Compile>

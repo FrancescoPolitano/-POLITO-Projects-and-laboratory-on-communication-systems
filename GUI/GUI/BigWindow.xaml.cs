@@ -31,15 +31,26 @@ namespace GUI
 
         public ObservableCollection<Access> Contenuto { get => contenuto; set => contenuto = value; }
 
-        public BigWindow()
+        public BigWindow(string UserType)
         {
             InitializeComponent();
-            UserList = new ObservableCollection<User>();
+            if (String.Compare(UserType,"ADMIN") != 0)
+            {
+                Management.Visibility = Visibility.Collapsed;
+                UserTab.Visibility = Visibility.Collapsed;
+                History.Visibility = Visibility.Collapsed;
+            }
+            UserList = new ObservableCollection<Employee>();
 
             if (App.userList != null)
             {
-                UserList = new ObservableCollection<User>(App.userList);
-                foreach (User user in App.userList)
+                UserList = new ObservableCollection<Employee>(App.userList);
+                UserList.Add(new Employee("Giorgio", "Mastrota", "ADMIN", "ACASA", "F:\\Downloads\\Farmer.png", 0));
+                UserList.Add(new Employee("Francesco", "Mastrota", "DOORMAN", "ACASA", "F:\\Downloads\\Farmer2.png", 9));
+                UserList.Add(new Employee("Piercarlo", "Mastrota", "USER", "ACASA", "F:\\Downloads\\Farmer.png", 11));
+                UserList.Add(new Employee("Antonio", "Mastrota", "USER", "ACASA", "F:\\Downloads\\Farmer2.png", 12));
+                UserList.Add(new Employee("Mirko", "Mastrota", "USER", "ACASA", "F:\\Downloads\\Farmer2.png", 13));
+                foreach (Employee user in UserList)
                     users.Add(user.Name + " " + user.Surname + " " + user.Serial);
             }
             CalendarDateRange cdr = new CalendarDateRange(DateTime.Today.AddDays(1), DateTime.MaxValue);
@@ -48,26 +59,13 @@ namespace GUI
             if (App.roomList != null)
                 foreach (Room room in App.roomList)
                     rooms.Add(room.Name);
-            UserList.Add(new User("Giorgio", "Mastrota", "ADMIN", "ACASA", "F:\\Downloads\\Farmer.png", 0));
-            UserList.Add(new User("Giorgio", "Mastrota", "DOORMAN", "ACASA", "F:\\Downloads\\Farmer2.png", 9));
-            UserList.Add(new User("Giorgio", "Mastrota", "USER", "ACASA", "F:\\Downloads\\Farmer.png", 11));
-            UserList.Add(new User("Giorgio", "Mastrota", "USER", "ACASA", "F:\\Downloads\\Farmer2.png", 12));
-            UserList.Add(new User("Giorgio", "Mastrota", "USER", "ACASA", "F:\\Downloads\\Farmer2.png", 13));
+           
             Users.ItemsSource = UserList;
 
-
+       
             users.Add("Tutti");
-            users.Add("Gianmaria Tremigliozzi 2");
-            users.Add("Cristiano Palazzi 4");
-            users.Add("Francesco Politano 1");
-            users.Add("Alfredo Nazzaro 5");
-            users.Add("Gabriele Basile 9");
             rooms.Add("Tutte");
-            rooms.Add("Laboratorio");
-            rooms.Add("Cancello");
-            rooms.Add("CEO ");
-            rooms.Add("Batalfonso");
-            rooms.Add("Ingresso");
+            
             Utenti.ItemsSource = users;
             Rooms.ItemsSource = rooms;
             SelectedEmployees.ItemsSource = listUsers;
@@ -75,8 +73,8 @@ namespace GUI
             listContent.ItemsSource = Contenuto;
         }
 
-        public static ObservableCollection<User> UserList { get => userList; set => userList = value; }
-        private static ObservableCollection<User> userList;
+        public static ObservableCollection<Employee> UserList { get => userList; set => userList = value; }
+        private static ObservableCollection<Employee> userList;
 
         private void newUser_Click(object sender, RoutedEventArgs e)
         {
@@ -95,7 +93,7 @@ namespace GUI
         private void Modify_User(object sender, RoutedEventArgs e)
         {
             Button b = sender as Button;
-            User u = b.DataContext as User;
+            Employee u = b.DataContext as Employee;
             UserModification uw = new UserModification(u);
             uw.Show();
 
@@ -106,7 +104,7 @@ namespace GUI
             var item = sender as ListViewItem;
             if (item != null)
             {
-                User user = item.DataContext as User;
+                Employee user = item.DataContext as Employee;
                 UserDetails uD = new UserDetails(user);
                 uD.ShowDialog();
 
@@ -240,13 +238,22 @@ namespace GUI
                     continue;
                 if (String.Compare(st, "Tutti") == 0)
                 {
-                    temp.Add(st);
+                    //qua ho cambiato, ora si manda vuoto se c'è solo TUTTI
                     continue;
                 }
                 temp.Add(st.Substring(st.LastIndexOf(" ")));
             }
             qr.Users = temp;
-            qr.Rooms = new List<string>(listRooms);
+            List<String> temp2 = new List<string>();
+            foreach(string st in listRooms)
+            {
+                //uguale a quello degli utenti, per non mandare TUTTE
+                if (String.Compare("Tutte", st) == 0)
+                    continue;
+                else
+                    temp2.Add(st);
+            }
+            qr.Rooms = temp;
             if (t != null)
                 qr.Initial = t ?? DateTime.MinValue;
             if (t1 != null)

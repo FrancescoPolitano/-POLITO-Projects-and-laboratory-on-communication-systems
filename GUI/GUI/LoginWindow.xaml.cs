@@ -38,16 +38,20 @@ namespace GUI
                 return;
             }
 
-            if (RestClient.Login(username.Text, password.Password).Result)
-            {
-                PageChange();
-                Close();
-            }
-            else
-            {
-                errors.Text = "Something is wrong, retry";
-                return;
-            }
+            //TODO temporary, while fixing login
+            PageChange("ADMIN");
+            Close();
+
+            //if (RestClient.Login(username.Text, password.Password).Result)
+            //{
+            //    PageChange();
+            //    Close();
+            //}
+            //else
+            //{
+            //    errors.Text = "Something is wrong, retry";
+            //    return;
+            //}
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
@@ -56,7 +60,7 @@ namespace GUI
         }
 
 
-        public delegate void myDelegate();
+        public delegate void myDelegate(string UserType);
         public static event myDelegate PageChange;
     }
 }

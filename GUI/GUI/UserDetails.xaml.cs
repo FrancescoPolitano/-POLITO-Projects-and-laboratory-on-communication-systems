@@ -19,8 +19,8 @@ namespace GUI
     /// </summary>
     public partial class UserDetails : Window
     {
-        private User user;
-        public UserDetails(User u)
+        private Employee user;
+        public UserDetails(Employee u)
         {
             InitializeComponent();
             User = u;
@@ -28,7 +28,7 @@ namespace GUI
             InnerGrid.DataContext = User;
         }
 
-        public User User { get => user; set => user = value; }
+        public Employee User { get => user; set => user = value; }
 
         private void History_Click(object sender, RoutedEventArgs e)
         {
@@ -38,7 +38,7 @@ namespace GUI
         private void modify_Click(object sender, RoutedEventArgs e)
         {
             Button b = sender as Button;
-            User u = b.DataContext as User;
+            Employee u = b.DataContext as Employee;
             UserModification uw = new UserModification(u);
             uw.ShowDialog();
         }

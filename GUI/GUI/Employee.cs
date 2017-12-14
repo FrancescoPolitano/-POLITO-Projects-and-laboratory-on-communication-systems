@@ -8,24 +8,28 @@ using System.Windows.Media.Imaging;
 
 namespace GUI
 {
-    public class User : INotifyPropertyChanged
+    public class Employee : INotifyPropertyChanged
     {
         String name, surname, authLevel, currentPosition, pathPhoto;
         private int serial;
 
-        public User() { }
+        public Employee() { }
 
-        public User(string name, string surname, string level, string curPos, string imgPath)
+        public Employee (string name,string surname,string level)
         {
             Name = name;
             Surname = surname;
             AuthLevel = level;
+        }
+
+        public Employee(string name, string surname, string level, string curPos, string imgPath) : this(name,surname,level)
+        {
             if (!String.IsNullOrEmpty(imgPath))
                 PathPhoto = imgPath;
             CurrentPosition = curPos;
         }
 
-        public User(string name, string surname, string level, string curPos, string imgPath, int serial) : this(name, surname, level, curPos, imgPath)
+        public Employee(string name, string surname, string level, string curPos, string imgPath, int serial) : this(name, surname, level, curPos, imgPath)
         {
             Serial = serial;
         }

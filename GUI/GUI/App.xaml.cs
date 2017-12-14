@@ -16,23 +16,20 @@ namespace GUI
         BigWindow mw;
         UserCreation uc;
         VisitorCreation vc;
-        public static List<User> userList = new List<User>();
+        public static List<Employee> userList = new List<Employee>();
         public static List<Room> roomList = new List<Room>();
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             BigWindow.CreateUser += CreateUser;
             LoginWindow.PageChange += LoginWindow_PageChange;
-            //userList = RestClient.GetAllUsers();
-            //roomList = RestClient.GetAllRooms();
-            //if (userList != null)
-            //    foreach (User user in userList)
-            //        Console.WriteLine("nome {0} cognome {1} ruolo {2} serial {3} currentPosition {4}", user.Name, user.Surname, user.AuthLevel, user.Serial, user.CurrentPosition);
+            userList = RestClient.GetAllUsers();
+            roomList = RestClient.GetAllRooms();
         }
 
-        private void LoginWindow_PageChange()
+        private void LoginWindow_PageChange(string UserType)
         {
-            mw = new BigWindow();
+            mw = new BigWindow( UserType);
             mw.Show();
         }
 

@@ -10,24 +10,16 @@
         Title="MainWindow" Height="450" Width="600" BorderThickness="0" GlowBrush="Black"
         >
     <TabControl Width="Auto">
-        <TabItem Header="Management">
-            <Grid Background="AliceBlue">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Button Name="newUser" Content="Create new User"  Height="60" Width="200" HorizontalAlignment="Center" VerticalAlignment="Center" Click="newUser_Click"/>
-                <Button Name="newVisitor" Grid.Row="1" Content="Create new visitor" Height="60" Width="200" HorizontalAlignment="Center" VerticalAlignment="Center" Click="newVisitor_Click"/>
-            </Grid>
-        </TabItem>
-        <TabItem Header="Planimetry">
+        <TabItem Header="Planimetry" Name="Planimetry">
             <Grid >
                 <Grid.Background>
                     <ImageBrush ImageSource="F:\Downloads\planimetry.jpg" Stretch="UniformToFill"/>
                 </Grid.Background>
             </Grid>
         </TabItem>
-        <TabItem Header="Users">
+      
+     
+        <TabItem Header="Users" Name="UserTab">
             <Grid Background="AliceBlue">
                 <ListView Name="Users" ItemsSource="{Binding UserList}" Width="Auto" Height="Auto" >
                     <ListView.ItemTemplate>
@@ -64,7 +56,7 @@
                 </ListView>
             </Grid>
         </TabItem>
-        <TabItem Header="History" >
+        <TabItem Header="History" Name="History">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
@@ -158,6 +150,16 @@
                         <Setter Property="IsReadOnly" Value="true" />
                     </Style>
             </Grid.Resources>
+            </Grid>
+        </TabItem>
+        <TabItem Header="Management" Name="Management">
+            <Grid Background="AliceBlue">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Button Name="newUser" Content="Create new User"  Height="60" Width="200" HorizontalAlignment="Center" VerticalAlignment="Center" Click="newUser_Click"/>
+                <Button Name="newVisitor" Grid.Row="1" Content="Create new visitor" Height="60" Width="200" HorizontalAlignment="Center" VerticalAlignment="Center" Click="newVisitor_Click"/>
             </Grid>
         </TabItem>
     </TabControl>

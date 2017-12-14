@@ -38,7 +38,7 @@ namespace GUI
             fromDate.BlackoutDates.Add(cdr);
             toDate.BlackoutDates.Add(cdr);
             if (App.userList != null)
-                foreach(User user in App.userList)
+                foreach(Employee user in App.userList)
                     users.Add(user.Name + " " + user.Surname + " " + user.Serial);
             if (App.roomList != null)
                 foreach (Room room in App.roomList)

@@ -27,7 +27,7 @@
         <TextBlock Grid.Row="6" Text="Motivation" />
         <TextBox Name="Name" Grid.Row="1" Text="{Binding Name}" />
         <TextBox Name="Surname" Grid.Row="3" Text="{Binding Surname}" />
-        <TextBox Name="Motivation" Grid.Row="7" VerticalAlignment="Stretch" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" Text="{Binding Motivation}"/>
+        <TextBox Name="Motivation" Grid.Row="7" VerticalAlignment="Stretch" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" Text="{Binding Causal}"/>
         <Grid Grid.Row="8">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />

@@ -30,18 +30,28 @@ public class Resources {
 
 	// returns all the employes
 	@GET
-	@Path("users")
+	@Path("users/employees")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response sendAllEmployes() {
 		Gson gson = new Gson();
 		String Json = gson.toJson(Database.getAllEmployes());
 		if (Json == null)
+			return Response.status(801).entity("Something goes wrong").build();
+		return Response.ok(Json, MediaType.APPLICATION_JSON).build();
+
+	}
+	@GET
+	@Path("users/visitors")
+	@Produces(MediaType.TEXT_PLAIN)
+	public Response sendAllVisitors() {
+		Gson gson = new Gson();
+		String Json = gson.toJson(Database.getAllVisitors());
+		if (Json == null)
 			return Response.status(801).entity("We're in big trubles").build();
 		return Response.ok(Json, MediaType.APPLICATION_JSON).build();
 
 	}
-
-	// returns the employee related to the chosen id
+	// returns the employee related to the chosen id    
 	@GET
 	@Path("users/{id}")
 	@Produces(MediaType.TEXT_PLAIN)
@@ -53,12 +63,15 @@ public class Resources {
 		return Response.ok(Json, MediaType.APPLICATION_JSON).build();
 	}
 
-	// create a new employee and return the user and the QRcode
+	// create a new employee and return the user and the QRcode   (not working)
 	@POST
-	@Path("users")
+	@Path("users/employee")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response newEmployee(String employee) throws SQLException {
-		Employee temp = new Gson().fromJson(employee, Employee.class);
+		EmployeeRequestClass temp = new Gson().fromJson(employee, EmployeeRequestClass.class);
+		if (temp.getEmployee() == null)
+			return Response.status(802).entity("Fucking bugged").build();
+
 		EmployeeResponseClass newEmployee = Database.createEmployee(temp);
 		if (newEmployee == null)
 			return Response.status(801).entity("We're in big trubles").build();
@@ -79,7 +92,7 @@ public class Resources {
 	// create a temporary user and grant him the lowest level of permission, returns
 	// the user as a json
 	@POST
-	@Path("auth/visitor")
+	@Path("users/visitors")
 	public Response newVisitor(String visitor) {
 		rest.Visitor temp = new Gson().fromJson(visitor, rest.Visitor.class);
 		// TODO return the qrcode image
@@ -135,8 +148,12 @@ public class Resources {
 	@Path("query")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response complexQuery(String parameters) throws SQLException {
-		
-	//TODO NON FA NIENTE
-		return Response.ok().build();
+		ComplexQuery query = new Gson().fromJson(parameters, ComplexQuery.class);
+		Gson gson = new Gson();
+		String Json = gson.toJson(Database.makeQuery(query));
+		if (Json == null)
+			return Response.status(801).entity("Some Problem occurred").build();
+
+		return Response.ok(Json, MediaType.APPLICATION_JSON).build();
 	}
 }

@@ -1,9 +1,12 @@
 package rest;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Base64;
 import java.util.Hashtable;
 import java.util.Random;
 
@@ -45,7 +48,8 @@ public class Utils {
 	 * Creates the qrCode and store it into the filesystem
 	 *
 	 */
-	public static String writeQRCode(String data) {
+	public static String writeQRCode(String data, String UserId) {
+
 		// get a byte matrix for the data
 		ByteMatrix matrix;
 		com.google.zxing.Writer writer = new QRCodeWriter();
@@ -76,7 +80,7 @@ public class Utils {
 
 		// write the image to the output stream
 		FileOutputStream fos = null;
-		String URI= "C:\\Users\\franc\\Desktop\\ServerData\\"+data+".jpg";
+		String URI= "C:\\Users\\franc\\Desktop\\ServerData\\"+UserId+".jpg";
 		String URL= "/images/"+data+".jpg";
 		try {
 			fos = new FileOutputStream(URI);
@@ -93,5 +97,35 @@ public class Utils {
 		
 		return URL;
 		
+	}
+
+	public static String StoreEmployeePhoto(byte[] fileContent, String id ) {
+		BufferedImage img;
+		String URL= "/images/profiles/"+id+".jpg";
+		//Converto il byte array in una buffered image
+		 ByteArrayInputStream bais = new ByteArrayInputStream(fileContent);
+		    try {
+		         img= ImageIO.read(bais);
+		    } catch (IOException e) {
+		        throw new RuntimeException(e);
+		    }
+
+		FileOutputStream fos = null;
+		String URI= "C:\\Users\\franc\\Desktop\\ServerData\\profiles\\"+id+".jpg";
+		try {
+			fos = new FileOutputStream(URI);
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			ImageIO.write(img, "png", fos);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return URL;
+				
 	}
 }

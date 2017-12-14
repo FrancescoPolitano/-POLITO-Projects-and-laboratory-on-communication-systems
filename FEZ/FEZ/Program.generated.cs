@@ -24,9 +24,6 @@ namespace FEZ {
         /// <summary>The Camera module using socket 3 of the mainboard.</summary>
         private Gadgeteer.Modules.GHIElectronics.Camera camera;
         
-        /// <summary>The Button module using socket 14 of the mainboard.</summary>
-        private Gadgeteer.Modules.GHIElectronics.Button button;
-        
         /// <summary>The LED Strip module using socket 12 of the mainboard.</summary>
         private Gadgeteer.Modules.GHIElectronics.LEDStrip ledStrip;
         
@@ -55,7 +52,6 @@ namespace FEZ {
             this.usbClientEDP = new GTM.GHIElectronics.USBClientEDP(1);
             this.camera = new GTM.GHIElectronics.Camera(3);
             this.ethernetJ11D = new GTM.GHIElectronics.EthernetJ11D(7);
-            this.button = new GTM.GHIElectronics.Button(14);
             this.ledStrip = new GTM.GHIElectronics.LEDStrip(12);
         }
     }

@@ -20,10 +20,14 @@ namespace FEZ
 {
     public partial class Program
     {
-        //TODO remove button
+
+        private IPEndPoint remoteEP;
+        private Socket sockSender = null;
+
         void ProgramStarted()
         {
-            Debug.Print("PROGRAM_STARTEDDDDDDDDDDDDDDDDDDD");
+            remoteEP = new IPEndPoint(IPAddress.Parse(Constants.IP_SERVER), Constants.PORT_TCP);
+            Debug.Print("PROGRAM STARTED");
             camera.CameraConnected += Camera_CameraConnected;
             camera.CameraDisconnected += Camera_CameraDisconnected;
             camera.PictureCaptured += Camera_PictureCaptured;
@@ -31,71 +35,100 @@ namespace FEZ
             ethernetJ11D.UseThisNetworkInterface();
             ethernetJ11D.NetworkUp += EthernetJ11D_NetworkUp;
             ethernetJ11D.NetworkDown += EthernetJ11D_NetworkDown;
-            button.ButtonPressed += Button_ButtonPressed;
-            new Thread(RunWebServer).Start();
-
+            new Thread(connectionChecking).Start();
         }
 
 
         private void Camera_PictureCaptured(Camera sender, GT.Picture e)
         {
-            byte[] image = e.PictureData;
-            int pictureSize = image.Length;
-            Debug.Print("Send picture");
-            IPEndPoint remoteEP = new IPEndPoint(IPAddress.Parse(Constants.IP_SERVER), Constants.PORT_TCP);
-            Socket sockSender = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            sockSender.Connect(remoteEP);
-            //TODO CHANGE
-            sockSender.ReceiveTimeout = 0;
-            sockSender.SendTimeout = 0;
-            int sent = 0, received = 0;
-            sent = sockSender.Send(BitConverter.GetBytes(pictureSize), 0, sizeof(int), SocketFlags.None);
-            sent = 0;
-            //TODO handle socket exception
-            while (sent < pictureSize)
+            try
             {
-                if (pictureSize - sent > Constants.PACKET_SIZE)
-                    sent += sockSender.Send(image, sent, Constants.PACKET_SIZE, SocketFlags.None);
-                else sent += sockSender.Send(image, sent, pictureSize - sent, SocketFlags.None);
+                byte[] image = e.PictureData;
+                Debug.Print("FOTO ACQUISITA");
+                int pictureSize = image.Length;
+                //TODO CHANGE
+                sockSender.ReceiveTimeout = 0;
+                sockSender.SendTimeout = 0;
+                int sent = 0, received = 0;
+                sent = sockSender.Send(BitConverter.GetBytes(pictureSize), 0, sizeof(int), SocketFlags.None);
+                sent = 0;
+                Debug.Print("MANDO FOTO");
+                while (sent < pictureSize)
+                {
+                    if (pictureSize - sent > Constants.PACKET_SIZE)
+                        sent += sockSender.Send(image, sent, Constants.PACKET_SIZE, SocketFlags.None);
+                    else sent += sockSender.Send(image, sent, pictureSize - sent, SocketFlags.None);
+                }
+                Debug.Print("FOTO FINITA");
+
+                byte[] responseFromServer = new byte[Constants.ACCEPT.Length];
+                received = sockSender.Receive(responseFromServer, 0, responseFromServer.Length, SocketFlags.None);
+                Debug.Print("RECEIVED FROM SERVER");
+                string responseString = new string(Encoding.UTF8.GetChars(responseFromServer));
+                if (String.Compare(responseString, Constants.ACCEPT) == 0)
+                {
+                    //TODO CHANGE LED BEHAVIOUR
+                    ledStrip.SetBitmask(3);
+                }
+                else if (String.Compare(responseString, Constants.REJECT) == 0)
+                {
+                }
+                else if (String.Compare(responseString, Constants.NOCODE) == 0)
+                {
+                    ledStrip.SetBitmask(96);
+                    Thread.Sleep(100);
+                    ledStrip.TurnAllLedsOff();
+                }
+            }
+            catch (SocketException ex)
+            {
+                Debug.Print("Exception " + ex.Message);
+                sockSender.Close();
+                connectionChecking();
+            }
+            finally
+            {
+                //TODO TUNING SLEEP
+                Thread.Sleep(300);
+                if (camera.CameraReady)
+                    camera.TakePicture();
+            }
+        }
+
+        private void connectionChecking()
+        {
+            while (ethernetJ11D.IsNetworkUp == false)
+            {
+                Debug.Print("Waiting...");
+                Thread.Sleep(1000);
             }
 
-            byte[] responseFromServer = new byte[Constants.ACCEPT.Length];
-            received = sockSender.Receive(responseFromServer, 0, responseFromServer.Length, SocketFlags.None);
 
-            string responseString = new string(Encoding.UTF8.GetChars(responseFromServer));
-            if (String.Compare(responseString, Constants.ACCEPT) == 0)
+            while (true)
             {
-                //TURN ON GREEN LIGHT
-                Debug.Print("GREEN");
-                ledStrip.SetBitmask(3);
-            }
-            else if (String.Compare(responseString, Constants.REJECT) == 0)
-            {
-                //TURN ON RED LIGHT
-                Debug.Print("RED");
-            }
-            else if (String.Compare(responseString, Constants.NOCODE) == 0)
-            {
-                //CONTINUE TO LOOP
-                Debug.Print("NOQRCODE");
-                ledStrip.SetBitmask(96);
+                sockSender = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                sockSender.Connect(remoteEP);
+                IPEndPoint ipEndPoint = sockSender.RemoteEndPoint as IPEndPoint;
+                if (String.Compare(ipEndPoint.Address.ToString(), remoteEP.Address.ToString()) == 0
+                    && ipEndPoint.Port == remoteEP.Port)
+                    break;
+                Debug.Print("ASPETTO IL SERVER");
+                sockSender.Close();
+                ledStrip.SetBitmask(28);
+                Thread.Sleep(30);
             }
 
-            sockSender.Close();
-            Debug.Print("sent " + sent);
-            Thread.Sleep(500);
+            ledStrip.TurnAllLedsOff();
+
+            while (!camera.CameraReady)
+            {
+                Debug.Print("CAMERA NOT READY");
+                Thread.Sleep(30);
+            }
+
             camera.TakePicture();
         }
 
-        private void Button_ButtonPressed(Button sender, Button.ButtonState state)
-        {
-            if (camera.CameraReady)
-            {
-                Debug.Print("CAMERA READY");
-                camera.TakePicture();
-            }
-            else Debug.Print("CAMERA NOT READY");
-        }
 
         private void Camera_CameraConnected(Camera sender, EventArgs e)
         {
@@ -107,15 +140,6 @@ namespace FEZ
             Debug.Print("Camera disconnessa");
         }
 
-        private void RunWebServer()
-        {
-            while (ethernetJ11D.IsNetworkUp == false)
-            {
-                Debug.Print("Waiting...");
-                Thread.Sleep(1000);
-            }
-        }
-
         private void EthernetJ11D_NetworkDown(GTM.Module.NetworkModule sender, GTM.Module.NetworkModule.NetworkState state)
         {
             Debug.Print("Network is down!");
@@ -124,20 +148,6 @@ namespace FEZ
         private void EthernetJ11D_NetworkUp(GTM.Module.NetworkModule sender, GTM.Module.NetworkModule.NetworkState state)
         {
             Debug.Print("Network is up!");
-            Thread.Sleep(500);
-            while (!camera.CameraReady)
-            {
-                Debug.Print("dormo un po'");
-                Thread.Sleep(30);
-            }
-            Debug.Print("READYYYYYYYYYYYY");
-            camera.TakePicture();
-
-        }
-
-        private void disconnected(GHI.Usb.Host.BaseDevice.DisconnectedEventHandler d, Microsoft.SPOT.EventArgs e)
-        {
-            Debug.Print("DEVICE DISCONNECTED");
         }
     }
 }

@@ -59,31 +59,79 @@ public class Database {
 			if (conn != null) {
 				Statement stmt = (Statement) conn.createStatement();
 				stmt.executeQuery("SELECT e.*, l.Name, max(a.TimeS)\r\n" + "from employes e , locals l, accesses a \r\n"
-						+ "where a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal\r\n" + "GROUP BY e.SerialNumber");
+						+ "where e.Causal IS NULL and a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal\r\n" + "GROUP BY e.SerialNumber");
 				ResultSet rs = stmt.getResultSet();
 				while (rs.next()) {
-					int serial = rs.getInt("SerialNumber");
+					String serial = rs.getString("SerialNumber");
 					String name = rs.getString("Name");
 					String surname = rs.getString("Surname");
 					String auth = rs.getString("AuthGrade");
 					String position = rs.getString("l.Name");
 
-					Employee temp = new Employee(serial, name, surname, auth, position);
+					Employee temp = new Employee(serial, name, surname, auth, "ops");
 					list.add(temp);
 				}
 				stmt.executeQuery("SELECT e.* from employes e\r\n"
-						+ "where e.SerialNumber not  in(SELECT e.SerialNumber from employes e , locals l, accesses a \r\n"
+						+ "where e.Causal IS NULL and e.SerialNumber not  in(SELECT e.SerialNumber from employes e , locals l, accesses a \r\n"
 						+ "						where a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal GROUP BY e.SerialNumber)\r\n"
 						+ "");
 				rs = stmt.getResultSet();
 				while (rs.next()) {
-					int serial = rs.getInt("SerialNumber");
+					String serial = rs.getString("SerialNumber");
 					String name = rs.getString("Name");
 					String surname = rs.getString("Surname");
 					String auth = rs.getString("AuthGrade");
 					String position = "No position found";
 
 					Employee temp = new Employee(serial, name, surname, auth, position);
+					list.add(temp);
+
+				}
+				return list;
+			}
+		} catch (SQLException ex) {
+			System.out.println("Error: access problem while loading!");
+			System.exit(2);
+		}
+		return list;
+	}
+
+	public static ArrayList<Visitor> getAllVisitors() {
+		ArrayList<Visitor> list = new ArrayList<Visitor>();
+		try {
+			if (conn != null) {
+				Statement stmt = (Statement) conn.createStatement();
+				stmt.executeQuery("SELECT e.*, l.Name, max(a.TimeS)\r\n" + "from employes e , locals l, accesses a \r\n"
+						+ "where e.Causal IS NOT NULL and a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal\r\n" + "GROUP BY e.SerialNumber");
+				ResultSet rs = stmt.getResultSet();
+				while (rs.next()) {
+					String serial = rs.getString("SerialNumber");
+					String name = rs.getString("Name");
+					String surname = rs.getString("Surname");
+					String causal = rs.getString("Causal");
+					String expiration = rs.getString("Expiration");
+					String position = rs.getString("l.Name");
+
+					Visitor temp = new Visitor(name, surname, causal, expiration) ;
+					temp.setPosition(position);
+					temp.setId(serial);
+					list.add(temp);
+				}
+				stmt.executeQuery("SELECT e.* from employes e\r\n"
+						+ "where e.Causal IS NOT NULL and e.SerialNumber not  in(SELECT e.SerialNumber from employes e , locals l, accesses a \r\n"
+						+ "						where a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal GROUP BY e.SerialNumber)\r\n"
+						+ "");
+				rs = stmt.getResultSet();
+				while (rs.next()) {
+					String serial = rs.getString("SerialNumber");
+					String name = rs.getString("Name");
+					String surname = rs.getString("Surname");
+					String causal = rs.getString("Causal");
+					String expiration = rs.getString("Expiration");
+					String position = "No position found";
+					Visitor temp = new Visitor(name, surname, causal, expiration) ;
+					temp.setPosition(position);
+					temp.setId(serial);
 					list.add(temp);
 
 				}
@@ -103,10 +151,10 @@ public class Database {
 				Statement stmt = (Statement) conn.createStatement();
 				stmt.executeQuery("SELECT e.*, l.Name, a.TimeS\r\n" + "from employes e , locals l, accesses a \r\n"
 						+ "where a.TimeS= (select max(TimeS) from accesses a where a.IdEmployee='" + id + "') \r\n"
-						+ "and a.IdEmployee=e.SerialNumber and l.Result='true' and l.Id=a.IdLocal\r\n" + "");
+						+ "and a.IdEmployee=e.SerialNumber and a.Result='true' and l.Id=a.IdLocal\r\n" + "");
 				ResultSet rs = stmt.getResultSet();
 				while (rs.next()) {
-					int serial = rs.getInt("SerialNumber");
+					String serial = rs.getString("SerialNumber");
 					String name = rs.getString("Name");
 					String surname = rs.getString("Surname");
 					String auth = rs.getString("AuthGrade");
@@ -114,10 +162,27 @@ public class Database {
 					temp = new Employee(serial, name, surname, auth, position);
 
 				}
+				if(temp!=null)
+				return temp;
+				else {
+				stmt.executeQuery("SELECT e.* from employes e where e.SerialNumber='"+id+"' and e.SerialNumber  not  in(SELECT a.IdEmployee from accesses a) ");
+				rs = stmt.getResultSet();
+				while (rs.next()) {
+					String serial = rs.getString("SerialNumber");
+					String name = rs.getString("Name");
+					String surname = rs.getString("Surname");
+					String auth = rs.getString("AuthGrade");
+					String position = "position not found";
+					temp = new Employee(serial, name, surname, auth, position);
+					temp.setCurrentPosition(position);
+					temp.setSerial(serial);
+
+				}
 				return temp;
 			}
+			}
 		} catch (SQLException ex) {
-			System.out.println("Error: access problem while loading!");
+			System.out.println(ex.getMessage());
 			System.exit(2);
 		}
 		return temp;
@@ -193,8 +258,17 @@ public class Database {
 					rs = stmt.getResultSet();
 					rs.first();
 				} while (rs.getInt("total") == 1);
+				stmt.executeQuery("SELECT COUNT(*) as total FROM auth WHERE IdEmployee='" + id + "'");
+				rs = stmt.getResultSet();
+				rs.first();
+
+				if(rs.getInt("total")==0) {
+					stmt.executeUpdate("INSERT INTO auth (IdEmployee, Code) VALUES('"+id + "','" + newCode + "')");
+				}
+				else {
 				stmt.executeUpdate("UPDATE auth SET Code='" + newCode + "' WHERE IdEmployee='" + id + "'");
-				image = Utils.writeQRCode(newCode);
+				}
+				image = Utils.writeQRCode(newCode, id);
 				return image;
 			}
 
@@ -234,7 +308,7 @@ public class Database {
 
 			if (conn != null) {
 				Statement stmt = (Statement) conn.createStatement();
-				stmt.executeUpdate("INSERT into visitors (Name, Surname, Causal, expiration) values" + " ('"
+				stmt.executeUpdate("INSERT into employes (Name, Surname, Causal, expiration) values" + " ('"
 						+ visitor.getName() + "', '" + visitor.getSurname() + "', '" + visitor.getNotes() + "', '"
 						+ visitor.getExpirationDate() + "')", Statement.RETURN_GENERATED_KEYS);
 
@@ -283,7 +357,7 @@ public class Database {
 	}
 
 	public static EmployeeResponseClass createEmployee(EmployeeRequestClass temp) {
-		Integer employeeId = null;
+		String employeeId = null;
 		String code = null;
 		try {
 
@@ -295,8 +369,8 @@ public class Database {
 
 				try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
 					if (generatedKeys.next()) {
-						employeeId = generatedKeys.getInt(1);
-						temp.employee.setPhoto(Utils.StoreEmployeePhoto(temp.getPhoto(), employeeId));
+						employeeId = generatedKeys.getString(1);
+						temp.getEmployee().setPhoto(Utils.StoreEmployeePhoto(temp.getPhoto(), employeeId));
 
 						ResultSet rs;
 						do {
@@ -324,7 +398,7 @@ public class Database {
 			return null;
 		}
 
-		return new EmployeeResponseClass(temp.getEmployee(), Utils.writeQRCode(code));
+		return new EmployeeResponseClass(temp.getEmployee(), Utils.writeQRCode(code, employeeId));
 	}
 
 	public static ArrayList<Access> makeQuery(ComplexQuery query) {

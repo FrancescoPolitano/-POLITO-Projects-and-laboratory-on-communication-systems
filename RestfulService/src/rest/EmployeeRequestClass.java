@@ -1,11 +1,10 @@
 package rest;
 
 public class EmployeeRequestClass {
-	public Employee employee;
-	public byte[] photo;
+	private Employee employee;
+	private byte[] photo;
 	
 	public EmployeeRequestClass(Employee employee, byte[] photo) {
-		super();
 		this.employee = employee;
 		this.photo = photo;
 	}

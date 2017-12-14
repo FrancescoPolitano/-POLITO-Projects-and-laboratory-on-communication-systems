@@ -6,7 +6,7 @@ package rest;
  *
  */
 public class Visitor {
-	private String name, surname, causal;
+	private String  id,name, surname, causal, position;
 	private String expiration;
 	
 	public Visitor(String name, String surname, String notes, String expiration) {
@@ -16,6 +16,39 @@ public class Visitor {
 		this.causal = notes;
 		this.expiration = expiration;
 	}
+	
+	public String getPosition() {
+		return position;
+	}
+
+	public void setPosition(String position) {
+		this.position = position;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getCausal() {
+		return causal;
+	}
+
+	public void setCausal(String causal) {
+		this.causal = causal;
+	}
+
+	public String getExpiration() {
+		return expiration;
+	}
+
+	public void setExpiration(String expiration) {
+		this.expiration = expiration;
+	}
+
 	public String getName() {
 		return name;
 	}

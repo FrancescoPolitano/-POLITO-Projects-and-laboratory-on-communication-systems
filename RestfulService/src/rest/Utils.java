@@ -48,7 +48,7 @@ public class Utils {
 	 * Creates the qrCode and store it into the filesystem
 	 *
 	 */
-	public static String writeQRCode(String data) {
+	public static String writeQRCode(String data, String UserId) {
 
 		// get a byte matrix for the data
 		ByteMatrix matrix;
@@ -80,7 +80,7 @@ public class Utils {
 
 		// write the image to the output stream
 		FileOutputStream fos = null;
-		String URI= "C:\\Users\\franc\\Desktop\\ServerData\\"+data+".jpg";
+		String URI= "C:\\Users\\franc\\Desktop\\ServerData\\"+UserId+".jpg";
 		String URL= "/images/"+data+".jpg";
 		try {
 			fos = new FileOutputStream(URI);
@@ -99,7 +99,7 @@ public class Utils {
 		
 	}
 
-	public static String StoreEmployeePhoto(byte[] fileContent, int id ) {
+	public static String StoreEmployeePhoto(byte[] fileContent, String id ) {
 		BufferedImage img;
 		String URL= "/images/profiles/"+id+".jpg";
 		//Converto il byte array in una buffered image

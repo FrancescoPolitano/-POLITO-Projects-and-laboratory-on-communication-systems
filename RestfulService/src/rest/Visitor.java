@@ -6,71 +6,64 @@ package rest;
  *
  */
 public class Visitor {
-	private String  id,name, surname, causal, position;
-	private String expiration;
+	private String  Id,Name, Surname, Causal, Position;
+	private String Expiration;
 	
-	public Visitor(String name, String surname, String notes, String expiration) {
+	public Visitor(String name, String surname, String causal, String expiration) {
+		this.Name=name;
+		this.Surname=surname;
+		this.Causal=causal;
+		this.Expiration=expiration;
 		
-		this.name = name;
-		this.surname = surname;
-		this.causal = notes;
-		this.expiration = expiration;
-	}
-	
-	public String getPosition() {
-		return position;
-	}
-
-	public void setPosition(String position) {
-		this.position = position;
 	}
 
 	public String getId() {
-		return id;
+		return Id;
 	}
 
 	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getCausal() {
-		return causal;
-	}
-
-	public void setCausal(String causal) {
-		this.causal = causal;
-	}
-
-	public String getExpiration() {
-		return expiration;
-	}
-
-	public void setExpiration(String expiration) {
-		this.expiration = expiration;
+		Id = id;
 	}
 
 	public String getName() {
-		return name;
+		return Name;
 	}
+
 	public void setName(String name) {
-		this.name = name;
+		Name = name;
 	}
+
 	public String getSurname() {
-		return surname;
+		return Surname;
 	}
+
 	public void setSurname(String surname) {
-		this.surname = surname;
+		Surname = surname;
 	}
-	public String getNotes() {
-		return causal;
+
+	public String getCausal() {
+		return Causal;
 	}
-	public void setNotes(String notes) {
-		this.causal = notes;
+
+	public void setCausal(String causal) {
+		Causal = causal;
 	}
-	public String getExpirationDate() {
-		return expiration;
+
+	public String getPosition() {
+		return Position;
 	}
-	public void setExpirationDate(String expiration) {
-		this.expiration = expiration;
+
+	public void setPosition(String position) {
+		Position = position;
 	}
+
+	public String getExpiration() {
+		return Expiration;
+	}
+
+	public void setExpiration(String expiration) {
+		Expiration = expiration;
+	}
+	
+
 }

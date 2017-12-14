@@ -1,13 +1,7 @@
 package rest;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
 
-import javax.imageio.ImageIO;
+import java.sql.SQLException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -15,17 +9,16 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
 
-//Sets the bae url
+//Sets the base url
 @Path("/resources")
-public class Resources {
-	public Resources() throws SQLException {
-		Database.init();
+public class Resources{
+	public Resources(){
+		Database.connect();
 	}
 
 	// returns all the employes
@@ -34,6 +27,7 @@ public class Resources {
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response sendAllEmployes() {
 		Gson gson = new Gson();
+//		EmployeeRequestClass.testing();
 		String Json = gson.toJson(Database.getAllEmployes());
 		if (Json == null)
 			return Response.status(801).entity("Something goes wrong").build();
@@ -65,7 +59,7 @@ public class Resources {
 
 	// create a new employee and return the user and the QRcode   (not working)
 	@POST
-	@Path("users/employee")
+	@Path("users/employees")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response newEmployee(String employee) throws SQLException {
 		EmployeeRequestClass temp = new Gson().fromJson(employee, EmployeeRequestClass.class);
@@ -96,7 +90,12 @@ public class Resources {
 	public Response newVisitor(String visitor) {
 		rest.Visitor temp = new Gson().fromJson(visitor, rest.Visitor.class);
 		// TODO return the qrcode image
-		return Response.ok(Database.createVisitor(temp)).build();
+		String code=Database.createVisitor(temp);
+		if(code==null) {
+			return Response.status(801).entity("We're in big trubles").build();
+
+		}
+		return Response.ok(code).build();
 	}
 
 	// revoke a user QRCode and obtain a new one
@@ -104,7 +103,11 @@ public class Resources {
 	@Path("users/new_code")
 	 @Produces(MediaType.TEXT_PLAIN)
     public Response getNewCode(String id) {
- 		return Response.ok().entity(Database.newCode(id)).build();
+		String code= Database.newCode(id);
+ 		if(code==null) {
+			return Response.status(801).entity("We're in big trubles").build();
+		}
+		return Response.ok(code).build();
  		
     }
 
@@ -113,6 +116,8 @@ public class Resources {
 	@Path("users/{id}")
 	public Response deleteEmployee(@PathParam("id") String id) {
 		boolean result = Database.deleteEmployee(id);
+		if(!result)
+		return Response.status(404).entity("Nothng to delete").build();
 		return Response.ok(result).build();
 	}
 

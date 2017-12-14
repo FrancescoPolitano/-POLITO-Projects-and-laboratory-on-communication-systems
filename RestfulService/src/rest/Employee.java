@@ -5,67 +5,67 @@ package rest;
  *
  */
 public class Employee {
-	private String name, surname , authLevel, currentPosition;
-	private String Photo;
-	private String serial;
+	private String Name, Surname , AuthLevel, CurrentPosition;
+	private String PathPhoto;
+	private String Serial;
 	
 	public Employee() {}
 	
 	public Employee(String name, String surname, String authLevel) {
-		this.name=name;
-		this.surname=surname;
-		this.authLevel=authLevel;
+		this.Name=name;
+		this.Surname=surname;
+		this.AuthLevel=authLevel;
 	}
 	public Employee(String serial,String name, String surname, String authLevel, String position) {
-		this.serial=serial;
-		this.name=name;
-		this.surname=surname;
-		this.authLevel=authLevel;
-		this.currentPosition=position;
+		this.Serial=serial;
+		this.Name=name;
+		this.Surname=surname;
+		this.AuthLevel=authLevel;
+		this.CurrentPosition=position;
 	}
 
 	public String getName() {
-		return name;
+		return Name;
 	}
 	public void setName(String name) {
-		this.name = name;
+		this.Name = name;
 	}
 	public String getSurname() {
-		return surname;
+		return Surname;
 	}
 	public void setSurname(String surname) {
-		this.surname = surname;
+		this.Surname = surname;
 	}
 	
 	public String getAuthLevel() {
-		return authLevel;
+		return AuthLevel;
 	}
 	public void setAuthLevel(String authLevel) {
-		this.authLevel = authLevel;
+		this.AuthLevel = authLevel;
 	}
 
 	public String getPhoto() {
-		return Photo;
+		return PathPhoto;
 	}
 
 	public void setPhoto(String Photo) {
-		this.Photo = Photo;
+		this.PathPhoto = Photo;
 	}
 
 	public String getSerial() {
-		return serial;
+		return Serial;
 	}
 
 	public void setSerial(String employeeId) {
-		this.serial = employeeId;
+		this.Serial = employeeId;
 	}
 
 	public String getCurrentPosition() {
-		return currentPosition;
+		return CurrentPosition;
 	}
 
 	public void setCurrentPosition(String currentPosition) {
-		this.currentPosition = currentPosition;
+		this.CurrentPosition = currentPosition;
 	}
 
 }

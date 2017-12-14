@@ -1,36 +1,19 @@
 package rest;
 
-import java.awt.image.BufferedImage;
 import java.sql.Connection;
+import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Random;
+import java.util.Enumeration;
 
 public class Database {
 	static Connection conn;
 
-	public static void init() throws SQLException {
-		try {
-			connect();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	private static void connect()
-			throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException {
+	public static void connect() {
 		String user = "root";
 		String password = user;
 		try {
@@ -38,15 +21,17 @@ public class Database {
 
 		} catch (ClassNotFoundException ex) {
 			System.out.println("Error: unable to load driver class!");
-			System.exit(1);
 		} catch (IllegalAccessException ex) {
 			System.out.println("Error: access problem while loading!");
-			System.exit(2);
 		} catch (InstantiationException ex) {
 			System.out.println("Error: unable to instantiate driver!");
-			System.exit(3);
 		}
-		conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/paldb", user, password);
+		try {
+			conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/paldb", user, password);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
+		}
 
 		if (conn != null) {
 			System.out.println("Connected to the database");
@@ -55,11 +40,13 @@ public class Database {
 
 	public static ArrayList<Employee> getAllEmployes() {
 		ArrayList<Employee> list = new ArrayList<Employee>();
+		Statement stmt = null;
 		try {
 			if (conn != null) {
-				Statement stmt = (Statement) conn.createStatement();
+				stmt = (Statement) conn.createStatement();
 				stmt.executeQuery("SELECT e.*, l.Name, max(a.TimeS)\r\n" + "from employes e , locals l, accesses a \r\n"
-						+ "where e.Causal IS NULL and a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal\r\n" + "GROUP BY e.SerialNumber");
+						+ "where e.Causal IS NULL and a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal\r\n"
+						+ "GROUP BY e.SerialNumber");
 				ResultSet rs = stmt.getResultSet();
 				while (rs.next()) {
 					String serial = rs.getString("SerialNumber");
@@ -68,7 +55,7 @@ public class Database {
 					String auth = rs.getString("AuthGrade");
 					String position = rs.getString("l.Name");
 
-					Employee temp = new Employee(serial, name, surname, auth, "ops");
+					Employee temp = new Employee(serial, name, surname, auth, position);
 					list.add(temp);
 				}
 				stmt.executeQuery("SELECT e.* from employes e\r\n"
@@ -91,18 +78,29 @@ public class Database {
 			}
 		} catch (SQLException ex) {
 			System.out.println("Error: access problem while loading!");
-			System.exit(2);
+
+		} finally {
+			try {
+				if (conn != null)
+					conn.close();
+				if (stmt != null)
+					stmt.close();
+			} catch (SQLException e) {
+				System.out.println("Error closing " + e.getMessage());
+			}
 		}
 		return list;
 	}
 
 	public static ArrayList<Visitor> getAllVisitors() {
 		ArrayList<Visitor> list = new ArrayList<Visitor>();
+		Statement stmt = null;
 		try {
 			if (conn != null) {
-				Statement stmt = (Statement) conn.createStatement();
+				stmt = (Statement) conn.createStatement();
 				stmt.executeQuery("SELECT e.*, l.Name, max(a.TimeS)\r\n" + "from employes e , locals l, accesses a \r\n"
-						+ "where e.Causal IS NOT NULL and a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal\r\n" + "GROUP BY e.SerialNumber");
+						+ "where e.Causal IS NOT NULL and a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal\r\n"
+						+ "GROUP BY e.SerialNumber");
 				ResultSet rs = stmt.getResultSet();
 				while (rs.next()) {
 					String serial = rs.getString("SerialNumber");
@@ -112,7 +110,7 @@ public class Database {
 					String expiration = rs.getString("Expiration");
 					String position = rs.getString("l.Name");
 
-					Visitor temp = new Visitor(name, surname, causal, expiration) ;
+					Visitor temp = new Visitor(name, surname, causal, expiration);
 					temp.setPosition(position);
 					temp.setId(serial);
 					list.add(temp);
@@ -129,26 +127,34 @@ public class Database {
 					String causal = rs.getString("Causal");
 					String expiration = rs.getString("Expiration");
 					String position = "No position found";
-					Visitor temp = new Visitor(name, surname, causal, expiration) ;
+					Visitor temp = new Visitor(name, surname, causal, expiration);
 					temp.setPosition(position);
 					temp.setId(serial);
 					list.add(temp);
 
 				}
-				return list;
 			}
 		} catch (SQLException ex) {
 			System.out.println("Error: access problem while loading!");
-			System.exit(2);
+		} finally {
+			try {
+				if (conn != null)
+					conn.close();
+				if (stmt != null)
+					stmt.close();
+			} catch (SQLException e) {
+				System.out.println("Error closing " + e.getMessage());
+			}
 		}
 		return list;
 	}
 
 	public static Employee getEmployee(String id) throws SQLException {
 		Employee temp = null;
+		Statement stmt = null;
 		try {
 			if (conn != null) {
-				Statement stmt = (Statement) conn.createStatement();
+				stmt = (Statement) conn.createStatement();
 				stmt.executeQuery("SELECT e.*, l.Name, a.TimeS\r\n" + "from employes e , locals l, accesses a \r\n"
 						+ "where a.TimeS= (select max(TimeS) from accesses a where a.IdEmployee='" + id + "') \r\n"
 						+ "and a.IdEmployee=e.SerialNumber and a.Result='true' and l.Id=a.IdLocal\r\n" + "");
@@ -162,38 +168,47 @@ public class Database {
 					temp = new Employee(serial, name, surname, auth, position);
 
 				}
-				if(temp!=null)
-				return temp;
+				if (temp != null)
+					return temp;
 				else {
-				stmt.executeQuery("SELECT e.* from employes e where e.SerialNumber='"+id+"' and e.SerialNumber  not  in(SELECT a.IdEmployee from accesses a) ");
-				rs = stmt.getResultSet();
-				while (rs.next()) {
-					String serial = rs.getString("SerialNumber");
-					String name = rs.getString("Name");
-					String surname = rs.getString("Surname");
-					String auth = rs.getString("AuthGrade");
-					String position = "position not found";
-					temp = new Employee(serial, name, surname, auth, position);
-					temp.setCurrentPosition(position);
-					temp.setSerial(serial);
+					stmt.executeQuery("SELECT e.* from employes e where e.SerialNumber='" + id
+							+ "' and e.SerialNumber  not  in(SELECT a.IdEmployee from accesses a) ");
+					rs = stmt.getResultSet();
+					while (rs.next()) {
+						String serial = rs.getString("SerialNumber");
+						String name = rs.getString("Name");
+						String surname = rs.getString("Surname");
+						String auth = rs.getString("AuthGrade");
+						String position = "position not found";
+						temp = new Employee(serial, name, surname, auth, position);
+						temp.setCurrentPosition(position);
+						temp.setSerial(serial);
 
+					}
 				}
-				return temp;
-			}
 			}
 		} catch (SQLException ex) {
 			System.out.println(ex.getMessage());
-			System.exit(2);
+		} finally {
+			try {
+				if (conn != null)
+					conn.close();
+				if (stmt != null)
+					stmt.close();
+			} catch (SQLException e) {
+				System.out.println("Error closing " + e.getMessage());
+			}
 		}
 		return temp;
 	}
 
 	public static boolean isAuth(String local, String code) {
 		Integer serial = null;
+		Statement stmt = null;
 		int authGrade = 0, requestedGrade = 0;
 		try {
 			if (conn != null) {
-				Statement stmt = (Statement) conn.createStatement();
+				stmt = (Statement) conn.createStatement();
 				stmt.executeQuery("select  SerialNumber, e.AuthGrade , l.AuthGrade "
 						+ "from employes e , auth a , locals l" + " where a.Code ='" + code
 						+ "' and a.IdEmployee= e.SerialNumber and l.Id='" + local + "'");
@@ -203,36 +218,40 @@ public class Database {
 					authGrade = rs.getInt("e.Authgrade");
 					requestedGrade = rs.getInt("l.Authgrade");
 				}
-				if (serial == null) {
+				if (serial == null)
 					return false;
-				}
+
 				if (authGrade < requestedGrade) {
 					stmt.executeUpdate("INSERT INTO accesses (IdEmployee,IdLocal,Result) VALUES ('" + serial + "','"
 							+ local + "', 'false')");
 
 					return false;
-				}
-
-				else {
-
+				} else {
 					stmt.executeUpdate("INSERT INTO accesses (IdEmployee,IdLocal,Result) VALUES ('" + serial + "','"
 							+ local + "', 'true')");
-
 					return true;
 				}
-
 			}
 		} catch (SQLException ex) {
 			System.out.println(ex.getMessage());
-			System.exit(2);
+		} finally {
+			try {
+				if (conn != null)
+					conn.close();
+				if (stmt != null)
+					stmt.close();
+			} catch (SQLException e) {
+				System.out.println("Error closing " + e.getMessage());
+			}
 		}
 		return false;
 	}
 
 	public static boolean deleteEmployee(String id) {
+		Statement stmt = null;
 		try {
 			if (conn != null) {
-				Statement stmt = (Statement) conn.createStatement();
+				stmt = (Statement) conn.createStatement();
 				stmt.executeUpdate("DELETE FROM employes  WHERE SerialNumber='" + id + "'");
 				return true;
 			}
@@ -240,6 +259,15 @@ public class Database {
 		} catch (SQLException ex) {
 			System.out.println(ex.getMessage());
 			return false;
+		} finally {
+			try {
+				if (conn != null)
+					conn.close();
+				if (stmt != null)
+					stmt.close();
+			} catch (SQLException e) {
+				System.out.println("Error closing " + e.getMessage());
+			}
 		}
 		return false;
 
@@ -247,9 +275,10 @@ public class Database {
 
 	public static String newCode(String id) {
 		String image = null;
+		Statement stmt = null;
 		try {
 			if (conn != null) {
-				Statement stmt = (Statement) conn.createStatement();
+				stmt = (Statement) conn.createStatement();
 				ResultSet rs;
 				String newCode;
 				do {
@@ -262,11 +291,10 @@ public class Database {
 				rs = stmt.getResultSet();
 				rs.first();
 
-				if(rs.getInt("total")==0) {
-					stmt.executeUpdate("INSERT INTO auth (IdEmployee, Code) VALUES('"+id + "','" + newCode + "')");
-				}
-				else {
-				stmt.executeUpdate("UPDATE auth SET Code='" + newCode + "' WHERE IdEmployee='" + id + "'");
+				if (rs.getInt("total") == 0) {
+					stmt.executeUpdate("INSERT INTO auth (IdEmployee, Code) VALUES('" + id + "','" + newCode + "')");
+				} else {
+					stmt.executeUpdate("UPDATE auth SET Code='" + newCode + "' WHERE IdEmployee='" + id + "'");
 				}
 				image = Utils.writeQRCode(newCode, id);
 				return image;
@@ -274,17 +302,28 @@ public class Database {
 
 		} catch (SQLException ex) {
 			System.out.println(ex.getMessage());
-			return null;
+			return image;
+		} finally {
+			try {
+				if (conn != null)
+					conn.close();
+				if (stmt != null)
+					stmt.close();
+			} catch (SQLException e) {
+				System.out.println("Error closing " + e.getMessage());
+			}
 		}
+
 		return image;
 
 	}
 
 	public static ArrayList<Local> getAllLocals() {
+		Statement stmt = null;
 		ArrayList<Local> locals = new ArrayList<Local>();
 		try {
 			if (conn != null) {
-				Statement stmt = (Statement) conn.createStatement();
+				stmt = (Statement) conn.createStatement();
 				stmt.executeQuery("SELECT * from locals");
 				ResultSet rs = stmt.getResultSet();
 				while (rs.next()) {
@@ -298,19 +337,29 @@ public class Database {
 			System.out.println("Error: access problem while loading!");
 			System.out.println("ECCEZIONE " + ex.getMessage());
 			return null;
+		} finally {
+			try {
+				if (conn != null)
+					conn.close();
+				if (stmt != null)
+					stmt.close();
+			} catch (SQLException e) {
+				System.out.println("Error closing " + e.getMessage());
+			}
 		}
 		return locals;
 	}
 
 	public static String createVisitor(Visitor visitor) {
 		Integer visitorId = null;
+		Statement stmt = null;
 		try {
 
 			if (conn != null) {
-				Statement stmt = (Statement) conn.createStatement();
+				stmt = (Statement) conn.createStatement();
 				stmt.executeUpdate("INSERT into employes (Name, Surname, Causal, expiration) values" + " ('"
-						+ visitor.getName() + "', '" + visitor.getSurname() + "', '" + visitor.getNotes() + "', '"
-						+ visitor.getExpirationDate() + "')", Statement.RETURN_GENERATED_KEYS);
+						+ visitor.getName() + "', '" + visitor.getSurname() + "', '" + visitor.getCausal() + "', '"
+						+ visitor.getExpiration() + "')", Statement.RETURN_GENERATED_KEYS);
 
 				try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
 					if (generatedKeys.next()) {
@@ -327,22 +376,32 @@ public class Database {
 
 						stmt.executeUpdate("INSERT into auth (IdEmployee, Code) values" + " ('" + visitorId + "', '"
 								+ code + "')");
+
+						return Utils.writeQRCode(code, String.valueOf(visitorId));
 					}
 				}
 
 			}
 		} catch (SQLException ex) {
 			System.out.println(ex.getMessage());
-			return "error";
+		} finally {
+			try {
+				if (conn != null)
+					conn.close();
+				if (stmt != null)
+					stmt.close();
+			} catch (SQLException e) {
+				System.out.println("Error closing " + e.getMessage());
+			}
 		}
 		return null;
-
 	}
 
 	public static int createNewLocal(Local local) {
+		Statement stmt = null;
 		try {
 			if (conn != null) {
-				Statement stmt = (Statement) conn.createStatement();
+				stmt = (Statement) conn.createStatement();
 				stmt.executeUpdate("INSERT into locals (Id, AuthGrade, Name) values ('" + local.getIdLocal() + "', '"
 						+ local.getAuthGrade() + "', '" + local.getName() + "' )");
 			}
@@ -352,17 +411,29 @@ public class Database {
 		} catch (SQLException ex) {
 			System.out.println("SQLException " + ex.getMessage());
 			return -2;
+		} finally {
+			try {
+				
+				
+				if (conn != null)
+					conn.close();
+				if (stmt != null)
+					stmt.close();
+			} catch (SQLException e) {
+				System.out.println("Error closing " + e.getMessage());
+			}
 		}
 		return 0;
 	}
 
 	public static EmployeeResponseClass createEmployee(EmployeeRequestClass temp) {
 		String employeeId = null;
+		Statement stmt = null;
 		String code = null;
 		try {
 
 			if (conn != null) {
-				Statement stmt = (Statement) conn.createStatement();
+				stmt = (Statement) conn.createStatement();
 				stmt.executeUpdate("INSERT into employes (Name, Surname, AuthGrade) values" + " ('"
 						+ temp.getEmployee().getName() + "', '" + temp.getEmployee().getSurname() + "', '"
 						+ temp.getEmployee().getAuthLevel() + "')", Statement.RETURN_GENERATED_KEYS);
@@ -386,7 +457,6 @@ public class Database {
 								+ temp.getEmployee().getPhoto() + "')");
 					}
 				}
-
 				if (employeeId != null) {
 					temp.getEmployee().setSerial(employeeId);
 				} else
@@ -396,17 +466,26 @@ public class Database {
 		} catch (SQLException ex) {
 			System.out.println(ex.getMessage());
 			return null;
+		} finally {
+			try {
+				if (conn != null)
+					conn.close();
+				if (stmt != null)
+					stmt.close();
+			} catch (SQLException e) {
+				System.out.println("Error closing " + e.getMessage());
+			}
 		}
-
 		return new EmployeeResponseClass(temp.getEmployee(), Utils.writeQRCode(code, employeeId));
 	}
 
 	public static ArrayList<Access> makeQuery(ComplexQuery query) {
+		Statement stmt = null;
 		ResultSet results;
 		ArrayList<Access> accessResults = new ArrayList<Access>();
 		try {
 			if (conn != null) {
-				Statement stmt = (Statement) conn.createStatement();
+				stmt = (Statement) conn.createStatement();
 				stmt.executeQuery(query.toValidSQLQuery());
 				results = stmt.getResultSet();
 
@@ -428,6 +507,15 @@ public class Database {
 		} catch (SQLException ex) {
 			System.out.println(ex.getMessage());
 			return null;
+		} finally {
+			try {
+				if (conn != null)
+					conn.close();
+				if (stmt != null)
+					stmt.close();
+			} catch (SQLException e) {
+				System.out.println("Error closing " + e.getMessage());
+			}
 		}
 		return accessResults;
 	}

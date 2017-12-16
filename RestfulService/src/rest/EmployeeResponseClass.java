@@ -1,24 +1,24 @@
 package rest;
 
 public class EmployeeResponseClass {
-	public Employee employee;
-	public String qrcodeURL;
+	public Employee Employee;
+	public String QrcodeURL;
 
 
 	public EmployeeResponseClass(Employee temp, String QRCode) {
-		this.employee=temp;
-		this.qrcodeURL=QRCode;
+		this.Employee=temp;
+		this.QrcodeURL=QRCode;
 	}
 	public Employee getEmployee() {
-		return employee;
+		return Employee;
 	}
 	public void setEmployee(Employee employee) {
-		this.employee = employee;
+		this.Employee = employee;
 	}
 	public String getQrcodeURL() {
-		return qrcodeURL;
+		return QrcodeURL;
 	}
 	public void setQrcodeURL(String qrcodeURL) {
-		this.qrcodeURL = qrcodeURL;
+		this.QrcodeURL = qrcodeURL;
 	}
 }

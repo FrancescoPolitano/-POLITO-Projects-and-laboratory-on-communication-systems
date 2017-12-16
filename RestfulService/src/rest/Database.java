@@ -38,60 +38,61 @@ public class Database {
 		}
 	}
 
-	public static ArrayList<Employee> getAllEmployes() {
-		ArrayList<Employee> list = new ArrayList<Employee>();
-		Statement stmt = null;
-		try {
-			if (conn != null) {
-				stmt = (Statement) conn.createStatement();
-				stmt.executeQuery("SELECT e.*, l.Name, max(a.TimeS)\r\n" + "from employes e , locals l, accesses a \r\n"
-						+ "where e.Causal IS NULL and a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal\r\n"
-						+ "GROUP BY e.SerialNumber");
-				ResultSet rs = stmt.getResultSet();
-				while (rs.next()) {
-					String serial = rs.getString("SerialNumber");
-					String name = rs.getString("Name");
-					String surname = rs.getString("Surname");
-					String auth = rs.getString("AuthGrade");
-					String position = rs.getString("l.Name");
-
-					Employee temp = new Employee(serial, name, surname, auth, position);
-					list.add(temp);
-				}
-				stmt.executeQuery("SELECT e.* from employes e\r\n"
-						+ "where e.Causal IS NULL and e.SerialNumber not  in(SELECT e.SerialNumber from employes e , locals l, accesses a \r\n"
-						+ "						where a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal GROUP BY e.SerialNumber)\r\n"
-						+ "");
-				rs = stmt.getResultSet();
-				while (rs.next()) {
-					String serial = rs.getString("SerialNumber");
-					String name = rs.getString("Name");
-					String surname = rs.getString("Surname");
-					String auth = rs.getString("AuthGrade");
-					String position = "No position found";
-
-					Employee temp = new Employee(serial, name, surname, auth, position);
-					list.add(temp);
-
-				}
-				return list;
-			}
-		} catch (SQLException ex) {
-			System.out.println("Error: access problem while loading!");
-
-		} finally {
-			try {
-				if (conn != null)
-					conn.close();
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException e) {
-				System.out.println("Error closing " + e.getMessage());
-			}
-		}
-		return list;
-	}
-
+public static ArrayList<Employee> getAllEmployes() {
+        ArrayList<Employee> list = new ArrayList<Employee>();
+        Statement stmt = null;
+        try {
+            if (conn != null) {
+                stmt = (Statement) conn.createStatement();
+                stmt.executeQuery("SELECT e.*, l.Name, max(a.TimeS), photo from employes e , photos p, locals l, accesses a  where p.IdEmployee= e.SerialNumber AND e.Causal IS NULL and a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal GROUP BY e.SerialNumber");
+                ResultSet rs = stmt.getResultSet();
+                while (rs.next()) {
+                    String serial = rs.getString("SerialNumber");
+                    String name = rs.getString("Name");
+                    String surname = rs.getString("Surname");
+                    String auth = rs.getString("AuthGrade");
+                    String position = rs.getString("l.Name");
+                    String photo = rs.getString("photo");
+ 
+                    Employee temp = new Employee(serial, name, surname, auth, position);
+                    temp.setPhoto(photo);
+                    list.add(temp);
+                }
+                stmt.executeQuery("SELECT e.*, photo from employes e, photos p \r\n" + 
+                		"                		                       where  p.IdEmployee=e.SerialNumber and e.Causal IS NULL and e.SerialNumber not  in(SELECT e.SerialNumber from employes e , locals l, accesses a \r\n" + 
+                		"                		                                          where a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal GROUP BY e.SerialNumber)\r\n" + 
+                		"                		                     GROUP BY e.SerialNumber");
+                rs = stmt.getResultSet();
+                while (rs.next()) {
+                    String serial = rs.getString("SerialNumber");
+                    String name = rs.getString("Name");
+                    String surname = rs.getString("Surname");
+                    String auth = rs.getString("AuthGrade");
+                    String position = "No position found";
+                    String photo = rs.getString("photo");
+ 
+                    Employee temp = new Employee(serial, name, surname, auth, position);
+                    temp.setPhoto(photo);
+                    list.add(temp);
+ 
+                }
+                return list;
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+ 
+        } finally {
+            try {
+                if (conn != null)
+                    conn.close();
+                if (stmt != null)
+                    stmt.close();
+            } catch (SQLException e) {
+                System.out.println("Error closing " + e.getMessage());
+            }
+        }
+        return list;
+    }
 	public static ArrayList<Visitor> getAllVisitors() {
 		ArrayList<Visitor> list = new ArrayList<Visitor>();
 		Statement stmt = null;
@@ -155,8 +156,8 @@ public class Database {
 		try {
 			if (conn != null) {
 				stmt = (Statement) conn.createStatement();
-				stmt.executeQuery("SELECT e.*, l.Name, a.TimeS\r\n" + "from employes e , locals l, accesses a \r\n"
-						+ "where a.TimeS= (select max(TimeS) from accesses a where a.IdEmployee='" + id + "') \r\n"
+				stmt.executeQuery("SELECT e.*, l.Name, a.TimeS , photo from employes e , locals l, accesses a, photos p \r\n"
+						+ "where p.IdEmployee= e.SerialNumber and a.TimeS= (select max(TimeS) from accesses a where a.IdEmployee='" + id + "') \r\n"
 						+ "and a.IdEmployee=e.SerialNumber and a.Result='true' and l.Id=a.IdLocal\r\n" + "");
 				ResultSet rs = stmt.getResultSet();
 				while (rs.next()) {
@@ -165,13 +166,16 @@ public class Database {
 					String surname = rs.getString("Surname");
 					String auth = rs.getString("AuthGrade");
 					String position = rs.getString("l.Name");
+                    String photo = rs.getString("photo");
+
 					temp = new Employee(serial, name, surname, auth, position);
+                    temp.setPhoto(photo);
 
 				}
 				if (temp != null)
 					return temp;
 				else {
-					stmt.executeQuery("SELECT e.* from employes e where e.SerialNumber='" + id
+					stmt.executeQuery("SELECT e.* , photo from employes e, photos p where p.IdEmployee= e.SerialNumber and e.SerialNumber='" + id
 							+ "' and e.SerialNumber  not  in(SELECT a.IdEmployee from accesses a) ");
 					rs = stmt.getResultSet();
 					while (rs.next()) {
@@ -180,8 +184,12 @@ public class Database {
 						String surname = rs.getString("Surname");
 						String auth = rs.getString("AuthGrade");
 						String position = "position not found";
+	                    String photo = rs.getString("photo");
+
 						temp = new Employee(serial, name, surname, auth, position);
 						temp.setCurrentPosition(position);
+	                    temp.setPhoto(photo);
+
 						temp.setSerial(serial);
 
 					}
@@ -474,6 +482,8 @@ public class Database {
 				System.out.println("Error closing " + e.getMessage());
 			}
 		}
+		temp.getEmployee().setCurrentPosition("position not found");
+
 		return new EmployeeResponseClass(temp.getEmployee(), Utils.writeQRCode(code, employeeId));
 	}
 

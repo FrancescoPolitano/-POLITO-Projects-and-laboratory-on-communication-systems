@@ -297,12 +297,10 @@ public class Database {
 					stmt.executeUpdate("UPDATE auth SET Code='" + newCode + "' WHERE IdEmployee='" + id + "'");
 				}
 				image = Utils.writeQRCode(newCode, id);
-				return image;
 			}
 
 		} catch (SQLException ex) {
 			System.out.println(ex.getMessage());
-			return image;
 		} finally {
 			try {
 				if (conn != null)

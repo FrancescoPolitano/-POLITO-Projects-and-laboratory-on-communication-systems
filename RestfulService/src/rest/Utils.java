@@ -86,15 +86,20 @@ public class Utils {
 			fos = new FileOutputStream(URI);
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			return null;
 		}
 		try {
 			ImageIO.write(image, "png", fos);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return null;
 		}
-		
+		try {
+			fos.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			return null;
+		}
 		return URL;
 		
 	}

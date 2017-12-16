@@ -2,6 +2,8 @@ package rest;
 
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -30,7 +32,7 @@ public class Resources{
 //		EmployeeRequestClass.testing();
 		String Json = gson.toJson(Database.getAllEmployes());
 		if (Json == null)
-			return Response.status(801).entity("Something goes wrong").build();
+			return Response.status(801).entity(Errors.generic_error).build();
 		return Response.ok(Json, MediaType.APPLICATION_JSON).build();
 
 	}
@@ -41,7 +43,7 @@ public class Resources{
 		Gson gson = new Gson();
 		String Json = gson.toJson(Database.getAllVisitors());
 		if (Json == null)
-			return Response.status(801).entity("We're in big trubles").build();
+			return Response.status(801).entity(Errors.generic_error).build();
 		return Response.ok(Json, MediaType.APPLICATION_JSON).build();
 
 	}
@@ -51,9 +53,10 @@ public class Resources{
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response sendEmployee(@PathParam("id") String id) throws SQLException {
 		Gson gson = new Gson();
-		String Json = gson.toJson(Database.getEmployee(id));
-		if (Json == null)
-			return Response.status(404).entity("The resource doesn't exist").build();
+		Employee temp= Database.getEmployee(id);
+		if (temp==null)
+			return Response.status(404).entity(Errors.not_found).build();
+		String Json = gson.toJson(temp);
 		return Response.ok(Json, MediaType.APPLICATION_JSON).build();
 	}
 
@@ -61,14 +64,14 @@ public class Resources{
 	@POST
 	@Path("users/employees")
 	@Produces(MediaType.TEXT_PLAIN)
-	public Response newEmployee(String employee) throws SQLException {
+	public Response newEmployee(String employee)  {
 		EmployeeRequestClass temp = new Gson().fromJson(employee, EmployeeRequestClass.class);
 		if (temp.getEmployee() == null)
-			return Response.status(802).entity("Fucking bugged").build();
+			return Response.status(802).entity(Errors.invalid_input).build();
 
 		EmployeeResponseClass newEmployee = Database.createEmployee(temp);
 		if (newEmployee == null)
-			return Response.status(801).entity("We're in big trubles").build();
+			return Response.status(801).entity(Errors.generic_error).build();
 		Gson gson = new Gson();
 		String Json = gson.toJson(newEmployee);
 		return Response.ok(Json).build();
@@ -89,16 +92,16 @@ public class Resources{
 	@Path("users/visitors")
 	public Response newVisitor(String visitor) {
 		rest.Visitor temp = new Gson().fromJson(visitor, rest.Visitor.class);
-		// TODO return the qrcode image
 		String code=Database.createVisitor(temp);
 		if(code==null) {
-			return Response.status(801).entity("We're in big trubles").build();
+			return Response.status(801).entity(Errors.generic_error).build();
 
 		}
 		return Response.ok(code).build();
 	}
 
 	// revoke a user QRCode and obtain a new one
+	//MUST FIX THE ERROR MANAGMENT
 	@POST
 	@Path("users/new_code")
 	 @Produces(MediaType.TEXT_PLAIN)
@@ -117,7 +120,7 @@ public class Resources{
 	public Response deleteEmployee(@PathParam("id") String id) {
 		boolean result = Database.deleteEmployee(id);
 		if(!result)
-		return Response.status(404).entity("Nothng to delete").build();
+		return Response.status(404).entity(Errors.not_found).build();
 		return Response.ok(result).build();
 	}
 
@@ -127,9 +130,10 @@ public class Resources{
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response getLocals() {
 		Gson gson = new Gson();
-		String Json = gson.toJson(Database.getAllLocals());
-		if (Json == null)
-			return Response.status(801).entity("Some Problem occurred").build();
+		ArrayList<Local> locals=Database.getAllLocals();
+		if (locals == null)
+			return Response.status(801).entity(Errors.generic_error).build();
+		String Json = gson.toJson(locals);
 		return Response.ok(Json, MediaType.APPLICATION_JSON).build();
 	}
 
@@ -142,23 +146,26 @@ public class Resources{
 		Local local = new Gson().fromJson(json, Local.class);
 		int result = Database.createNewLocal(local);
 		if (result == -1)
-			return Response.status(789).entity("This id is already used").build();
+			return Response.status(789).entity(Errors.existing_key).build();
 		else if (result == -2)
-			return Response.status(801).entity("Some Problem occurred").build();
+			return Response.status(801).entity(Errors.generic_error).build();
 		return Response.ok().build();
 
 	}
 	
+	
+	//gestire meglio
 	@POST
 	@Path("query")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response complexQuery(String parameters) throws SQLException {
 		ComplexQuery query = new Gson().fromJson(parameters, ComplexQuery.class);
 		Gson gson = new Gson();
-		String Json = gson.toJson(Database.makeQuery(query));
-		if (Json == null)
-			return Response.status(801).entity("Some Problem occurred").build();
-
+		ArrayList<Access> temp=Database.makeQuery(query);
+		
+		if (temp == null)
+			return Response.status(801).entity(Errors.generic_error).build();
+		String Json = gson.toJson(temp);
 		return Response.ok(Json, MediaType.APPLICATION_JSON).build();
 	}
 }

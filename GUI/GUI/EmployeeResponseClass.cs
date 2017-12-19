@@ -9,17 +9,17 @@ namespace GUI
     class EmployeeResponseClass
     {
         private Employee employee;
-        private string qrCodeString;
+        private string qrCodeURL;
 
         public EmployeeResponseClass() { }
 
         public EmployeeResponseClass(Employee u , String url)
         {
             Employee = u;
-            QrCodeString = url;
+            QrCodeURL = url;
         }
 
-        public string QrCodeString { get => qrCodeString; set => qrCodeString = value; }
+        public string QrCodeURL { get => qrCodeURL; set => qrCodeURL = value; }
         public Employee Employee { get => employee; set => employee = value; }
     }
 }

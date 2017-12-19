@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -24,6 +25,12 @@ namespace GUI
             BigWindow.CreateUser += CreateUser;
             LoginWindow.PageChange += LoginWindow_PageChange;
             userList = RestClient.GetAllUsers();
+            Thread t = new Thread(UserListUpdate)
+            {
+                Name="thread Aggiornamenti",
+                IsBackground = true
+            };
+            t.Start();
             roomList = RestClient.GetAllRooms();
         }
 
@@ -46,6 +53,26 @@ namespace GUI
                 uc.ShowDialog();
                 //do post here
 
+            }
+        }
+
+        private void UserListUpdate()
+        {
+            while (true)
+            {
+                Thread.Sleep(60000);
+                List<Employee> temp = RestClient.GetAllUsers();
+                foreach (Employee e in temp)
+                {
+                    foreach (Employee user in userList)
+                        if (e.Serial == user.Serial)
+                        {
+                            if (String.Compare(e.CurrentPosition, user.CurrentPosition) != 0)
+                                user.CurrentPosition = e.CurrentPosition;
+                            break;
+                        }
+                }
+                
             }
         }
     }

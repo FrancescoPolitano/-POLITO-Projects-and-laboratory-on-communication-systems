@@ -69,8 +69,7 @@ namespace GUI
             string QRcodeNew = await RestClient.CreateVisitor(myVisitor);
             if (!String.IsNullOrEmpty(QRcodeNew))
             {
-                string urlll = Constants.IPREMOTE + QRcodeNew;
-                QRCode qr = new QRCode(urlll);
+                QRCode qr = new QRCode(Constants.IPREMOTE + QRcodeNew);
                 qr.ShowDialog();
                 Close();
             }

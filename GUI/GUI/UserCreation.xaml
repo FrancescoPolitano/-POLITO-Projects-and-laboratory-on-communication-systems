@@ -18,8 +18,10 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0" Grid.Column="0">
+        <Grid Grid.Row="0" Grid.Column="0" Margin="5">
             <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
@@ -29,6 +31,8 @@
             <TextBox Name="Name" Grid.Row="1" FontSize="16" Text="{Binding Name}"/>
             <TextBlock  Grid.Row="2" Text="Surname"  />
             <TextBox Name="Surname" Grid.Row="3" FontSize="16" Text="{Binding Surname}"/>
+            <TextBlock Grid.Row="4" Text="Email" />
+            <TextBox Name="Email" Grid.Row="5" FontSize="16" Text="{Binding Email}"/>
         </Grid>
         <Grid Grid.Row="1" Grid.Column="0" >
             <Grid.RowDefinitions>

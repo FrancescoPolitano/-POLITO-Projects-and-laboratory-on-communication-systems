@@ -9,6 +9,11 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="600" BorderThickness="0" GlowBrush="Black"
         >
+
+    <Controls:MetroWindow.Resources>
+        <local:UriConverter x:Key="UriConverter" />
+    </Controls:MetroWindow.Resources>
+    
     <TabControl Width="Auto">
         <TabItem Header="Planimetry" Name="Planimetry">
             <Grid >
@@ -34,7 +39,7 @@
                                 </Grid.ColumnDefinitions>
                                 <Ellipse Grid.Column ="0" Width="64" Height="64">
                                     <Ellipse.Fill>
-                                        <ImageBrush ImageSource="{Binding PathPhoto}" Stretch="Fill" />
+                                        <ImageBrush ImageSource="{Binding Path=PathPhoto,Converter={StaticResource UriConverter}}" Stretch="Fill" />
                                     </Ellipse.Fill>
                                 </Ellipse>
                                 <TextBlock Text="{Binding Name}" Grid.Column="1" Margin="3" VerticalAlignment="Center"/>
@@ -164,5 +169,5 @@
         </TabItem>
     </TabControl>
 
-
+   
 </Controls:MetroWindow>

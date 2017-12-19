@@ -82,6 +82,7 @@
       <DependentUpon>QRCode.xaml</DependentUpon>
     </Compile>
     <Compile Include="Room.cs" />
+    <Compile Include="UriConverter.cs" />
     <Compile Include="UserDetails.xaml.cs">
       <DependentUpon>UserDetails.xaml</DependentUpon>
     </Compile>

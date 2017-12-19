@@ -41,7 +41,8 @@ namespace GUI
 
             if (response.IsSuccessStatusCode)
             {
-                return JsonConvert.DeserializeObject<List<Employee>>(response.Content.ReadAsStringAsync().Result);
+                List<Employee> lista =  JsonConvert.DeserializeObject<List<Employee>>(response.Content.ReadAsStringAsync().Result);
+                return lista;
             }
             return null;
         }
@@ -142,10 +143,11 @@ namespace GUI
         }
 
 
-        public static async Task<bool> Login(string username, string password)
+        public static async Task<bool> Login(LoginData logindata)
         {
-
-            HttpResponseMessage response = client.GetAsync(myRest + "/login" + "/username=" + username + "password=" + password).Result;
+            string json = JsonConvert.SerializeObject(logindata);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = client.PostAsync(myRest + "/login" ,content).Result;
             if (response.IsSuccessStatusCode)
             {
                 string result = await response.Content.ReadAsStringAsync();
@@ -158,6 +160,7 @@ namespace GUI
 
         public static List<Access> GetHistory(ComplexQuery q)
         {
+            //TODO s'è rotto sulla complex query
             string json = JsonConvert.SerializeObject(q);
             Console.WriteLine(json);
             var content = new StringContent(json, Encoding.UTF8, "application/json");

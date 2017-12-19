@@ -20,9 +20,11 @@ namespace GUI
     /// </summary>
     public partial class LoginWindow : MetroWindow
     {
+        private LoginData myLoginData = new LoginData();
         public LoginWindow()
         {
             InitializeComponent();
+            myGrid.DataContext = myLoginData;
         }
 
         private void Confirm_Click(object sender, RoutedEventArgs e)
@@ -38,24 +40,31 @@ namespace GUI
                 return;
             }
 
-            //TODO temporary, while fixing login
-            PageChange("ADMIN");
-            Close();
+            myLoginData.Password = password.Password;
+            ////TODO temporary, while fixing login
+            //PageChange("ADMIN");
+            //Close();
 
-            //if (RestClient.Login(username.Text, password.Password).Result)
-            //{
-            //    PageChange();
-            //    Close();
-            //}
-            //else
-            //{
-            //    errors.Text = "Something is wrong, retry";
-            //    return;
-            //}
+            if (RestClient.Login(myLoginData).Result)
+            {
+                PageChange("ADMIN");
+                Close();
+            }
+            else
+            {
+                errors.Text = "Something is wrong, retry";
+                return;
+            }
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
+            Close();
+        }
+
+        private void Enter_Click(object sender, RoutedEventArgs e)
+        {
+            PageChange("DOORKEEPER");
             Close();
         }
 

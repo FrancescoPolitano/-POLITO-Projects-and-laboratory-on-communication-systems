@@ -56,6 +56,12 @@ namespace GUI
                 this.ShowModalMessageExternal("Ops", "Insert a valid Authorization Level");
                 return;
             }
+            if (String.IsNullOrEmpty(Email.Text))
+            {
+                //errore ruolo
+                this.ShowModalMessageExternal("Ops", "Insert a valid Email");
+                return;
+            }
 
             EmployeeResponseClass erc = RestClient.CreateUser(user);
             if (erc == null)
@@ -63,7 +69,9 @@ namespace GUI
             else
             {
                 App.userList.Add(erc.Employee);
-                QRCode qr = new QRCode(Constants.IPREMOTE + erc.QrCodeString);
+                BigWindow.UserList.Add(erc.Employee);
+
+                QRCode qr = new QRCode(Constants.IPREMOTE + erc.QrCodeURL);
                 qr.ShowDialog();
             }
             Close();

@@ -45,11 +45,6 @@ namespace GUI
             if (App.userList != null)
             {
                 UserList = new ObservableCollection<Employee>(App.userList);
-                UserList.Add(new Employee("Giorgio", "Mastrota", "ADMIN", "ACASA", "F:\\Downloads\\Farmer.png", 0));
-                UserList.Add(new Employee("Francesco", "Mastrota", "DOORMAN", "ACASA", "F:\\Downloads\\Farmer2.png", 9));
-                UserList.Add(new Employee("Piercarlo", "Mastrota", "USER", "ACASA", "F:\\Downloads\\Farmer.png", 11));
-                UserList.Add(new Employee("Antonio", "Mastrota", "USER", "ACASA", "F:\\Downloads\\Farmer2.png", 12));
-                UserList.Add(new Employee("Mirko", "Mastrota", "USER", "ACASA", "F:\\Downloads\\Farmer2.png", 13));
                 foreach (Employee user in UserList)
                     users.Add(user.Name + " " + user.Surname + " " + user.Serial);
             }

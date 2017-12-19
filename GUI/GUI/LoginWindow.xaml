@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:GUI"
         mc:Ignorable="d"
         Title="LoginWindow" Height="300" Width="350" FontSize="16" BorderThickness="0" GlowBrush="Black">
-    <Grid Background="AliceBlue">
+    <Grid Background="AliceBlue" Name="myGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
@@ -16,14 +16,21 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <TextBlock FontWeight="Bold" Grid.Row="0" Text="Welcome!" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        <TextBlock Name="errors" FontWeight="Bold" Grid.Row="1" Text="Please log in" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+        <TextBlock Name="errors" FontWeight="Bold" Grid.Column="0" Text="Please log in or" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <Button Grid.Column="1" Content="Enter as Doorkeeper" Name="Enter"  Click="Confirm_Click" />
+        </Grid>
         <StackPanel Grid.Row="2">
             <TextBlock FontSize="16" FontWeight="Bold" Text="Username"  VerticalAlignment="Center" Margin="5,0" />
-            <TextBox Name="username"/>
+            <TextBox Name="username" Text="{Binding Username}"/>
         </StackPanel>
         <StackPanel Grid.Row="3">
             <TextBlock FontSize="16" FontWeight="Bold" Text="Password"  VerticalAlignment="Center" Margin="5,0"/>
-            <PasswordBox Margin="5" Name="password"/>
+            <PasswordBox Margin="5" Name="password"  />
         </StackPanel>
         <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>

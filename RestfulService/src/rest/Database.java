@@ -9,11 +9,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 public class Database {
-	static Connection conn;
+	private static Database instance = null;
+	private boolean adminLogged;
 
-	public static void connect() {
-		String user = "root";
-		String password = user;
+	private Database() {
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 
@@ -24,21 +23,42 @@ public class Database {
 		} catch (InstantiationException ex) {
 			System.out.println("Error: unable to instantiate driver!");
 		}
+		adminLogged = false;
+	}
+
+	public static Database getInstance() {
+		if (instance == null)
+			instance = new Database();
+		return instance;
+	}
+
+	private Connection connect() {
+		String user = "root";
+		String password = user;
+		Connection conn = null;
 		try {
 			conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/paldb", user, password);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			System.out.println(e.getMessage());
+			System.out.println("Eccezione catturata" + e.getMessage());
 		}
 
-		if (conn != null) {
+		if (conn != null)
 			System.out.println("Connected to the database");
-		}
+		return conn;
 	}
 
-	public static ArrayList<Employee> getAllEmployes() {
+	public boolean isAdminLogged() {
+		return adminLogged;
+	}
+
+	public void setAdminLogged(boolean adminLogged) {
+		this.adminLogged = adminLogged;
+	}
+
+	public ArrayList<Employee> getAllEmployes() {
 		ArrayList<Employee> list = new ArrayList<Employee>();
 		Statement stmt = null;
+		Connection conn = connect();
 		try {
 			if (conn != null) {
 				stmt = (Statement) conn.createStatement();
@@ -78,7 +98,7 @@ public class Database {
 				return list;
 			}
 		} catch (SQLException ex) {
-			System.out.println(ex.getMessage());
+			System.out.println("111 " + ex.getMessage());
 
 		} finally {
 			try {
@@ -93,9 +113,10 @@ public class Database {
 		return list;
 	}
 
-	public static ArrayList<Visitor> getAllVisitors() {
+	public ArrayList<Visitor> getAllVisitors() {
 		ArrayList<Visitor> list = new ArrayList<Visitor>();
 		Statement stmt = null;
+		Connection conn = connect();
 		try {
 			if (conn != null) {
 				stmt = (Statement) conn.createStatement();
@@ -136,7 +157,7 @@ public class Database {
 				}
 			}
 		} catch (SQLException ex) {
-			System.out.println("Error: access problem while loading!");
+			System.out.println("222 " + ex.getMessage());
 		} finally {
 			try {
 				if (conn != null)
@@ -150,9 +171,10 @@ public class Database {
 		return list;
 	}
 
-	public static Employee getEmployee(String id) throws SQLException {
+	public Employee getEmployee(String id) throws SQLException {
 		Employee temp = null;
 		Statement stmt = null;
+		Connection conn = connect();
 		try {
 			if (conn != null) {
 				stmt = (Statement) conn.createStatement();
@@ -199,7 +221,7 @@ public class Database {
 				}
 			}
 		} catch (SQLException ex) {
-			System.out.println(ex.getMessage());
+			System.out.println("333 " + ex.getMessage());
 		} finally {
 			try {
 				if (conn != null)
@@ -213,9 +235,10 @@ public class Database {
 		return temp;
 	}
 
-	public static boolean isAuth(String local, String code) {
+	public boolean isAuth(String local, String code) {
 		Integer serial = null;
 		Statement stmt = null;
+		Connection conn = connect();
 		int authGrade = 0, requestedGrade = 0;
 		try {
 			if (conn != null) {
@@ -244,7 +267,7 @@ public class Database {
 				}
 			}
 		} catch (SQLException ex) {
-			System.out.println(ex.getMessage());
+			System.out.println("444 " + ex.getMessage());
 		} finally {
 			try {
 				if (conn != null)
@@ -258,8 +281,9 @@ public class Database {
 		return false;
 	}
 
-	public static boolean deleteEmployee(String id) {
+	public boolean deleteEmployee(String id) {
 		Statement stmt = null;
+		Connection conn = connect();
 		try {
 			if (conn != null) {
 				stmt = (Statement) conn.createStatement();
@@ -268,7 +292,7 @@ public class Database {
 			}
 
 		} catch (SQLException ex) {
-			System.out.println(ex.getMessage());
+			System.out.println("555 " + ex.getMessage());
 			return false;
 		} finally {
 			try {
@@ -284,9 +308,10 @@ public class Database {
 
 	}
 
-	public static String newCode(String id) {
+	public String newCode(String id) {
 		String image = null;
 		Statement stmt = null;
+		Connection conn = connect();
 		try {
 			if (conn != null) {
 				stmt = (Statement) conn.createStatement();
@@ -311,7 +336,7 @@ public class Database {
 			}
 
 		} catch (SQLException ex) {
-			System.out.println(ex.getMessage());
+			System.out.println("666 " + ex.getMessage());
 		} finally {
 			try {
 				if (conn != null)
@@ -327,8 +352,9 @@ public class Database {
 
 	}
 
-	public static ArrayList<Local> getAllLocals() {
+	public ArrayList<Local> getAllLocals() {
 		Statement stmt = null;
+		Connection conn = connect();
 		ArrayList<Local> locals = new ArrayList<Local>();
 		try {
 			if (conn != null) {
@@ -343,8 +369,7 @@ public class Database {
 				}
 			}
 		} catch (SQLException ex) {
-			System.out.println("Error: access problem while loading!");
-			System.out.println("ECCEZIONE " + ex.getMessage());
+			System.out.println("777 " + ex.getMessage());
 			return null;
 		} finally {
 			try {
@@ -359,11 +384,11 @@ public class Database {
 		return locals;
 	}
 
-	public static String createVisitor(Visitor visitor) {
+	public String createVisitor(Visitor visitor) {
 		Integer visitorId = null;
 		Statement stmt = null;
+		Connection conn = connect();
 		try {
-
 			if (conn != null) {
 				stmt = (Statement) conn.createStatement();
 				stmt.executeUpdate("INSERT into employes (Name, Surname, Causal, expiration) values" + " ('"
@@ -392,7 +417,7 @@ public class Database {
 
 			}
 		} catch (SQLException ex) {
-			System.out.println(ex.getMessage());
+			System.out.println("888" + ex.getMessage());
 		} finally {
 			try {
 				if (conn != null)
@@ -406,8 +431,9 @@ public class Database {
 		return null;
 	}
 
-	public static int createNewLocal(Local local) {
+	public int createNewLocal(Local local) {
 		Statement stmt = null;
+		Connection conn = connect();
 		try {
 			if (conn != null) {
 				stmt = (Statement) conn.createStatement();
@@ -418,7 +444,7 @@ public class Database {
 			System.out.println("SQLException " + ex.getMessage());
 			return -1;
 		} catch (SQLException ex) {
-			System.out.println("SQLException " + ex.getMessage());
+			System.out.println("999 " + ex.getMessage());
 			return -2;
 		} finally {
 			try {
@@ -434,10 +460,11 @@ public class Database {
 		return 0;
 	}
 
-	public static EmployeeResponseClass createEmployee(EmployeeRequestClass temp) {
+	public EmployeeResponseClass createEmployee(EmployeeRequestClass temp) {
 		String employeeId = null;
 		Statement stmt = null;
 		String code = null;
+		Connection conn = connect();
 		try {
 
 			if (conn != null) {
@@ -472,7 +499,7 @@ public class Database {
 
 			}
 		} catch (SQLException ex) {
-			System.out.println(ex.getMessage());
+			System.out.println("101010 " + ex.getMessage());
 			return null;
 		} finally {
 			try {
@@ -489,8 +516,9 @@ public class Database {
 		return new EmployeeResponseClass(temp.getEmployee(), Utils.writeQRCode(code, employeeId));
 	}
 
-	public static ArrayList<Access> makeQuery(ComplexQuery query) {
+	public ArrayList<Access> makeQuery(ComplexQuery query) {
 		Statement stmt = null;
+		Connection conn = connect();
 		ResultSet results;
 		ArrayList<Access> accessResults = new ArrayList<Access>();
 		try {
@@ -515,7 +543,7 @@ public class Database {
 				}
 			}
 		} catch (SQLException ex) {
-			System.out.println(ex.getMessage());
+			System.out.println("111111 " + ex.getMessage());
 			return null;
 		} finally {
 			try {
@@ -530,11 +558,12 @@ public class Database {
 		return accessResults;
 	}
 
-	
-	public static boolean login(LoginData lg) {
+	public boolean login(LoginData lg) {
 		if (lg.getUsername().equalsIgnoreCase(Constants.admin_username)
-				&& lg.getPassword().equalsIgnoreCase(Constants.admin_password))
+				&& lg.getPassword().equalsIgnoreCase(Constants.admin_password)) {
+			adminLogged = true;
 			return true;
+		}
 		return false;
 	}
 }

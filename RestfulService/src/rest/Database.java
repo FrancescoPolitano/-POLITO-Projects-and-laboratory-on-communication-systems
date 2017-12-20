@@ -23,6 +23,7 @@ public class Database {
 		} catch (InstantiationException ex) {
 			System.out.println("Error: unable to instantiate driver!");
 		}
+		
 		adminLogged = false;
 	}
 

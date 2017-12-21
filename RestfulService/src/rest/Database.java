@@ -23,7 +23,7 @@ public class Database {
 		} catch (InstantiationException ex) {
 			System.out.println("Error: unable to instantiate driver!");
 		}
-		adminLogged = false;
+		adminLogged = true;
 	}
 
 	public static Database getInstance() {
@@ -33,11 +33,11 @@ public class Database {
 	}
 
 	private Connection connect() {
-		String user = "root";
+		String user = "cri";
 		String password = user;
 		Connection conn = null;
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/paldb", user, password);
+			conn = DriverManager.getConnection("jdbc:mysql://18.218.18.37:3306/paldb", user, password);
 		} catch (SQLException e) {
 			System.out.println("Eccezione catturata" + e.getMessage());
 		}
@@ -524,6 +524,7 @@ public class Database {
 		try {
 			if (conn != null) {
 				stmt = (Statement) conn.createStatement();
+				System.out.println("QUERYYYYY "+query.toValidSQLQuery());
 				stmt.executeQuery(query.toValidSQLQuery());
 				results = stmt.getResultSet();
 

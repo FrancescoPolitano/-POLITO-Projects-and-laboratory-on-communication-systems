@@ -13,6 +13,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 //Sets the base url
 @Path("/resources")
@@ -178,10 +179,11 @@ public class Resources {
 	public Response complexQuery(String parameters) throws SQLException {
 		if (!database.isAdminLogged())
 			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
-		ComplexQuery query = new Gson().fromJson(parameters, ComplexQuery.class);
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
+		ComplexQuery query = gson.fromJson(parameters, ComplexQuery.class);
 		if (query == null)
 			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
-		Gson gson = new Gson();
+//		Gson gson = new Gson();
 		ArrayList<Access> temp = database.makeQuery(query);
 
 		if (temp == null)

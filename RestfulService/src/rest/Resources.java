@@ -28,8 +28,6 @@ public class Resources {
 	@Path("users/employees")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response sendAllEmployes() {
-		if (!database.isAdminLogged())
-			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
 		Gson gson = new Gson();
 		// EmployeeRequestClass.testing();
 		String Json = gson.toJson(database.getAllEmployes());
@@ -43,8 +41,6 @@ public class Resources {
 	@Path("users/visitors")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response sendAllVisitors() {
-		if (!database.isAdminLogged())
-			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
 		Gson gson = new Gson();
 		String Json = gson.toJson(database.getAllVisitors());
 		if (Json == null)
@@ -149,8 +145,6 @@ public class Resources {
 	@Path("locals")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response getLocals() {
-		if (!database.isAdminLogged())
-			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
 		Gson gson = new Gson();
 		ArrayList<Local> locals = database.getAllLocals();
 		if (locals == null)

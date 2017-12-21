@@ -23,8 +23,7 @@ public class Database {
 		} catch (InstantiationException ex) {
 			System.out.println("Error: unable to instantiate driver!");
 		}
-		//TODO CHANGE
-		adminLogged = true;
+		adminLogged = false;
 	}
 
 	public static Database getInstance() {

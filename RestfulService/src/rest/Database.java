@@ -33,11 +33,11 @@ public class Database {
 	}
 
 	private Connection connect() {
-		String user = "cri";
+		String user = "root";
 		String password = user;
 		Connection conn = null;
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://18.218.18.37:3306/paldb", user, password);
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/paldb", user, password);
 		} catch (SQLException e) {
 			System.out.println("Eccezione catturata" + e.getMessage());
 		}

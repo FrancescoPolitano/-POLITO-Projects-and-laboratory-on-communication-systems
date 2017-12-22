@@ -14,6 +14,7 @@ import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.internal.LinkedTreeMap;
 
 //Sets the base url
 @Path("/resources")
@@ -72,7 +73,9 @@ public class Resources {
 	public Response newEmployee(String employee) {
 		if (!database.isAdminLogged())
 			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
-		EmployeeRequestClass temp = new Gson().fromJson(employee, EmployeeRequestClass.class);
+		AuthenticatedRequest req= new Gson().fromJson(employee, AuthenticatedRequest.class);
+		EmployeeRequestClass temp = new Gson().fromJson(new Gson().toJson(((LinkedTreeMap<String, Object>) req.getBody())), EmployeeRequestClass .class);
+
 		if (temp == null)
 			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
 		if (temp.getEmployee() == null)
@@ -148,6 +151,7 @@ public class Resources {
 	public Response getLocals() {
 		Gson gson = new Gson();
 		ArrayList<Local> locals = database.getAllLocals();
+		System.out.println(Utils.hashString("admin"));
 		if (locals == null)
 			return Response.status(Constants.status_generic_error).entity(Constants.generic_error).build();
 		String Json = gson.toJson(locals);
@@ -200,8 +204,9 @@ public class Resources {
 		LoginData lg = new Gson().fromJson(json, LoginData.class);
 		if (lg.getPassword() == null || lg.getUsername() == null || lg == null)
 			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
-		if (database.login(lg))
-			return Response.ok().build();
+		String token= database.login(lg);
+		if (token!=null)
+			return Response.ok(token, MediaType.TEXT_PLAIN).build();
 		return Response.status(Constants.status_generic_error).entity(Constants.generic_error).build();
 	}
 

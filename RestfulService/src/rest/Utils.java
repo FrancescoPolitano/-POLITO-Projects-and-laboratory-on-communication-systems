@@ -5,6 +5,9 @@ import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
 import javax.imageio.ImageIO;
@@ -70,7 +73,7 @@ public class Utils {
 
 		// write the image to the output stream
 		FileOutputStream fos = null;
-		String URI = "C:\\Users\\Administrator\\Desktop\\ServerData\\" + UserId + ".jpg";
+		String URI = "C:\\Users\\franc\\Desktop\\ServerData\\" + UserId + ".jpg";
 		String URL = "/images/" + UserId + ".jpg";
 		try {
 			fos = new FileOutputStream(URI);
@@ -103,7 +106,7 @@ public class Utils {
 		}
 
 		FileOutputStream fos = null;
-		String URI = "C:\\Users\\Administrator\\Desktop\\ServerData\\profiles\\" + id + ".jpg";
+		String URI = "C:\\Users\\franc\\Desktop\\ServerData\\profiles\\" + id + ".jpg";
 		try {
 			fos = new FileOutputStream(URI);
 		} catch (FileNotFoundException e1) {
@@ -117,4 +120,37 @@ public class Utils {
 		return URL;
 	}
 
+	public static String hashString(String message) {
+	 
+	        MessageDigest digest = null;
+			try {
+				digest = MessageDigest.getInstance( "SHA-256");
+			} catch (NoSuchAlgorithmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	        byte[] hashedBytes = null;
+			try {
+				hashedBytes = digest.digest(message.getBytes("UTF-8"));
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	 
+	        return convertByteArrayToHexString(hashedBytes);
+	 
+	}
+	private static String convertByteArrayToHexString(byte[] arrayBytes) {
+	    StringBuffer stringBuffer = new StringBuffer();
+	    for (int i = 0; i < arrayBytes.length; i++) {
+	        stringBuffer.append(Integer.toString((arrayBytes[i] & 0xff) + 0x100, 16)
+	                .substring(1));
+	    }
+	    return stringBuffer.toString();
+	}
+
+	public static String createToken(String string) {
+		String token= randomCodeGen();
+		return token;
+	}
 }

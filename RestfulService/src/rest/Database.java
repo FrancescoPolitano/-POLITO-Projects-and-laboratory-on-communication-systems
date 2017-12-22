@@ -7,11 +7,12 @@ import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Database {
 	private static Database instance = null;
 	private boolean adminLogged;
-
+	public static HashMap<String, String> tokens= new HashMap<String, String>();
 	private Database() {
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
@@ -23,7 +24,7 @@ public class Database {
 		} catch (InstantiationException ex) {
 			System.out.println("Error: unable to instantiate driver!");
 		}
-		adminLogged = false;
+		adminLogged = true;
 	}
 
 	public static Database getInstance() {
@@ -524,6 +525,7 @@ public class Database {
 		try {
 			if (conn != null) {
 				stmt = (Statement) conn.createStatement();
+				System.out.println("QUERYYYYY "+query.toValidSQLQuery());
 				stmt.executeQuery(query.toValidSQLQuery());
 				results = stmt.getResultSet();
 
@@ -558,12 +560,41 @@ public class Database {
 		return accessResults;
 	}
 
-	public boolean login(LoginData lg) {
-		if (lg.getUsername().equalsIgnoreCase(Constants.admin_username)
-				&& lg.getPassword().equalsIgnoreCase(Constants.admin_password)) {
-			adminLogged = true;
-			return true;
+	public String login(LoginData lg) {
+		Statement stmt = null;
+		 String temp=null;
+		ResultSet results;
+		Connection conn = connect();
+		String hash = Utils.hashString(lg.getPassword());
+		try {
+			if (conn != null) {
+				stmt = (Statement) conn.createStatement();
+				stmt.executeQuery("SELECT COUNT(*) as total FROM users WHERE Username='" + lg.getUsername() +"' and Password='"+hash+"'");
+				results = stmt.getResultSet();
+				results.first();
+			 if (results.getInt("total") == 1) {
+				 do {
+					  temp=Utils.createToken(lg.getUsername());
+				 }
+				 while(tokens.containsValue(temp));
+				 tokens.put(lg.getUsername(), temp);
+			 }
+			}
+		
+		} catch (SQLException ex) {
+			System.out.println("999 " + ex.getMessage());
+			return temp;
+		} finally {
+			try {
+
+				if (conn != null)
+					conn.close();
+				if (stmt != null)
+					stmt.close();
+			} catch (SQLException e) {
+				System.out.println("Error closing " + e.getMessage());
+			}
 		}
-		return false;
+		return temp;
 	}
 }

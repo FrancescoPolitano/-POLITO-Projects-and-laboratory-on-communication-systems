@@ -5,13 +5,13 @@ import java.util.Date;
 import java.util.Iterator;
 
 public class ComplexQuery {
-	private ArrayList<String> Employees = new ArrayList<String>();
-	private ArrayList<String> Rooms = new ArrayList<String>();
+	private ArrayList<String> Employees;
+	private ArrayList<String> Rooms;
 	private Date Initial, End;
 
 	public ComplexQuery(ArrayList<String> employees, ArrayList<String> rooms, Date initial, Date end) {
-		Employees = employees;
-		Rooms = rooms;
+		Employees = new ArrayList<String>(employees);
+		Rooms = new ArrayList<String>(rooms);
 		Initial = initial;
 		End = end;
 	}

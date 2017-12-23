@@ -19,7 +19,7 @@ namespace ServerFEZ
 
         public Server()
         {
-            localEndPoint = new IPEndPoint(IPAddress.Parse(Constants.IP_LOCAL), Constants.PORT_TCP);
+            localEndPoint = new IPEndPoint(IPAddress.Parse(Constants.STATIC_IP_SERVER), Constants.PORT_TCP);
             listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             startServer();
         }
@@ -47,8 +47,8 @@ namespace ServerFEZ
                 SocketError error;
                 try
                 {
-                    handler.ReceiveTimeout = 0;
-                    handler.SendTimeout = 0;
+                    handler.ReceiveTimeout = 8000;
+                    handler.SendTimeout = 8000;
 
                     byte[] pictureByteSize = new byte[sizeof(int)];
 
@@ -93,7 +93,7 @@ namespace ServerFEZ
                     if (barcodeResult != null && barcodeResult.BarcodeFormat == BarcodeFormat.QR_CODE)
                     {
                         HttpClient client = new HttpClient();
-                        HttpResponseMessage response = client.GetAsync("http://192.168.1.171:8082/RestfulService/resources/auth/" + Constants.DOOR_ID + "/" + barcodeResult.Text).Result;
+                        HttpResponseMessage response = client.GetAsync(Constants.URI + Constants.DOOR_ID + "/" + barcodeResult.Text).Result;
                         Console.WriteLine("RESPONSE CODE {0} ", response.StatusCode);
                         if (response.IsSuccessStatusCode)
                         {
@@ -108,8 +108,8 @@ namespace ServerFEZ
                     }
                     else responseToFEZ = Encoding.UTF8.GetBytes(Constants.EVALUATION.NOCODE.ToString());
 
-                    Console.WriteLine($"Decoded barcode text: {barcodeResult?.Text}");
-                    Console.WriteLine($"Barcode format: {barcodeResult?.BarcodeFormat}");
+                    //Console.WriteLine($"Decoded barcode text: {barcodeResult?.Text}");
+                    //Console.WriteLine($"Barcode format: {barcodeResult?.BarcodeFormat}");
 
 
                     sent = handler.Send(responseToFEZ, 0, responseToFEZ.Length, SocketFlags.None, out error);

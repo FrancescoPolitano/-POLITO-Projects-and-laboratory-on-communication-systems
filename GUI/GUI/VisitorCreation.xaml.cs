@@ -22,12 +22,13 @@ namespace GUI
     /// </summary>
     public partial class VisitorCreation : MetroWindow
     {
-        private Visitor myVisitor = new Visitor();
+        private Visitor myVisitor;
 
-        internal Visitor MyVisitor { get => myVisitor; set => myVisitor = value; }
+        public Visitor MyVisitor { get => myVisitor; set => myVisitor = value; }
 
         public VisitorCreation()
         {
+            MyVisitor = new Visitor();
             InitializeComponent();
             myGrid.DataContext = MyVisitor;
             CalendarDateRange cdr = new CalendarDateRange(DateTime.MinValue, DateTime.Today);
@@ -42,13 +43,13 @@ namespace GUI
         private async void Confirm_Click(object sender, RoutedEventArgs e)
         {
             //take fields and trigger something to do post
-            if (String.IsNullOrEmpty(Name.Text))
+            if (String.IsNullOrEmpty(NameBox.Text))
             {
                 //errore Nome
                 this.ShowModalMessageExternal("Ops", "Insert a valid name");
                 return;
             }
-            if (String.IsNullOrEmpty(Surname.Text))
+            if (String.IsNullOrEmpty(SurnameBox.Text))
             {
                 //errore Cognome
                 this.ShowModalMessageExternal("Ops", "Insert a valid surname");
@@ -60,30 +61,26 @@ namespace GUI
                 this.ShowModalMessageExternal("Ops", "Insert a valid expiryDate");
                 return;
             }
-               
-        
-
-            //TODO capire perchè il binding non funziona bene
-            myVisitor.ExpiryDate = DatePick.Text;
-            //TODO questo va spostato quando ci sono le query
-            QRCode qr = new QRCode(@"F:\Downloads\qrcode.jpg");
-            qr.ShowDialog();
-            Close();
-            //if (await RestClient.CreateVisitor(myVisitor))
-            //{
-            //    //stampare successo
-            //    MessageBox.Show("Successo");
-            //    //Mostrare QR temporaneo
-            //    Close();
-            //}
-            //else
-            //{
-            //    //stampare fallimento
-            //    MessageBox.Show("Fallimento");
-            //    Close();
-            //}
 
 
+            
+            myVisitor.Expiration = String.Format("{0:yyyy-MM-dd HH:mm:ss}", DatePick.SelectedDate);
+            //TODO CHANGE : cambiare valore di ritorno, per prendere il path del QR code nuovo
+            string QRcodeNew = await RestClient.CreateVisitor(myVisitor);
+            if (!String.IsNullOrEmpty(QRcodeNew))
+            {
+                QRCode qr = new QRCode(Constants.IPREMOTE + QRcodeNew);
+                qr.ShowDialog();
+                App.visitorList.Add(MyVisitor);
+                BigWindow.VisitorList.Add(MyVisitor);
+                Close();
+            }
+            else
+            {
+                //stampare fallimento
+                this.ShowModalMessageExternal("Ops", "Error while creating this visitor");
+                Close();
+            }
         }
 
         private void Cancel_Click_1(object sender, RoutedEventArgs e)

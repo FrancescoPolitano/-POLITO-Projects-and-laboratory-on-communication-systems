@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace GUI
 {
-    class Visitor : INotifyPropertyChanged
+    public class Visitor : INotifyPropertyChanged
     {
-        string name, surname, motivation, expiryDate;
+        string name, surname, causal, expiration;
 
         public Visitor() { }
 
@@ -17,14 +17,14 @@ namespace GUI
         {
             Name = name;
             Surname = surname;
-            Motivation = motivation;
-            ExpiryDate = expiryDate;
+            Causal = motivation;
+            Expiration = expiryDate;
         }
 
         public string Name { get => name; set { name = value; NotifyPropertyChanged("Name"); } }
         public string Surname { get => surname; set { surname = value; NotifyPropertyChanged("Surname"); } }
-        public string Motivation { get => motivation; set { motivation = value; NotifyPropertyChanged("Motivation"); } }
-        public string ExpiryDate { get => expiryDate; set { expiryDate = value; NotifyPropertyChanged("ExpiryDate"); } }
+        public string Causal { get => causal; set { causal = value; NotifyPropertyChanged("Causal"); } }
+        public string Expiration { get => expiration; set { expiration = value; NotifyPropertyChanged("Expiration"); } }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

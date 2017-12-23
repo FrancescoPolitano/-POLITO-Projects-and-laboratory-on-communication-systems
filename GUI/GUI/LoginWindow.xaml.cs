@@ -20,9 +20,11 @@ namespace GUI
     /// </summary>
     public partial class LoginWindow : MetroWindow
     {
+        private LoginData myLoginData = new LoginData();
         public LoginWindow()
         {
             InitializeComponent();
+            myGrid.DataContext = myLoginData;
         }
 
         private void Confirm_Click(object sender, RoutedEventArgs e)
@@ -38,14 +40,21 @@ namespace GUI
                 return;
             }
 
-            if (RestClient.Login(username.Text, password.Password).Result)
+            myLoginData.Password = password.Password;
+            ////TODO temporary, while fixing login
+            //PageChange("ADMIN");
+            //Close();
+
+            if (RestClient.Login(myLoginData).Result)
             {
-                PageChange();
+                PageChange(Constants.ADMIN);
                 Close();
             }
             else
             {
                 errors.Text = "Something is wrong, retry";
+                username.Text = "";
+                password.Password = "";
                 return;
             }
         }
@@ -55,8 +64,18 @@ namespace GUI
             Close();
         }
 
+        private void Enter_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO non è proprio cosi nella versione finale, #imbroglio
+            myLoginData.Username = "admin";
+            myLoginData.Password = "admin";
+            if (RestClient.Login(myLoginData).Result)
+                PageChange(Constants.ADMIN);
+            Close();
+        }
 
-        public delegate void myDelegate();
+
+        public delegate void myDelegate(string UserType);
         public static event myDelegate PageChange;
     }
 }

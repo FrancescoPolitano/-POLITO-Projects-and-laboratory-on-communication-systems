@@ -1,6 +1,8 @@
 ﻿using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,117 +13,54 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
-using MahApps.Metro.Controls.Dialogs;
-using System.Collections.ObjectModel;
 
 namespace GUI
 {
+
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for History.xaml
     /// </summary>
-    public partial class BigWindow : MetroWindow
+    public partial class History : MetroWindow
     {
-        public static ObservableCollection<string> users = new ObservableCollection<string>();
+        private ObservableCollection<string> users = new ObservableCollection<string>();
         private ObservableCollection<string> rooms = new ObservableCollection<string>();
         private ObservableCollection<string> listUsers = new ObservableCollection<string>();
         private ObservableCollection<string> listRooms = new ObservableCollection<string>();
         private ObservableCollection<Access> contenuto = new ObservableCollection<Access>();
-        private static ObservableCollection<Employee> userList;
-        private static ObservableCollection<Visitor> visitorList;
 
-        public static ObservableCollection<Employee> UserList { get => userList; set => userList = value; }
-        internal static ObservableCollection<Visitor> VisitorList { get => visitorList; set => visitorList = value; }
         public ObservableCollection<Access> Contenuto { get => contenuto; set => contenuto = value; }
 
-        public BigWindow(string UserType)
+        public History()
         {
             InitializeComponent();
-            if (String.Compare(UserType,Constants.ADMIN) != 0)
-            {
-                VisitorTab.Visibility = Visibility.Collapsed;
-                UserTab.Visibility = Visibility.Collapsed;
-                History.Visibility = Visibility.Collapsed;
-            }
-            UserList = new ObservableCollection<Employee>();
-            VisitorList = new ObservableCollection<Visitor>();
-
-            if (App.userList != null)
-            {
-                UserList = new ObservableCollection<Employee>(App.userList);
-                foreach (Employee user in UserList)
-                    users.Add(user.Name + " " + user.Surname + " " + user.Serial);
-            }
-            if (App.visitorList != null)
-                VisitorList = new ObservableCollection<Visitor>(App.visitorList);
-
             CalendarDateRange cdr = new CalendarDateRange(DateTime.Today.AddDays(1), DateTime.MaxValue);
             fromDate.BlackoutDates.Add(cdr);
             toDate.BlackoutDates.Add(cdr);
+            if (App.userList != null)
+                foreach(Employee user in App.userList)
+                    users.Add(user.Name + " " + user.Surname + " " + user.Serial);
             if (App.roomList != null)
                 foreach (Room room in App.roomList)
                     rooms.Add(room.Name);
-           
-            Users.ItemsSource = UserList;
-            Visitors.ItemsSource = VisitorList;
-
-       
             users.Add("Tutti");
+            users.Add("Gianmaria Tremigliozzi 2");
+            users.Add("Cristiano Palazzi 4");
+            users.Add("Francesco Politano 1");
+            users.Add("Alfredo Nazzaro 5");
+            users.Add("Gabriele Basile 9");
             rooms.Add("Tutte");
-            
-            Utenti.ItemsSource = users;
+            rooms.Add("Laboratorio");
+            rooms.Add("Cancello");
+            rooms.Add("CEO ");
+            rooms.Add("Batalfonso");
+            rooms.Add("Ingresso");
+            Users.ItemsSource = users;
             Rooms.ItemsSource = rooms;
             SelectedEmployees.ItemsSource = listUsers;
             SelectedRooms.ItemsSource = listRooms;
             listContent.ItemsSource = Contenuto;
         }
-
-      
-
-        private void newUser_Click(object sender, RoutedEventArgs e)
-        {
-            CreateUser(false);
-        }
-
-        private void newVisitor_Click(object sender, RoutedEventArgs e)
-        {
-            CreateUser(true);
-        }
-
-
-        public delegate void myDelegate(bool temporary);
-        public static event myDelegate CreateUser;
-
-        private void Modify_User(object sender, RoutedEventArgs e)
-        {
-            Button b = sender as Button;
-            Employee u = b.DataContext as Employee;
-            UserModification uw = new UserModification(u);
-            uw.Show();
-
-        }
-
-        private void ListViewItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            var item = sender as ListViewItem;
-            if (item != null)
-            {
-                Employee user = item.DataContext as Employee;
-                UserDetails uD = new UserDetails(user);
-                uD.ShowDialog();
-
-
-            }
-
-
-        }
-
-        private void Users_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-        }
-
 
         private void Users_CLICK(object sender, MouseButtonEventArgs e)
         {
@@ -224,8 +163,8 @@ namespace GUI
                 listRooms.Add("Tutte");
             if (listUsers.Count == 0)
                 listUsers.Add("Tutti");
-
-            result = RestClient.GetHistory(createArrays(fromDate.SelectedDate, toDate.SelectedDate));
+          
+            result =  RestClient.GetHistory(createArrays(fromDate.SelectedDate,toDate.SelectedDate));
             if (result != null)
                 foreach (Access acc in result)
                     Contenuto.Add(acc);
@@ -241,37 +180,18 @@ namespace GUI
                     continue;
                 if (String.Compare(st, "Tutti") == 0)
                 {
-                    //qua ho cambiato, ora si manda vuoto se c'è solo TUTTI
+                    temp.Add(st);
                     continue;
                 }
-                temp.Add(st.Substring(st.LastIndexOf(" ")+1));
+                temp.Add(st.Substring(st.LastIndexOf(" ")));
             }
             qr.Employees = temp;
-            List<String> temp2 = new List<string>();
-            foreach(string st in listRooms)
-            {
-                //uguale a quello degli utenti, per non mandare TUTTE
-                if (String.Compare("Tutte", st) == 0)
-                    continue;
-                else
-                    temp2.Add(st);
-            }
-            qr.Rooms = temp2;
+            qr.Rooms = new List<string>(listRooms);
             if (t != null)
                 qr.Initial = t ?? DateTime.MinValue;
             if (t1 != null)
                 qr.End = t1 ?? DateTime.MaxValue;
             return qr;
-        }
-
-        private void ListViewItem_PreviewMouseLeftButtonDown_1(object sender, MouseButtonEventArgs e)
-        {
-            var item = sender as ListViewItem;
-            if (item != null)
-            {
-                Visitor visitor = item.DataContext as Visitor;
-                MessageBox.Show("nome del visitor" + visitor.Name);
-            }
         }
     }
 }

@@ -7,29 +7,31 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GUI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525" BorderThickness="0" GlowBrush="Black"
+        Title="MainWindow" Height="450" Width="600" BorderThickness="0" GlowBrush="Black"
         >
+
+    <Controls:MetroWindow.Resources>
+        <local:UriConverter x:Key="UriConverter" />
+    </Controls:MetroWindow.Resources>
+    
     <TabControl Width="Auto">
-        <TabItem Header="Management">
-            <Grid Background="AliceBlue">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Button Name="newUser" Content="Create new User"  Height="60" Width="200" HorizontalAlignment="Center" VerticalAlignment="Center" Click="newUser_Click"/>
-                <Button Name="newVisitor" Grid.Row="1" Content="Create new visitor" Height="60" Width="200" HorizontalAlignment="Center" VerticalAlignment="Center" Click="newVisitor_Click"/>
-            </Grid>
-        </TabItem>
-        <TabItem Header="Planimetry">
+        <TabItem Header="Planimetry" Name="Planimetry">
             <Grid >
                 <Grid.Background>
                     <ImageBrush ImageSource="F:\Downloads\planimetry.jpg" Stretch="UniformToFill"/>
                 </Grid.Background>
             </Grid>
         </TabItem>
-        <TabItem Header="Users">
+      
+     
+        <TabItem Header="Users" Name="UserTab">
             <Grid Background="AliceBlue">
-                <ListView Name="Users" ItemsSource="{Binding UserList}" Width="Auto" Height="Auto" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="7*" />
+                </Grid.RowDefinitions>
+                <Button Grid.Row="0" Name="newUser" Content="Create new User" HorizontalAlignment="Right" Margin="5" Click="newUser_Click"/>
+                <ListView Grid.Row="1" Name="Users" ItemsSource="{Binding UserList}" Width="Auto" Height="Auto" >
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Grid>
@@ -42,7 +44,7 @@
                                 </Grid.ColumnDefinitions>
                                 <Ellipse Grid.Column ="0" Width="64" Height="64">
                                     <Ellipse.Fill>
-                                        <ImageBrush ImageSource="{Binding PathPhoto}" Stretch="Fill" />
+                                        <ImageBrush ImageSource="{Binding Path=PathPhoto,Converter={StaticResource UriConverter}}" Stretch="Fill" />
                                     </Ellipse.Fill>
                                 </Ellipse>
                                 <TextBlock Text="{Binding Name}" Grid.Column="1" Margin="3" VerticalAlignment="Center"/>
@@ -64,8 +66,138 @@
                 </ListView>
             </Grid>
         </TabItem>
+        <TabItem Header="Visitors" Name="VisitorTab">
+            <Grid Background="AliceBlue">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="7*" />
+                </Grid.RowDefinitions>
+                <Button Name="newVisitor" Grid.Row="0" Content="Create new visitor"  HorizontalAlignment="Right" Margin="5" Click="newVisitor_Click"/>
+                <ListView Grid.Row="1" Name="Visitors" ItemsSource="{Binding VisitorList}" Width="Auto" Height="Auto" >
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Name}" Grid.Column="0" Margin="3" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Surname}" Grid.Column="1" Margin="3" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Expiration}" Grid.Column="2" Margin="3" VerticalAlignment="Center" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.ItemContainerStyle>
+                        <Style  TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="BorderBrush" Value="LightGray" />
+                            <Setter Property="BorderThickness" Value="0,0,0,1" />
+                            <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListViewItem_PreviewMouseLeftButtonDown_1" />
+                        </Style>
+
+                    </ListView.ItemContainerStyle>
+                </ListView>
+            </Grid>
+        </TabItem>
+        <TabItem Header="History" Name="History">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="4*"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="2*" />
+                        <RowDefinition Height="3*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Controls:DropDownButton Name="Utenti"  Grid.Column="0" Content="Employees" >
+                        <Controls:DropDownButton.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel DataContext="{Binding}" PreviewMouseDown="Users_CLICK" >
+                                    <TextBlock Text="{Binding}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </Controls:DropDownButton.ItemTemplate>
+                    </Controls:DropDownButton>
+                    <Controls:DropDownButton Name="Rooms" Grid.Column="1" Content="Rooms" >
+                        <Controls:DropDownButton.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel DataContext="{Binding}" PreviewMouseDown="Room_click" >
+                                    <TextBlock Text="{Binding}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </Controls:DropDownButton.ItemTemplate>
+                    </Controls:DropDownButton>
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="From" />
+                    <TextBlock Grid.Row="0" Grid.Column="3" Text="To" />
+                    <ListView Name="SelectedEmployees" Grid.Row="1" Grid.Column="0" >
+                        <ListView.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Rimuovi" Click="MenuItem_Click_Employees"/>
+                            </ContextMenu>
+                        </ListView.ContextMenu>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" />
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    <ListView Name="SelectedRooms" Grid.Row="1" Grid.Column="1" >
+                        <ListView.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Rimuovi" Click="MenuItem_Click_Rooms"/>
+                            </ContextMenu>
+                        </ListView.ContextMenu>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" />
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    <DatePicker Name="fromDate" Grid.Row="1" Grid.Column="2" SelectedDateChanged="fromDate_SelectedDateChanged"/>
+                    <DatePicker Name="toDate" Grid.Row="1" Grid.Column="3" SelectedDateChanged="toDate_SelectedDateChanged"/>
+                </Grid>
+                <ListView Name="listContent" Grid.Row="1" >
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="Id" Grid.Column="0" />
+                                <TextBlock Text="Nome" Grid.Column="1" />
+                                <TextBlock Text="Cognome" Grid.Column="2" />
+                                <TextBlock Text="stanza" Grid.Column="3" />
+                                <TextBlock Text="orario" Grid.Column="4" />
+                                <TextBlock Text="vero/falso" Grid.Column="5" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            <Grid.Resources>
+                    <Style TargetType="DatePickerTextBox">
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                        <Setter Property="IsReadOnly" Value="true" />
+                    </Style>
+            </Grid.Resources>
+            </Grid>
+        </TabItem>
        
     </TabControl>
 
-
+   
 </Controls:MetroWindow>

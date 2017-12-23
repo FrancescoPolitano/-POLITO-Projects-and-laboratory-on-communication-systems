@@ -6,11 +6,11 @@ namespace GUI
 {
     public partial class UserModification : MetroWindow
     {
-        private User user;
+        private Employee user;
 
-        public User User { get => user; set => user = value; }
+        public Employee User { get => user; set => user = value; }
 
-        public UserModification(User u)
+        public UserModification(Employee u)
         {
             InitializeComponent();
             User = u;
@@ -24,8 +24,9 @@ namespace GUI
             {
                 User.AuthLevel = result;
                 text.Text = result;
-                //    bool change = RestClient.RoleChange(User).Result;
-                //TODO aggiungere qualche cosa qua 
+                //TODO test this
+                if (!RestClient.RoleChange(User).Result)
+                    this.ShowModalMessageExternal("Ops", "Cannot change authorization level right now.");
                 Close();
             }
 
@@ -34,13 +35,19 @@ namespace GUI
         private void QRChange_Click(object sender, RoutedEventArgs e)
         {
             this.ShowModalMessageExternal("ChangingQRCode", "A new QRCode is being generated");
-            QRCode qr = new QRCode(@"F:\Downloads\qrcode.jpg");
-            qr.ShowDialog();
-            //TODO chiedere e mostrare QR nuovo
+            string result = RestClient.QRCodeChange(user.Serial.ToString());
+            if (!string.IsNullOrEmpty(result))
+            {
+                QRCode qr = new QRCode(Constants.IPREMOTE+result);
+                qr.ShowDialog();
+            }
+            else
+                this.ShowModalMessageExternal("Ops", "An error occurred while changing the code");
         }
 
         private void BlockUser_Click(object sender, RoutedEventArgs e)
         {
+            //TODO something with user ID and a date
             MessageBox.Show("Niente ancora non l'ho fatto");
         }
 

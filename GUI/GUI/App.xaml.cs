@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -16,21 +18,57 @@ namespace GUI
         BigWindow mw;
         UserCreation uc;
         VisitorCreation vc;
-        public static List<User> userList = new List<User>();
+        private string userType = String.Empty;
+        public static List<Employee> userList;
+        public static List<Room> roomList;
+        public static List<Visitor> visitorList;
+        private Thread t;
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             BigWindow.CreateUser += CreateUser;
             LoginWindow.PageChange += LoginWindow_PageChange;
-            //userList = RestClient.GetAllUsers().Result;
-            //if (userList != null)
-            //    foreach (User user in userList)
-            //        Console.WriteLine("nome {0} cognome {1} ruolo {2} serial {3} currentPosition {4}", user.Name, user.Surname, user.AuthLevel, user.Serial, user.CurrentPosition);
+            SystemEvents.SessionEnded += SystemEvents_SessionEnded;
+            //TODO mettere qualcosa per il get del portinaio ( atm se non sei loggato restituisce null)
+
+            t = new Thread(UserListUpdate)
+            {
+                Name = "thread Aggiornamenti",
+                IsBackground = true
+            };
         }
 
-        private void LoginWindow_PageChange()
+        private void SystemEvents_SessionEnded(object sender, SessionEndedEventArgs e)
         {
-            mw = new BigWindow();
+            if (String.Compare(userType, Constants.ADMIN) == 0)
+                RestClient.Logout();
+        }
+
+        private void LoginWindow_PageChange(string UserType)
+        {
+            //chiamate ridondate per non prendere i null
+            if (userList == null)
+            {
+                userList = RestClient.GetAllUsers();
+                if (userList == null)
+                    userList = new List<Employee>();
+            }
+            if (roomList == null)
+            {
+                roomList = RestClient.GetAllRooms();
+                if (roomList == null)
+                    roomList = new List<Room>();
+            }
+            if (visitorList == null)
+            {
+                visitorList = RestClient.GetAllVisitors();
+                if (visitorList == null)
+                    visitorList = new List<Visitor>();
+            }
+            if (t != null)
+                t.Start();
+            userType = UserType;
+            mw = new BigWindow(UserType);
             mw.Show();
         }
 
@@ -45,9 +83,32 @@ namespace GUI
             {
                 uc = new UserCreation();
                 uc.ShowDialog();
-                //do post here
-
             }
+        }
+
+        private void UserListUpdate()
+        {
+            while (true)
+            {
+                List<Employee> temp = RestClient.GetAllUsers();
+                foreach (Employee e in temp)
+                {
+                    foreach (Employee user in userList)
+                        if (e.Serial == user.Serial)
+                        {
+                            if (String.Compare(e.CurrentPosition, user.CurrentPosition) != 0)
+                                user.CurrentPosition = e.CurrentPosition;
+                            break;
+                        }
+                }
+                Thread.Sleep(60000);
+            }
+        }
+
+        private void Application_Exit(object sender, ExitEventArgs e)
+        {
+            if (String.Compare(userType, Constants.ADMIN) == 0)
+                RestClient.Logout();
         }
     }
 }

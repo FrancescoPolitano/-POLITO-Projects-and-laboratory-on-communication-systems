@@ -24,18 +24,19 @@ namespace GUI
     /// </summary>
     public partial class UserCreation : MetroWindow
     {
-        User user = new User();
+        Employee user = new Employee();
 
-        public User User { get => user; set => user = value; }
+        public Employee User { get => user; set => user = value; }
 
         public UserCreation()
         {
             InitializeComponent();
+            //TODO mettere un placeholder vero
             User.PathPhoto = "F:\\Downloads\\farmer.png";
             myGrid.DataContext = User;
         }
 
-        private async void Confirm_Click(object sender, RoutedEventArgs e)
+        private void Confirm_Click(object sender, RoutedEventArgs e)
         {
             //take fields and trigger something to do post
             if (String.IsNullOrEmpty(Name.Text))
@@ -52,28 +53,28 @@ namespace GUI
             if (String.IsNullOrEmpty(Role.Text))
             {
                 //errore ruolo
-                this.ShowModalMessageExternal("Ops", "Insert a valid role");
+                this.ShowModalMessageExternal("Ops", "Insert a valid Authorization Level");
+                return;
+            }
+            if (String.IsNullOrEmpty(Email.Text))
+            {
+                //errore ruolo
+                this.ShowModalMessageExternal("Ops", "Insert a valid Email");
                 return;
             }
 
-            BigWindow.UserList.Add(user);
-            QRCode qr = new QRCode(@"F:\Downloads\qrcode.jpg");
-            qr.ShowDialog();
+            EmployeeResponseClass erc = RestClient.CreateUser(user);
+            if (erc == null)
+                this.ShowModalMessageExternal("Ops", "Error creating the user");
+            else
+            {
+                App.userList.Add(erc.Employee);
+                BigWindow.UserList.Add(erc.Employee);
+                BigWindow.users.Add(erc.Employee.Name+" "+erc.Employee.Surname+" "+erc.Employee.Serial);
+                QRCode qr = new QRCode(Constants.IPREMOTE + erc.QrCodeURL);
+                qr.ShowDialog();
+            }
             Close();
-            //if (await RestClient.CreateUser(user))
-            //{
-            //    //stampare successo
-            //    System.Windows.MessageBox.Show("Successo");
-            //Mostrare QR temporaneo
-            //    Close();
-
-            //}
-            //else
-            //{
-            //    //stampare fallimento
-            //    System.Windows.MessageBox.Show("fallimento");
-            //    Close();
-            //}
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
@@ -92,7 +93,7 @@ namespace GUI
             openFileDialog1.Multiselect = false;
 
             // Call the ShowDialog method to show the dialog box.
-            if ( openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 User.PathPhoto = openFileDialog1.FileName;
             }

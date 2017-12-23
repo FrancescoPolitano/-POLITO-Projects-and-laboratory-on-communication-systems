@@ -8,24 +8,29 @@ using System.Windows.Media.Imaging;
 
 namespace GUI
 {
-    public class User : INotifyPropertyChanged
+    public class Employee : INotifyPropertyChanged
     {
-        String name, surname, authLevel, currentPosition, pathPhoto;
+        String name, surname, authLevel, currentPosition, pathPhoto, email;
         private int serial;
 
-        public User() { }
+        public Employee() { }
 
-        public User(string name, string surname, string role, string curPos, string imgPath)
+        public Employee(string name, string surname, string level, string email)
         {
             Name = name;
             Surname = surname;
-            AuthLevel = role;
+            AuthLevel = level;
+            Email = email;
+        }
+
+        public Employee(string name, string surname, string level, string email, string curPos, string imgPath) : this(name, surname, level, email)
+        {
             if (!String.IsNullOrEmpty(imgPath))
                 PathPhoto = imgPath;
             CurrentPosition = curPos;
         }
 
-        public User(string name, string surname, string role, string curPos, string imgPath, int serial) : this(name, surname, role, curPos, imgPath)
+        public Employee(string name, string surname, string level, string email, string curPos, string imgPath, int serial) : this(name, surname, level, email, curPos, imgPath)
         {
             Serial = serial;
         }
@@ -57,14 +62,33 @@ namespace GUI
                 NotifyPropertyChanged("AuthLevel");
             }
         }
-        public string CurrentPosition { get => currentPosition; set => currentPosition = value; }
+        public string CurrentPosition
+        {
+            get => currentPosition;
+            set
+            {
+                currentPosition = value;
+                NotifyPropertyChanged("CurrentPosition");
+            }
+        }
         public int Serial { get => serial; set => serial = value; }
-        public string PathPhoto {
+        public string PathPhoto
+        {
             get => pathPhoto;
             set
             {
                 pathPhoto = value;
                 NotifyPropertyChanged("PathPhoto");
+            }
+        }
+
+        public string Email
+        {
+            get => email;
+            set
+            {
+                email = value;
+                NotifyPropertyChanged("Email");
             }
         }
 

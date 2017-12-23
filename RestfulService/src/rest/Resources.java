@@ -222,11 +222,29 @@ public class Resources {
 			return Response.ok(token, MediaType.TEXT_PLAIN).build();
 		return Response.status(Constants.status_generic_error).entity(Constants.generic_error).build();
 	}
+	
+	// login Admin
+	@POST
+	@Path("logout")
+	@Produces(MediaType.TEXT_PLAIN)
+	public Response adminLogout(String request) {
+		
+		AuthenticatedRequest req = new Gson().fromJson(request, AuthenticatedRequest.class);
+		if (!Database.tokens.containsValue(req.Token))
+			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
+		String user = new Gson().fromJson(new Gson().toJson(((LinkedTreeMap<String, Object>) req.getBody())),
+				String.class);
+		if(Database.tokens.remove(user,req.Token))
+			return Response.ok().build();
+		return Response.status(Constants.status_generic_error).entity(Constants.generic_error).build();
+	}
 
-	// change authLevel
+	// change authLevel  
 	@POST
 	@Path("users/authLevel")
+	@Produces(MediaType.TEXT_PLAIN)
 	public Response changeAuthLevel(String request) {
+		System.out.println("wdicbbceurberuvb");
 		AuthenticatedRequest req = new Gson().fromJson(request, AuthenticatedRequest.class);
 		if (!Database.tokens.containsValue(req.Token))
 			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();

@@ -15,6 +15,7 @@ using GTM = Gadgeteer.Modules;
 using System.Net.Sockets;
 using System.Net;
 using System.Text;
+#pragma warning disable CS0612
 
 namespace FEZ
 {
@@ -26,29 +27,61 @@ namespace FEZ
 
         void ProgramStarted()
         {
-            remoteEP = new IPEndPoint(IPAddress.Parse(Constants.IP_SERVER), Constants.PORT_TCP);
+            //remoteEP = new IPEndPoint(IPAddress.Parse(Constants.IP_SERVER), Constants.PORT_TCP);
+            remoteEP = new IPEndPoint(IPAddress.Parse(Constants.STATIC_IP_SERVER), Constants.PORT_TCP);
             Debug.Print("PROGRAM STARTED");
             camera.CameraConnected += Camera_CameraConnected;
             camera.CameraDisconnected += Camera_CameraDisconnected;
             camera.PictureCaptured += Camera_PictureCaptured;
             camera.CurrentPictureResolution = Camera.PictureResolution.Resolution176x144;
-            ethernetJ11D.UseThisNetworkInterface();
-            ethernetJ11D.NetworkUp += EthernetJ11D_NetworkUp;
-            ethernetJ11D.NetworkDown += EthernetJ11D_NetworkDown;
+            wifiRS21.NetworkDown += WifiRS21_NetworkDown;
+            wifiRS21.NetworkUp += WifiRS21_NetworkUp;
             new Thread(connectionChecking).Start();
+            initializeWifi();
+
+            //ethernetJ11D.UseThisNetworkInterface();
+            //ethernetJ11D.NetworkUp += EthernetJ11D_NetworkUp;
+            //ethernetJ11D.NetworkDown += EthernetJ11D_NetworkDown;
+
         }
 
+        private void initializeWifi()
+        {
+            ledStrip.SetBitmask(28);
+            if(!wifiRS21.NetworkInterface.Opened)
+            wifiRS21.NetworkInterface.Open();
+            wifiRS21.UseStaticIP(Constants.STATIC_IP, Constants.MASK, Constants.STATIC_IP);
+
+            wifiRS21.NetworkInterface.Join(Constants.WIFI_SSID, Constants.WIFI_PASSWORD);
+            while (wifiRS21.NetworkInterface.IPAddress == "0.0.0.0")
+            {
+                Debug.Print("ASPETTANDO IP");
+                Thread.Sleep(200);
+            }
+            Debug.Print("IP ADDRESS " + wifiRS21.NetworkInterface.IPAddress);
+            ledStrip.TurnAllLedsOff();
+            //TODO USE STATIC ADDRESS sulla SCHEDA WIFI PC
+        }
+
+        private void WifiRS21_NetworkUp(GTM.Module.NetworkModule sender, GTM.Module.NetworkModule.NetworkState state)
+        {
+            Debug.Print("WIFI UP");
+        }
+
+        private void WifiRS21_NetworkDown(GTM.Module.NetworkModule sender, GTM.Module.NetworkModule.NetworkState state)
+        {
+            Debug.Print("WIFI DOWN");
+        }
 
         private void Camera_PictureCaptured(Camera sender, GT.Picture e)
         {
             try
             {
                 byte[] image = e.PictureData;
-                Debug.Print("FOTO ACQUISITA");
                 int pictureSize = image.Length;
                 //TODO CHANGE
-                sockSender.ReceiveTimeout = 0;
-                sockSender.SendTimeout = 0;
+                sockSender.ReceiveTimeout = 8000;
+                sockSender.SendTimeout = 8000;
                 int sent = 0, received = 0;
                 sent = sockSender.Send(BitConverter.GetBytes(pictureSize), 0, sizeof(int), SocketFlags.None);
                 sent = 0;
@@ -82,7 +115,8 @@ namespace FEZ
             }
             catch (SocketException ex)
             {
-                Debug.Print("Exception " + ex.Message);
+                //Debug.Print("Exception " + ex.Message);
+                Debug.Print("SOCKET EXCEPTION DURANTE LA RICEZIONE");
                 sockSender.Close();
                 connectionChecking();
             }
@@ -97,27 +131,56 @@ namespace FEZ
 
         private void connectionChecking()
         {
-            while (ethernetJ11D.IsNetworkUp == false)
+            //while (ethernetJ11D.IsNetworkUp == false)
+            //{
+            //    Debug.Print("Waiting...");
+            //    Thread.Sleep(1000);
+
+            //}
+
+            while (wifiRS21.IsNetworkUp == false)
             {
                 Debug.Print("Waiting...");
+                ledStrip.SetBitmask(28);
                 Thread.Sleep(1000);
-
             }
 
 
             while (true)
             {
-                sockSender = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                sockSender.Connect(remoteEP);
-                IPEndPoint ipEndPoint = sockSender.RemoteEndPoint as IPEndPoint;
-                if (String.Compare(ipEndPoint.Address.ToString(), remoteEP.Address.ToString()) == 0
-                    && ipEndPoint.Port == remoteEP.Port)
+                bool isConnected = true;
+                try
+                {
+                    sockSender = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                    ledStrip.SetBitmask(28);
+                    sockSender.Connect(remoteEP);
+                }
+                catch (SocketException e)
+                {
+                    isConnected = false;
+                    Debug.Print("ECCEZIONE DURANTE CONNECT");
+                    if (e.ErrorCode == 11003)
+                    {
+                        //succede solo se stacco il wifi e poi nn riparte
+                    }
+                    //TODO Risolvere error code 11003
+                    //TODO aggiungere più controlli in initializeWifi
+                }
+                if (isConnected)
                     break;
-                Debug.Print("ASPETTO IL SERVER");
-                sockSender.Close();
-                ledStrip.SetBitmask(28);
-                Thread.Sleep(30);
+                Thread.Sleep(400);
+
             }
+
+            //IPEndPoint ipEndPoint = sockSender.RemoteEndPoint as IPEndPoint;
+            //if (String.Compare(ipEndPoint.Address.ToString(), remoteEP.Address.ToString()) == 0
+            //    && ipEndPoint.Port == remoteEP.Port)
+            //    break;
+            //Debug.Print("ASPETTO IL SERVER");
+            //sockSender.Close();
+            //ledStrip.SetBitmask(28);
+            //Thread.Sleep(30);
+
 
             ledStrip.TurnAllLedsOff();
 

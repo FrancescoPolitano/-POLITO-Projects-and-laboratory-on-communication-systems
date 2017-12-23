@@ -13,6 +13,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.internal.LinkedTreeMap;
 
 //Sets the base url
 @Path("/resources")
@@ -54,8 +56,7 @@ public class Resources {
 	@Path("users/{id}")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response sendEmployee(@PathParam("id") String id) throws SQLException {
-		if (!database.isAdminLogged())
-			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
+		
 		Gson gson = new Gson();
 		Employee temp = database.getEmployee(id);
 		if (temp == null)
@@ -68,10 +69,11 @@ public class Resources {
 	@POST
 	@Path("users/employees")
 	@Produces(MediaType.TEXT_PLAIN)
-	public Response newEmployee(String employee) {
-		if (!database.isAdminLogged())
-			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
-		EmployeeRequestClass temp = new Gson().fromJson(employee, EmployeeRequestClass.class);
+	public Response newEmployee(String request) {
+		AuthenticatedRequest req= new Gson().fromJson(request, AuthenticatedRequest.class);
+		EmployeeRequestClass temp = new Gson().fromJson(new Gson().toJson(((LinkedTreeMap<String, Object>) req.getBody())), EmployeeRequestClass .class);
+		if(!Database.tokens.containsKey(req.Token) )return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
+
 		if (temp == null)
 			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
 		if (temp.getEmployee() == null)
@@ -90,8 +92,6 @@ public class Resources {
 	@Path("auth/{local}/{code}")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response getAccess(@PathParam("local") String door, @PathParam("code") String code) {
-		if (!database.isAdminLogged())
-			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
 		return Response.ok(database.isAuth(door, code)).build();
 	}
 
@@ -99,10 +99,10 @@ public class Resources {
 	// the user as a json
 	@POST
 	@Path("users/visitors")
-	public Response newVisitor(String visitor) {
-		if (!database.isAdminLogged())
-			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
-		rest.Visitor temp = new Gson().fromJson(visitor, rest.Visitor.class);
+	public Response newVisitor(String request) {
+		AuthenticatedRequest req= new Gson().fromJson(request, AuthenticatedRequest.class);
+		rest.Visitor temp = new Gson().fromJson(new Gson().toJson(((LinkedTreeMap<String, Object>) req.getBody())),rest.Visitor.class);
+		if(!Database.tokens.containsKey(req.Token) )return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
 		if (temp == null)
 			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
 		String code = database.createVisitor(temp);
@@ -116,9 +116,10 @@ public class Resources {
 	@POST
 	@Path("users/new_code")
 	@Produces(MediaType.TEXT_PLAIN)
-	public Response getNewCode(String id) {
-		if (!database.isAdminLogged())
-			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
+	public Response getNewCode(String request) {
+		AuthenticatedRequest req= new Gson().fromJson(request, AuthenticatedRequest.class);
+		String id = new Gson().fromJson(new Gson().toJson(((LinkedTreeMap<String, Object>) req.getBody())),String.class);
+		if(!Database.tokens.containsKey(req.Token) )return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
 		if (id.isEmpty())
 			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
 		String code = database.newCode(id);
@@ -131,9 +132,10 @@ public class Resources {
 	// delete an user
 	@DELETE
 	@Path("users/{id}")
-	public Response deleteEmployee(@PathParam("id") String id) {
-		if (!database.isAdminLogged())
-			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
+	public Response deleteEmployee(@PathParam("id") String request) {
+		AuthenticatedRequest req= new Gson().fromJson(request, AuthenticatedRequest.class);
+		String id = new Gson().fromJson(new Gson().toJson(((LinkedTreeMap<String, Object>) req.getBody())),String.class);
+		if(!Database.tokens.containsKey(req.Token) )return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
 		boolean result = database.deleteEmployee(id);
 		if (!result)
 			return Response.status(Constants.status_not_found).entity(Constants.not_found).build();
@@ -147,6 +149,7 @@ public class Resources {
 	public Response getLocals() {
 		Gson gson = new Gson();
 		ArrayList<Local> locals = database.getAllLocals();
+		System.out.println(Utils.hashString("admin"));
 		if (locals == null)
 			return Response.status(Constants.status_generic_error).entity(Constants.generic_error).build();
 		String Json = gson.toJson(locals);
@@ -157,10 +160,10 @@ public class Resources {
 	@POST
 	@Path("locals")
 	@Produces(MediaType.TEXT_PLAIN)
-	public Response createNewLocal(String json) {
-		if (!database.isAdminLogged())
-			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
-		Local local = new Gson().fromJson(json, Local.class);
+	public Response createNewLocal(String request) {
+		AuthenticatedRequest req= new Gson().fromJson(request, AuthenticatedRequest.class);
+		Local local = new Gson().fromJson(new Gson().toJson(((LinkedTreeMap<String, Object>) req.getBody())), Local.class);
+		if(!Database.tokens.containsKey(req.Token) )return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
 		if (local == null)
 			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
 		int result = database.createNewLocal(local);
@@ -175,13 +178,13 @@ public class Resources {
 	@POST
 	@Path("query")
 	@Produces(MediaType.TEXT_PLAIN)
-	public Response complexQuery(String parameters) throws SQLException {
-		if (!database.isAdminLogged())
-			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
-		ComplexQuery query = new Gson().fromJson(parameters, ComplexQuery.class);
+	public Response complexQuery(String request) throws SQLException {
+		AuthenticatedRequest req= new Gson().fromJson(request, AuthenticatedRequest.class);
+		ComplexQuery query = new Gson().fromJson(new Gson().toJson(((LinkedTreeMap<String, Object>) req.getBody())),ComplexQuery.class);
+		if(!Database.tokens.containsKey(req.Token) )return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
 		if (query == null)
 			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
-		Gson gson = new Gson();
 		ArrayList<Access> temp = database.makeQuery(query);
 
 		if (temp == null)
@@ -194,23 +197,24 @@ public class Resources {
 	@POST
 	@Path("login")
 	@Produces(MediaType.TEXT_PLAIN)
-	public Response adminLogin(String json) {
-		LoginData lg = new Gson().fromJson(json, LoginData.class);
+	public Response adminLogin(String request) {
+		LoginData lg = new Gson().fromJson(request, LoginData.class);
 		if (lg.getPassword() == null || lg.getUsername() == null || lg == null)
 			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
-		if (database.login(lg))
-			return Response.ok().build();
+		String token= database.login(lg);
+		if (token!=null)
+			return Response.ok(token, MediaType.TEXT_PLAIN).build();
 		return Response.status(Constants.status_generic_error).entity(Constants.generic_error).build();
 	}
 
-	// logout Admin
-	@GET
-	@Path("logout")
-	@Produces(MediaType.TEXT_PLAIN)
-	public Response adminLogout() {
-		if (!database.isAdminLogged())
-			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
-		Database.getInstance().setAdminLogged(false);
-		return Response.ok().build();
-	}
+	// logout Admin  ---->sbagliata ora è una post
+//	@GET
+//	@Path("logout")
+//	@Produces(MediaType.TEXT_PLAIN)
+//	public Response adminLogout() {
+//		if (!database.isAdminLogged())
+//			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
+//		Database.getInstance().setAdminLogged(false);
+//		return Response.ok().build();
+//	}
 }

@@ -2,6 +2,7 @@ package rest;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
@@ -9,10 +10,12 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.google.gson.Gson;
+
 public class Database {
 	private static Database instance = null;
-	private boolean adminLogged;
-	public static HashMap<String, String> tokens= new HashMap<String, String>();
+	public static HashMap<String, String> tokens = new HashMap<String, String>();
+
 	private Database() {
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
@@ -24,7 +27,6 @@ public class Database {
 		} catch (InstantiationException ex) {
 			System.out.println("Error: unable to instantiate driver!");
 		}
-		adminLogged = true;
 	}
 
 	public static Database getInstance() {
@@ -46,14 +48,6 @@ public class Database {
 		if (conn != null)
 			System.out.println("Connected to the database");
 		return conn;
-	}
-
-	public boolean isAdminLogged() {
-		return adminLogged;
-	}
-
-	public void setAdminLogged(boolean adminLogged) {
-		this.adminLogged = adminLogged;
 	}
 
 	public ArrayList<Employee> getAllEmployes() {
@@ -525,7 +519,7 @@ public class Database {
 		try {
 			if (conn != null) {
 				stmt = (Statement) conn.createStatement();
-				System.out.println("QUERYYYYY "+query.toValidSQLQuery());
+				System.out.println("QUERYYYYY " + query.toValidSQLQuery());
 				stmt.executeQuery(query.toValidSQLQuery());
 				results = stmt.getResultSet();
 
@@ -562,28 +556,28 @@ public class Database {
 
 	public String login(LoginData lg) {
 		Statement stmt = null;
-		 String temp=null;
+		String temp = null;
 		ResultSet results;
 		Connection conn = connect();
 		String hash = Utils.hashString(lg.getPassword());
 		try {
 			if (conn != null) {
 				stmt = (Statement) conn.createStatement();
-				stmt.executeQuery("SELECT COUNT(*) as total FROM users WHERE Username='" + lg.getUsername() +"' and Password='"+hash+"'");
+				stmt.executeQuery("SELECT COUNT(*) as total FROM users WHERE Username='" + lg.getUsername()
+						+ "' and Password='" + hash + "'");
 				results = stmt.getResultSet();
 				results.first();
-			 if (results.getInt("total") == 1) {
-				 do {
-					  temp=Utils.createToken(lg.getUsername());
-				 }
-				 while(tokens.containsValue(temp));
-				 tokens.put(lg.getUsername(), temp);
-			 }
+				if (results.getInt("total") == 1) {
+					do {
+						temp = Utils.createToken(lg.getUsername());
+					} while (tokens.containsValue(temp));
+					tokens.put(lg.getUsername(), temp);
+				}
 			}
-		
+
 		} catch (SQLException ex) {
 			System.out.println("999 " + ex.getMessage());
-			return temp;
+			return null;
 		} finally {
 			try {
 
@@ -597,4 +591,57 @@ public class Database {
 		}
 		return temp;
 	}
+
+	public int changeAuthLevel(AuthLevel al) {
+		Connection conn = connect();
+		ResultSet results;
+		PreparedStatement ps = null, ps1 = null;
+		int affectedRows = 0;
+		if (conn == null)
+			return -1;
+		String sqlSearchUsers = "SELECT COUNT(*) as total from employes WHERE SerialNumber = ?";
+
+		try {
+			ps = conn.prepareStatement(sqlSearchUsers);
+			ps.setInt(1, al.getSerialNumber());
+			results = ps.executeQuery();
+
+			while (results.next())
+				if (results.getInt("total") == 0)
+					return 0;
+
+			String sql = "UPDATE employes SET AuthGrade = ? WHERE SerialNumber = ?";
+			ps1 = conn.prepareStatement(sql);
+			ps1.setString(1, al.getAuthLevel());
+			ps1.setInt(2, al.getSerialNumber());
+			affectedRows = ps1.executeUpdate();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return -1;
+		} finally {
+			try {
+				if (conn != null)
+					conn.close();
+				if (ps != null)
+					ps.close();
+				if (ps1 != null)
+					ps1.close();
+			} catch (SQLException e) {
+				System.out.println("Error closing " + e.getMessage());
+			}
+		}
+		return affectedRows;
+	}
+
+	// TODO TESTARE QUESTA FUNZIONE
+	public boolean isJSONValid(String jsonInString) {
+		try {
+			new Gson().fromJson(jsonInString, Object.class);
+			return true;
+		} catch (com.google.gson.JsonSyntaxException ex) {
+			return false;
+		}
+	}
+
 }

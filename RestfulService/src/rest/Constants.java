@@ -11,6 +11,4 @@ public class Constants {
 	public static final int status_invalid_input = 802;
 	public static final int status_existing_key = 803;
 	public static final int status_access_denied = 804;
-	public static final String admin_username = "AdminFEZ";
-	public static final String admin_password = "PasswordFEZ";
 }

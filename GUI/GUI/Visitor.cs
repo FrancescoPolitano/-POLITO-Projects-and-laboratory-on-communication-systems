@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GUI
 {
-    class Visitor : INotifyPropertyChanged
+    public class Visitor : INotifyPropertyChanged
     {
         string name, surname, causal, expiration;
 

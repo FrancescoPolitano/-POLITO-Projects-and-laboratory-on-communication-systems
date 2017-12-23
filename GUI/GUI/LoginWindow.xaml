@@ -22,7 +22,7 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
         <TextBlock Name="errors" FontWeight="Bold" Grid.Column="0" Text="Please log in or" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        <Button Grid.Column="1" Content="Enter as Doorkeeper" Name="Enter"  Click="Confirm_Click" />
+        <Button Grid.Column="1" Content="Enter as Doorkeeper" Name="Enter"  Click="Enter_Click" />
         </Grid>
         <StackPanel Grid.Row="2">
             <TextBlock FontSize="16" FontWeight="Bold" Text="Username"  VerticalAlignment="Center" Margin="5,0" />

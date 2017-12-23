@@ -22,12 +22,13 @@ namespace GUI
     /// </summary>
     public partial class VisitorCreation : MetroWindow
     {
-        private Visitor myVisitor = new Visitor();
+        private Visitor myVisitor;
 
-        internal Visitor MyVisitor { get => myVisitor; set => myVisitor = value; }
+        public Visitor MyVisitor { get => myVisitor; set => myVisitor = value; }
 
         public VisitorCreation()
         {
+            MyVisitor = new Visitor();
             InitializeComponent();
             myGrid.DataContext = MyVisitor;
             CalendarDateRange cdr = new CalendarDateRange(DateTime.MinValue, DateTime.Today);
@@ -42,13 +43,13 @@ namespace GUI
         private async void Confirm_Click(object sender, RoutedEventArgs e)
         {
             //take fields and trigger something to do post
-            if (String.IsNullOrEmpty(Name.Text))
+            if (String.IsNullOrEmpty(NameBox.Text))
             {
                 //errore Nome
                 this.ShowModalMessageExternal("Ops", "Insert a valid name");
                 return;
             }
-            if (String.IsNullOrEmpty(Surname.Text))
+            if (String.IsNullOrEmpty(SurnameBox.Text))
             {
                 //errore Cognome
                 this.ShowModalMessageExternal("Ops", "Insert a valid surname");
@@ -64,13 +65,14 @@ namespace GUI
 
             
             myVisitor.Expiration = String.Format("{0:yyyy-MM-dd HH:mm:ss}", DatePick.SelectedDate);
-            Console.WriteLine("Puppe");
             //TODO CHANGE : cambiare valore di ritorno, per prendere il path del QR code nuovo
             string QRcodeNew = await RestClient.CreateVisitor(myVisitor);
             if (!String.IsNullOrEmpty(QRcodeNew))
             {
                 QRCode qr = new QRCode(Constants.IPREMOTE + QRcodeNew);
                 qr.ShowDialog();
+                App.visitorList.Add(MyVisitor);
+                BigWindow.VisitorList.Add(MyVisitor);
                 Close();
             }
             else

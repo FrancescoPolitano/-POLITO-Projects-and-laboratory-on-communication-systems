@@ -26,7 +26,12 @@
      
         <TabItem Header="Users" Name="UserTab">
             <Grid Background="AliceBlue">
-                <ListView Name="Users" ItemsSource="{Binding UserList}" Width="Auto" Height="Auto" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="7*" />
+                </Grid.RowDefinitions>
+                <Button Grid.Row="0" Name="newUser" Content="Create new User" HorizontalAlignment="Right" Margin="5" Click="newUser_Click"/>
+                <ListView Grid.Row="1" Name="Users" ItemsSource="{Binding UserList}" Width="Auto" Height="Auto" >
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Grid>
@@ -57,6 +62,40 @@
                             <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListViewItem_PreviewMouseLeftButtonDown" />
                         </Style>
                         
+                    </ListView.ItemContainerStyle>
+                </ListView>
+            </Grid>
+        </TabItem>
+        <TabItem Header="Visitors" Name="VisitorTab">
+            <Grid Background="AliceBlue">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="7*" />
+                </Grid.RowDefinitions>
+                <Button Name="newVisitor" Grid.Row="0" Content="Create new visitor"  HorizontalAlignment="Right" Margin="5" Click="newVisitor_Click"/>
+                <ListView Grid.Row="1" Name="Visitors" ItemsSource="{Binding VisitorList}" Width="Auto" Height="Auto" >
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Name}" Grid.Column="0" Margin="3" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Surname}" Grid.Column="1" Margin="3" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Expiration}" Grid.Column="2" Margin="3" VerticalAlignment="Center" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.ItemContainerStyle>
+                        <Style  TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="BorderBrush" Value="LightGray" />
+                            <Setter Property="BorderThickness" Value="0,0,0,1" />
+                            <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListViewItem_PreviewMouseLeftButtonDown_1" />
+                        </Style>
+
                     </ListView.ItemContainerStyle>
                 </ListView>
             </Grid>
@@ -157,16 +196,7 @@
             </Grid.Resources>
             </Grid>
         </TabItem>
-        <TabItem Header="Management" Name="Management">
-            <Grid Background="AliceBlue">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Button Name="newUser" Content="Create new User"  Height="60" Width="200" HorizontalAlignment="Center" VerticalAlignment="Center" Click="newUser_Click"/>
-                <Button Name="newVisitor" Grid.Row="1" Content="Create new visitor" Height="60" Width="200" HorizontalAlignment="Center" VerticalAlignment="Center" Click="newVisitor_Click"/>
-            </Grid>
-        </TabItem>
+       
     </TabControl>
 
    

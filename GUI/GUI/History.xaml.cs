@@ -185,7 +185,7 @@ namespace GUI
                 }
                 temp.Add(st.Substring(st.LastIndexOf(" ")));
             }
-            qr.Users = temp;
+            qr.Employees = temp;
             qr.Rooms = new List<string>(listRooms);
             if (t != null)
                 qr.Initial = t ?? DateTime.MinValue;

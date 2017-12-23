@@ -8,7 +8,7 @@ namespace GUI
 {
     class ComplexQuery
     {
-        private List<string> users = new List<string>();
+        private List<string> employees = new List<string>();
         private List<string> rooms = new List<string>();
         private DateTime initial, end;
 
@@ -16,13 +16,13 @@ namespace GUI
 
         public ComplexQuery(List<string> users, List<string> rooms, DateTime initial, DateTime end)
         {
-            Users = users;
+            Employees = users;
             Rooms = rooms;
             Initial = initial;
             End = end;
         }
 
-        public List<string> Users { get => users; set => users = value; }
+        public List<string> Employees { get => employees; set => employees = value; }
         public List<string> Rooms { get => rooms; set => rooms = value; }
         public DateTime Initial { get => initial; set => initial = value; }
         public DateTime End { get => end; set => end = value; }

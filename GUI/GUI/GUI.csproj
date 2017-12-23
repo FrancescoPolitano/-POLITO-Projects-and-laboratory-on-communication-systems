@@ -70,6 +70,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Access.cs" />
+    <Compile Include="AuthenticatedRequest.cs" />
     <Compile Include="ByteArrayConverter.cs" />
     <Compile Include="ComplexQuery.cs" />
     <Compile Include="Constants.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="History.xaml.cs">
       <DependentUpon>History.xaml</DependentUpon>
     </Compile>
+    <Compile Include="LoginData.cs" />
     <Compile Include="QRCode.xaml.cs">
       <DependentUpon>QRCode.xaml</DependentUpon>
     </Compile>

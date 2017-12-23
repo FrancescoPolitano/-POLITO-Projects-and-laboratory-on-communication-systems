@@ -6,6 +6,13 @@
         xmlns:local="clr-namespace:GUI"
         mc:Ignorable="d"
         Title="UserDetails" Height="350" Width="450">
+    <Window.Resources>
+        <Style TargetType="Button" BasedOn="{StaticResource MetroButton}">
+            <Setter Property="Margin" Value="15" />
+        </Style>
+        <local:UriConverter x:Key="UriConverter" />
+    </Window.Resources>
+    
     <Grid Name="OuterGrid" >
         <Grid.RowDefinitions>
             <RowDefinition Height="2*" />
@@ -26,7 +33,20 @@
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Name="Name" Text="{Binding Name, StringFormat='Name: {0}'}" />
             <TextBlock Grid.Row="1" Name="Surname" Text="{Binding Surname, StringFormat='Surname: {0}'}" />
-            <TextBlock Grid.Row="2" Name="Role" Text="{Binding AuthLevel, StringFormat='AuthLevel: {0}'}" />
+            <TextBlock Grid.Row="2" Name="Role" Text="{Binding AuthLevel, StringFormat='AuthLevel: {0}'}" >
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock" >
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding Path=AuthLevel}" Value="0" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Text" Value="Access Blocked"/>
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
             <TextBlock Grid.Row="3" Name="Serial" Text="{Binding Serial, StringFormat='Serial: {0}'}" />
             <TextBlock Grid.Row="4" Name="CurrentPosition" Text="{Binding CurrentPosition, StringFormat='CurrentPosition: {0}'}" />
             <TextBlock Grid.Row="5" Name="Email" Text="{Binding Email, StringFormat='Email: {0}'}" />
@@ -39,14 +59,10 @@
                 </Style>
             </Grid.Resources>
         </Grid>
-        <Image Grid.Row="0" Grid.Column="1" Source="{Binding PathPhoto}" Stretch="Fill"/>
+        <Image Grid.Row="0" Grid.Column="1" Source="{Binding Path=PathPhoto,Converter={StaticResource UriConverter}}" Stretch="Fill"/>
         <Button Grid.Row="1" Grid.Column="0" Name="History" Content="History" Click="History_Click" />
         <Button Grid.Row="1" Grid.Column="1" Name="modify" Content="Modify" Click="modify_Click" />
     </Grid>
-    <Window.Resources>
-        <Style TargetType="Button" BasedOn="{StaticResource MetroButton}">
-            <Setter Property="Margin" Value="15" />
-        </Style>
-    </Window.Resources>
+  
     
 </Window>

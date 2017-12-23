@@ -23,24 +23,29 @@ namespace GUI
     /// </summary>
     public partial class BigWindow : MetroWindow
     {
-        private ObservableCollection<string> users = new ObservableCollection<string>();
+        public static ObservableCollection<string> users = new ObservableCollection<string>();
         private ObservableCollection<string> rooms = new ObservableCollection<string>();
         private ObservableCollection<string> listUsers = new ObservableCollection<string>();
         private ObservableCollection<string> listRooms = new ObservableCollection<string>();
         private ObservableCollection<Access> contenuto = new ObservableCollection<Access>();
+        private static ObservableCollection<Employee> userList;
+        private static ObservableCollection<Visitor> visitorList;
 
+        public static ObservableCollection<Employee> UserList { get => userList; set => userList = value; }
+        internal static ObservableCollection<Visitor> VisitorList { get => visitorList; set => visitorList = value; }
         public ObservableCollection<Access> Contenuto { get => contenuto; set => contenuto = value; }
 
         public BigWindow(string UserType)
         {
             InitializeComponent();
-            if (String.Compare(UserType,"ADMIN") != 0)
+            if (String.Compare(UserType,Constants.ADMIN) != 0)
             {
-                Management.Visibility = Visibility.Collapsed;
+                VisitorTab.Visibility = Visibility.Collapsed;
                 UserTab.Visibility = Visibility.Collapsed;
                 History.Visibility = Visibility.Collapsed;
             }
             UserList = new ObservableCollection<Employee>();
+            VisitorList = new ObservableCollection<Visitor>();
 
             if (App.userList != null)
             {
@@ -48,6 +53,9 @@ namespace GUI
                 foreach (Employee user in UserList)
                     users.Add(user.Name + " " + user.Surname + " " + user.Serial);
             }
+            if (App.visitorList != null)
+                VisitorList = new ObservableCollection<Visitor>(App.visitorList);
+
             CalendarDateRange cdr = new CalendarDateRange(DateTime.Today.AddDays(1), DateTime.MaxValue);
             fromDate.BlackoutDates.Add(cdr);
             toDate.BlackoutDates.Add(cdr);
@@ -56,6 +64,7 @@ namespace GUI
                     rooms.Add(room.Name);
            
             Users.ItemsSource = UserList;
+            Visitors.ItemsSource = VisitorList;
 
        
             users.Add("Tutti");
@@ -68,8 +77,7 @@ namespace GUI
             listContent.ItemsSource = Contenuto;
         }
 
-        public static ObservableCollection<Employee> UserList { get => userList; set => userList = value; }
-        private static ObservableCollection<Employee> userList;
+      
 
         private void newUser_Click(object sender, RoutedEventArgs e)
         {
@@ -236,9 +244,9 @@ namespace GUI
                     //qua ho cambiato, ora si manda vuoto se c'è solo TUTTI
                     continue;
                 }
-                temp.Add(st.Substring(st.LastIndexOf(" ")));
+                temp.Add(st.Substring(st.LastIndexOf(" ")+1));
             }
-            qr.Users = temp;
+            qr.Employees = temp;
             List<String> temp2 = new List<string>();
             foreach(string st in listRooms)
             {
@@ -248,12 +256,22 @@ namespace GUI
                 else
                     temp2.Add(st);
             }
-            qr.Rooms = temp;
+            qr.Rooms = temp2;
             if (t != null)
                 qr.Initial = t ?? DateTime.MinValue;
             if (t1 != null)
                 qr.End = t1 ?? DateTime.MaxValue;
             return qr;
+        }
+
+        private void ListViewItem_PreviewMouseLeftButtonDown_1(object sender, MouseButtonEventArgs e)
+        {
+            var item = sender as ListViewItem;
+            if (item != null)
+            {
+                Visitor visitor = item.DataContext as Visitor;
+                MessageBox.Show("nome del visitor" + visitor.Name);
+            }
         }
     }
 }

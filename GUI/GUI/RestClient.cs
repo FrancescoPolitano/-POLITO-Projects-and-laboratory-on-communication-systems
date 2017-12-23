@@ -29,7 +29,7 @@ namespace GUI
         //}
 
         private static string myRest = Constants.myRest;
-
+        private static string sessionToken = String.Empty;
         private static readonly HttpClient client = new HttpClient();
 
         //method for getting all users
@@ -42,6 +42,21 @@ namespace GUI
             if (response.IsSuccessStatusCode)
             {
                 List<Employee> lista =  JsonConvert.DeserializeObject<List<Employee>>(response.Content.ReadAsStringAsync().Result);
+                return lista;
+            }
+            return null;
+        }
+
+        //method for getting all visitors
+        public static List<Visitor> GetAllVisitors()
+        {
+            string json = String.Empty;
+            //TODO why this and not await?
+            HttpResponseMessage response = client.GetAsync(myRest + "/users/visitors").Result;
+
+            if (response.IsSuccessStatusCode)
+            {
+                List<Visitor> lista = JsonConvert.DeserializeObject<List<Visitor>>(response.Content.ReadAsStringAsync().Result);
                 return lista;
             }
             return null;
@@ -69,9 +84,9 @@ namespace GUI
                 Employee = u,
                 Photo = File.ReadAllBytes(u.PathPhoto)
             };
-
-            string json = JsonConvert.SerializeObject(eRC);
-            Console.WriteLine(json);
+            AuthenticatedRequest authReq = new AuthenticatedRequest(sessionToken, eRC);
+            string json = JsonConvert.SerializeObject(authReq);
+            //Console.WriteLine(json);
 
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -86,7 +101,9 @@ namespace GUI
         //TODO test this
         public static async Task<string> CreateVisitor(Visitor v)
         {
-            string json = JsonConvert.SerializeObject(v);
+            AuthenticatedRequest authReq = new AuthenticatedRequest(sessionToken, v);
+            string json = JsonConvert.SerializeObject(authReq);
+            //Console.WriteLine(json);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             HttpResponseMessage response = await client.PostAsync(myRest + "/users/visitors", content);
             if (response.IsSuccessStatusCode)
@@ -109,7 +126,9 @@ namespace GUI
         //method to block accesses from user 
         public static async Task<bool> BlockAccess(Employee u)
         {
-            string json = JsonConvert.SerializeObject(u);
+            AuthenticatedRequest authReq = new AuthenticatedRequest(sessionToken, u);
+
+            string json = JsonConvert.SerializeObject(authReq);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             HttpResponseMessage response = await client.PostAsync(myRest + "/users/block", content);
             if (response.IsSuccessStatusCode)
@@ -121,7 +140,8 @@ namespace GUI
         //method to ask for a change of role
         public static async Task<bool> RoleChange(Employee u)
         {
-            string json = JsonConvert.SerializeObject(u);
+            AuthenticatedRequest authReq = new AuthenticatedRequest(sessionToken, u);
+            string json = JsonConvert.SerializeObject(authReq);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             HttpResponseMessage response = await client.PostAsync(myRest + "/users/changeRole", content);
             if (response.IsSuccessStatusCode)
@@ -133,8 +153,9 @@ namespace GUI
         //method to ask for a change in QRcode
         public static string QRCodeChange(string id)
         {
-
-            var content = new StringContent(id, Encoding.UTF8, "application/json");
+            AuthenticatedRequest authReq = new AuthenticatedRequest(sessionToken, id);
+            string json = JsonConvert.SerializeObject(authReq);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
             HttpResponseMessage response = client.PostAsync(myRest + "/users/new_code", content).Result;
             if (response.IsSuccessStatusCode)
                 return response.Content.ReadAsStringAsync().Result;
@@ -150,18 +171,22 @@ namespace GUI
             HttpResponseMessage response = client.PostAsync(myRest + "/login" ,content).Result;
             if (response.IsSuccessStatusCode)
             {
-                string result = await response.Content.ReadAsStringAsync();
-                if (String.Compare(result, "OK") == 0)
+                sessionToken = response.Content.ReadAsStringAsync().Result;
+                if (String.IsNullOrEmpty(sessionToken))
+                    return false;
+                else
                     return true;
             }
             return false;
         }
 
+       
+
 
         public static List<Access> GetHistory(ComplexQuery q)
         {
-            //TODO s'è rotto sulla complex query
-            string json = JsonConvert.SerializeObject(q);
+            AuthenticatedRequest authReq = new AuthenticatedRequest(sessionToken, q);
+            string json = JsonConvert.SerializeObject(authReq);
             Console.WriteLine(json);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             HttpResponseMessage response = client.PostAsync(myRest + "/query", content).Result;
@@ -171,12 +196,16 @@ namespace GUI
         }
 
 
-
-
-
-
-
-
-
+        public static void Logout()
+        {
+            AuthenticatedRequest authReq = new AuthenticatedRequest(sessionToken, null);
+            string json = JsonConvert.SerializeObject(authReq);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = client.PostAsync(myRest + "/logout", content).Result;
+            if (!response.IsSuccessStatusCode)
+                throw new Exception();
+            else
+                sessionToken = String.Empty;
+        }
     }
 }

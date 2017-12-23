@@ -47,12 +47,14 @@ namespace GUI
 
             if (RestClient.Login(myLoginData).Result)
             {
-                PageChange("ADMIN");
+                PageChange(Constants.ADMIN);
                 Close();
             }
             else
             {
                 errors.Text = "Something is wrong, retry";
+                username.Text = "";
+                password.Password = "";
                 return;
             }
         }
@@ -64,7 +66,11 @@ namespace GUI
 
         private void Enter_Click(object sender, RoutedEventArgs e)
         {
-            PageChange("DOORKEEPER");
+            //TODO non è proprio cosi nella versione finale, #imbroglio
+            myLoginData.Username = "admin";
+            myLoginData.Password = "admin";
+            if (RestClient.Login(myLoginData).Result)
+                PageChange(Constants.ADMIN);
             Close();
         }
 

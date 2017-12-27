@@ -8,6 +8,8 @@ import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 import com.google.gson.Gson;
@@ -19,6 +21,8 @@ public class Database {
 	private Database() {
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			tokens.put("admin", "0");
+
 
 		} catch (ClassNotFoundException ex) {
 			System.out.println("Error: unable to load driver class!");
@@ -310,14 +314,18 @@ public class Database {
 		try {
 			if (conn != null) {
 				stmt = (Statement) conn.createStatement();
-				ResultSet rs;
+				ResultSet rs,rsCode, rsEmployee;
 				String newCode;
+				stmt.executeQuery("SELECT COUNT(*) as total FROM Employes WHERE SerialNumber='" + id + "'");
+				rsEmployee = stmt.getResultSet();
+				rsEmployee.first();
+				if(rsEmployee.getInt("total")!=1) return null;
 				do {
 					newCode = Utils.randomCodeGen();
 					stmt.executeQuery("SELECT COUNT(*) as total FROM auth WHERE Code='" + newCode + "'");
-					rs = stmt.getResultSet();
-					rs.first();
-				} while (rs.getInt("total") == 1);
+					rsCode = stmt.getResultSet();
+					rsCode.first();
+				} while (rsCode.getInt("total") == 1);
 				stmt.executeQuery("SELECT COUNT(*) as total FROM auth WHERE IdEmployee='" + id + "'");
 				rs = stmt.getResultSet();
 				rs.first();
@@ -571,6 +579,9 @@ public class Database {
 					do {
 						temp = Utils.createToken(lg.getUsername());
 					} while (tokens.containsValue(temp));
+					Calendar cal = Calendar.getInstance(); // creates calendar
+				    cal.setTime(new Date()); // sets calendar time/date
+				    cal.add(Calendar.HOUR_OF_DAY, 1); // adds one hour
 					tokens.put(lg.getUsername(), temp);
 				}
 			}
@@ -643,5 +654,6 @@ public class Database {
 			return false;
 		}
 	}
-
+	
+	
 }

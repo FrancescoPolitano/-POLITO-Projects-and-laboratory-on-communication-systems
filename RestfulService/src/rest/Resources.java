@@ -124,8 +124,7 @@ public class Resources {
 		if (!Database.tokens.containsValue(req.Token))
 			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
 		@SuppressWarnings("unchecked")
-		String id = new Gson().fromJson(new Gson().toJson(((LinkedTreeMap<String, Object>) req.getBody())),
-				String.class);
+		String id = (String) req.getBody();
 		if (id.isEmpty())
 			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
 		String code = database.newCode(id);
@@ -215,9 +214,14 @@ public class Resources {
 	public Response adminLogin(String request) {
 		
 		LoginData lg = new Gson().fromJson(request, LoginData.class);
+		String token;
 		if (lg.getPassword() == null || lg.getUsername() == null || lg == null)
 			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
-		String token = database.login(lg);
+		if(Database.tokens.containsKey(lg.getUsername())) {
+			token=  Database.tokens.get(lg.getUsername());
+			return Response.ok(token, MediaType.TEXT_PLAIN).build();
+		}
+		token = database.login(lg);
 		if (token != null)
 			return Response.ok(token, MediaType.TEXT_PLAIN).build();
 		return Response.status(Constants.status_generic_error).entity(Constants.generic_error).build();
@@ -232,8 +236,10 @@ public class Resources {
 		AuthenticatedRequest req = new Gson().fromJson(request, AuthenticatedRequest.class);
 		if (!Database.tokens.containsValue(req.Token))
 			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
-		String user = new Gson().fromJson(new Gson().toJson(((LinkedTreeMap<String, Object>) req.getBody())),
-				String.class);
+//		String user = new Gson().fromJson(new Gson().toJson(((LinkedTreeMap<String, Object>) req.getBody())),
+//				String.class);
+		String user = (String) req.getBody();
+			
 		if(Database.tokens.remove(user,req.Token))
 			return Response.ok().build();
 		return Response.status(Constants.status_generic_error).entity(Constants.generic_error).build();

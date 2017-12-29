@@ -69,7 +69,7 @@ public class Resources {
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response newEmployee(String request) {
 		AuthenticatedRequest req = new Gson().fromJson(request, AuthenticatedRequest.class);
-		if (!Database.tokens.containsValue(req.Token))
+		if (!database.isValidToken(req.Token))
 			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
 		@SuppressWarnings("unchecked")
 		EmployeeRequestClass temp = new Gson().fromJson(
@@ -101,7 +101,7 @@ public class Resources {
 	@Path("users/visitors")
 	public Response newVisitor(String request) {
 		AuthenticatedRequest req = new Gson().fromJson(request, AuthenticatedRequest.class);
-		if (!Database.tokens.containsValue(req.Token))
+		if (!database.isValidToken(req.Token))
 			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
 		@SuppressWarnings("unchecked")
 		rest.Visitor temp = new Gson().fromJson(new Gson().toJson(((LinkedTreeMap<String, Object>) req.getBody())),
@@ -121,7 +121,7 @@ public class Resources {
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response getNewCode(String request) {
 		AuthenticatedRequest req = new Gson().fromJson(request, AuthenticatedRequest.class);
-		if (!Database.tokens.containsValue(req.Token))
+		if (!database.isValidToken(req.getToken()))
 			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
 		@SuppressWarnings("unchecked")
 		String id = (String) req.getBody();
@@ -139,7 +139,7 @@ public class Resources {
 	@Path("users/{id}")
 	public Response deleteEmployee(@PathParam("id") String request) {
 		AuthenticatedRequest req = new Gson().fromJson(request, AuthenticatedRequest.class);
-		if (!Database.tokens.containsValue(req.Token))
+		if (!database.isValidToken(req.Token))
 			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
 		@SuppressWarnings("unchecked")
 		String id = new Gson().fromJson(new Gson().toJson(((LinkedTreeMap<String, Object>) req.getBody())),
@@ -170,7 +170,7 @@ public class Resources {
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response createNewLocal(String request) {
 		AuthenticatedRequest req = new Gson().fromJson(request, AuthenticatedRequest.class);
-		if (!Database.tokens.containsValue(req.Token))
+		if (!database.isValidToken(req.Token))
 			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
 		@SuppressWarnings("unchecked")
 		Local local = new Gson().fromJson(new Gson().toJson(((LinkedTreeMap<String, Object>) req.getBody())),
@@ -191,7 +191,7 @@ public class Resources {
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response complexQuery(String request) {
 		AuthenticatedRequest req = new Gson().fromJson(request, AuthenticatedRequest.class);
-		if (!Database.tokens.containsValue(req.Token))
+		if (!database.isValidToken(req.Token))
 			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
 		@SuppressWarnings("unchecked")
 		ComplexQuery query = new Gson().fromJson(new Gson().toJson(((LinkedTreeMap<String, Object>) req.getBody())),
@@ -217,10 +217,7 @@ public class Resources {
 		String token;
 		if (lg.getPassword() == null || lg.getUsername() == null || lg == null)
 			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
-		if(Database.tokens.containsKey(lg.getUsername())) {
-			token=  Database.tokens.get(lg.getUsername());
-			return Response.ok(token, MediaType.TEXT_PLAIN).build();
-		}
+		
 		token = database.login(lg);
 		if (token != null)
 			return Response.ok(token, MediaType.TEXT_PLAIN).build();
@@ -234,14 +231,14 @@ public class Resources {
 	public Response adminLogout(String request) {
 		
 		AuthenticatedRequest req = new Gson().fromJson(request, AuthenticatedRequest.class);
-		if (!Database.tokens.containsValue(req.Token))
+		if (!database.isValidToken(req.Token))
 			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
 //		String user = new Gson().fromJson(new Gson().toJson(((LinkedTreeMap<String, Object>) req.getBody())),
 //				String.class);
 		String user = (String) req.getBody();
 			
-		if(Database.tokens.remove(user,req.Token))
-			return Response.ok().build();
+//		if(Database.tokens.remove(user,req.Token))
+//			return Response.ok().build();
 		return Response.status(Constants.status_generic_error).entity(Constants.generic_error).build();
 	}
 
@@ -252,7 +249,7 @@ public class Resources {
 	public Response changeAuthLevel(String request) {
 		System.out.println("wdicbbceurberuvb");
 		AuthenticatedRequest req = new Gson().fromJson(request, AuthenticatedRequest.class);
-		if (!Database.tokens.containsValue(req.Token))
+		if (!database.isValidToken(req.Token))
 			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
 		@SuppressWarnings("unchecked")
 		AuthLevel al = new Gson().fromJson(new Gson().toJson(((LinkedTreeMap<String, Object>) req.getBody())),

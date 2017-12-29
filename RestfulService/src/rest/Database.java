@@ -16,13 +16,10 @@ import com.google.gson.Gson;
 
 public class Database {
 	private static Database instance = null;
-	public static HashMap<String, String> tokens = new HashMap<String, String>();
 
 	private Database() {
 		try {
-			Class.forName("com.mysql.jdbc.Driver").newInstance();
-			tokens.put("admin", "0");
-
+			Class.forName("com.mysql.jdbc.Driver").newInstance();			
 
 		} catch (ClassNotFoundException ex) {
 			System.out.println("Error: unable to load driver class!");
@@ -565,7 +562,7 @@ public class Database {
 	public String login(LoginData lg) {
 		Statement stmt = null;
 		String temp = null;
-		ResultSet results;
+		ResultSet results, exists;
 		Connection conn = connect();
 		String hash = Utils.hashString(lg.getPassword());
 		try {
@@ -578,11 +575,20 @@ public class Database {
 				if (results.getInt("total") == 1) {
 					do {
 						temp = Utils.createToken(lg.getUsername());
-					} while (tokens.containsValue(temp));
+						stmt.executeQuery("SELECT COUNT(*) as total FROM tokens WHERE Token='" + temp+ "'");
+						exists = stmt.getResultSet();
+						exists.first();
+
+					} while (exists.getInt("total")==1);
 					Calendar cal = Calendar.getInstance(); // creates calendar
 				    cal.setTime(new Date()); // sets calendar time/date
 				    cal.add(Calendar.HOUR_OF_DAY, 1); // adds one hour
-					tokens.put(lg.getUsername(), temp);
+//					tokens.put(lg.getUsername(), temp);
+				    java.text.SimpleDateFormat sdf = 
+				    	     new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+				    	String time = sdf.format(cal.getTime());
+				    stmt.executeUpdate("INSERT into tokens (Token, User, Expiration) values ('"+temp+"','"+lg.getUsername()+"','"+ time+"' )");
 				}
 			}
 
@@ -602,7 +608,77 @@ public class Database {
 		}
 		return temp;
 	}
+	
+	public  boolean isValidToken(String token) {
+		Statement stmt = null;
+		String temp = null;
+		ResultSet results;
+		Connection conn = connect();
+		String time = null;
+		try {
+			if (conn != null) {
+				stmt = (Statement) conn.createStatement();
+				Calendar cal = Calendar.getInstance(); // creates calendar
+			    cal.setTime(new Date()); // sets calendar time/date
+//				tokens.put(lg.getUsername(), temp);
+			    java.text.SimpleDateFormat sdf = 
+			    	     new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+			    	 time = sdf.format(cal.getTime());
+				stmt.executeQuery("SELECT COUNT(*) as total FROM tokens WHERE Token='" +token
+						+ "' and Expiration>'" + time + "'");
+				results = stmt.getResultSet();
+				results.first();
+				if (results.getInt("total") == 1) {
+					return true;
+			}
+			}
+		} catch (SQLException e) {
+			System.out.println(time);
+			return false;
+		}
+		return false;
+	}
+//	public String loginold(LoginData lg) {
+//		Statement stmt = null;
+//		String temp = null;
+//		ResultSet results;
+//		Connection conn = connect();
+//		String hash = Utils.hashString(lg.getPassword());
+//		try {
+//			if (conn != null) {
+//				stmt = (Statement) conn.createStatement();
+//				stmt.executeQuery("SELECT COUNT(*) as total FROM users WHERE Username='" + lg.getUsername()
+//						+ "' and Password='" + hash + "'");
+//				results = stmt.getResultSet();
+//				results.first();
+//				if (results.getInt("total") == 1) {
+//					do {
+//						temp = Utils.createToken(lg.getUsername());
+//					} while (tokens.containsValue(temp));
+//					Calendar cal = Calendar.getInstance(); // creates calendar
+//				    cal.setTime(new Date()); // sets calendar time/date
+//				    cal.add(Calendar.HOUR_OF_DAY, 1); // adds one hour
+//					tokens.put(lg.getUsername(), temp);
+//				}
+//			}
+//
+//		} catch (SQLException ex) {
+//			System.out.println("999 " + ex.getMessage());
+//			return null;
+//		} finally {
+//			try {
+//
+//				if (conn != null)
+//					conn.close();
+//				if (stmt != null)
+//					stmt.close();
+//			} catch (SQLException e) {
+//				System.out.println("Error closing " + e.getMessage());
+//			}
+//		}
+//		return temp;
+//	}
 	public int changeAuthLevel(AuthLevel al) {
 		Connection conn = connect();
 		ResultSet results;

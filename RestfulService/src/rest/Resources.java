@@ -221,10 +221,6 @@ public class Resources {
 	@Path("login")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response adminLogin(String request) {
-		// TODO
-		// testare con expiryDate invalido
-		// unformate con gianmaria il formato delle date, senza T in mezzo
-
 		if (request.isEmpty())
 			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
 

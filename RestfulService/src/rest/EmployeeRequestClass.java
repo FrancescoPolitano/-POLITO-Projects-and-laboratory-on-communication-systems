@@ -46,7 +46,7 @@ public class EmployeeRequestClass {
 
 		  BufferedImage image = null;
 		try {
-			File myFile= new File("C:\\Users\\franc\\Desktop\\myfile.jpg");
+			File myFile= new File("C:\\Users\\Administrator\\Desktop\\myfile.jpg");
 			image = ImageIO.read(myFile);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block

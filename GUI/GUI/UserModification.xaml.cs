@@ -22,10 +22,10 @@ namespace GUI
             string result = await this.ShowInputAsync("Changing Authorization level", "Please insert a new Authorhization Level", new MetroDialogSettings());
             if (!string.IsNullOrEmpty(result))
             {
-                User.AuthLevel = result;
+                AuthLevelClass auth = new AuthLevelClass(result, User.Serial);
                 text.Text = result;
                 //TODO test this
-                if (!RestClient.RoleChange(User).Result)
+                if (!RestClient.RoleChange(auth).Result)
                     this.ShowModalMessageExternal("Ops", "Cannot change authorization level right now.");
                 Close();
             }
@@ -48,6 +48,7 @@ namespace GUI
         private void BlockUser_Click(object sender, RoutedEventArgs e)
         {
             //TODO something with user ID and a date
+            RestClient.BlockAccess(User.Serial);
             MessageBox.Show("Niente ancora non l'ho fatto");
         }
 

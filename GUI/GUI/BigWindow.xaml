@@ -17,9 +17,9 @@
     <TabControl Width="Auto">
         <TabItem Header="Planimetry" Name="Planimetry">
             <Grid >
-                <Grid.Background>
+                <!--<Grid.Background>
                     <ImageBrush ImageSource="F:\Downloads\planimetry.jpg" Stretch="UniformToFill"/>
-                </Grid.Background>
+                </Grid.Background>-->
             </Grid>
         </TabItem>
       

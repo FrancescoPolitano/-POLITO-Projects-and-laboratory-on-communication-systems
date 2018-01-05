@@ -32,7 +32,7 @@ namespace GUI
         {
             InitializeComponent();
             //TODO mettere un placeholder vero
-            User.PathPhoto = "F:\\Downloads\\farmer.png";
+            //User.PathPhoto = "F:\\Downloads\\farmer.png";
             myGrid.DataContext = User;
         }
 

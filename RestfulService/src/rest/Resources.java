@@ -72,7 +72,7 @@ public class Resources {
 	@Path("users/employees")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response newEmployee(String request, @CookieParam("Token") String token) {
-		if (request.isEmpty())
+		if (request.trim().isEmpty())
 			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
 
 		if (!database.isValidToken(token))
@@ -107,7 +107,7 @@ public class Resources {
 	@Path("users/visitors")
 	public Response newVisitor(String request, @CookieParam("Token") String token) {
 
-		if (request.isEmpty())
+		if (request.trim().isEmpty())
 			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
 
 		if (!database.isValidToken(token))
@@ -128,7 +128,7 @@ public class Resources {
 	@Path("users/new_code")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response getNewCode(String request, @CookieParam("Token") String token) {
-		if (request.isEmpty())
+		if (request.trim().isEmpty())
 			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
 
 		if (!database.isValidToken(token))
@@ -138,14 +138,13 @@ public class Resources {
 		if (code == null)
 			return Response.status(Constants.status_generic_error).entity(Constants.generic_error).build();
 		return Response.ok(code).build();
-
 	}
 
 	// delete an user
 	@DELETE
 	@Path("users/{id}")
 	public Response deleteEmployee(@PathParam("id") String request, @CookieParam("Token") String token) {
-		if (request.isEmpty())
+		if (request.trim().isEmpty())
 			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
 
 		if (!database.isValidToken(token))
@@ -175,7 +174,7 @@ public class Resources {
 	@Path("locals")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response createNewLocal(String request, @CookieParam("Token") String token) {
-		if (request.isEmpty())
+		if (request.trim().isEmpty())
 			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
 
 		if (!database.isValidToken(token))
@@ -197,7 +196,7 @@ public class Resources {
 	@Path("query")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response complexQuery(String request, @CookieParam("Token") String token) {
-		if (request.isEmpty())
+		if (request.trim().isEmpty())
 			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
 
 		if (!database.isValidToken(token))
@@ -221,9 +220,10 @@ public class Resources {
 	@Path("login")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response adminLogin(String request) {
-		if (request.isEmpty())
+		if (request.trim().isEmpty())
 			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
 
+		database.deleteOldTokens();
 		LoginData lg = new Gson().fromJson(request, LoginData.class);
 
 		if (lg.getPassword() == null || lg.getUsername() == null || lg == null)
@@ -232,14 +232,13 @@ public class Resources {
 		Date tomorrow = new Date(new Date().getTime() + (1000 * 60 * 60 * 24));
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String expiryDate = format.format(tomorrow);
-		NewCookie expiryCookie = new NewCookie("ExpiryDate", expiryDate);
 
 		String token = database.login(lg, expiryDate);
 		if (token == null)
 			return Response.status(Constants.status_generic_error).entity(Constants.generic_error).build();
 
 		NewCookie tokenCookie = new NewCookie("Token", token);
-		return Response.ok(token).cookie(tokenCookie).cookie(expiryCookie).build();
+		return Response.ok(token).cookie(tokenCookie).build();
 	}
 
 	// login Admin
@@ -247,9 +246,8 @@ public class Resources {
 	@Path("logout")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response adminLogout(@CookieParam("Token") String token) {
-		if (!database.isValidToken(token))
-			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
-
+		if (token.isEmpty() || token == null)
+			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
 		boolean result = database.logout(token);
 		if (!result)
 			return Response.status(Constants.status_generic_error).entity(Constants.generic_error).build();
@@ -262,7 +260,7 @@ public class Resources {
 	@Path("users/authLevel")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response changeAuthLevel(String request, @CookieParam("Token") String token) {
-		if (request.isEmpty())
+		if (request.trim().isEmpty())
 			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
 
 		if (!database.isValidToken(token))
@@ -275,6 +273,30 @@ public class Resources {
 		if (result == -1)
 			return Response.status(Constants.status_generic_error).entity(Constants.generic_error).build();
 		else if (result == 0)
+			return Response.status(Constants.status_not_found).entity(Constants.not_found).build();
+		else
+			return Response.ok().build();
+	}
+
+	@POST
+	@Path("users/block")
+	public Response blockUser(String request, @CookieParam("Token") String token) {
+		if (request.trim().isEmpty())
+			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
+
+		if (!database.isValidToken(token))
+			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
+
+		int serial = -1;
+		try {
+			serial = Integer.parseInt(new Gson().fromJson(request, String.class));
+		} catch (NumberFormatException e) {
+			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
+		}
+
+		if (database.blockUsers(serial) == -1)
+			return Response.status(Constants.status_generic_error).entity(Constants.generic_error).build();
+		else if (database.blockUsers(serial) == 0)
 			return Response.status(Constants.status_not_found).entity(Constants.not_found).build();
 		else
 			return Response.ok().build();

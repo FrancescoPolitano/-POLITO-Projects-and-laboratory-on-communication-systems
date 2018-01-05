@@ -15,16 +15,6 @@ public class ComplexQuery {
 		Initial = initial;
 		End = end;
 	}
-	// public ComplexQuery() {
-	// employes = new ArrayList<String>();
-	// locals= new ArrayList<String> ();
-	// employes.add("3");
-	// employes.add("4");
-	// locals.add("BOSSDESK");
-	// initial= new Date(11,12,2017);
-	// end= new Date(16,12,2017);
-	// System.out.println(toValidSQLQuery());
-	// }
 
 	public ArrayList<String> getEmployees() {
 		return Employees;
@@ -63,9 +53,6 @@ public class ComplexQuery {
 		sb.append("SELECT l.Name, a.TimeS, e.SerialNumber, e.Name, e.Surname, a.Result "
 				+ "FROM locals l ,employes e ,accesses a  " + "WHERE ");
 
-		// if (!Employees.isEmpty())
-		// sb.append("(");
-
 		StringBuilder employees = new StringBuilder("");
 		for (Iterator<String> it = Employees.iterator(); it.hasNext();) {
 			String element = it.next();
@@ -78,13 +65,6 @@ public class ComplexQuery {
 			sb.append(" ( ").append(employees.toString()).append(" ) AND ");
 		}
 
-		// if (!Employees.isEmpty())
-		// sb.append(" )");
-		//
-		// if (!Rooms.isEmpty())
-		// sb.append(" AND (");
-		//
-
 		StringBuilder rooms = new StringBuilder("");
 		for (Iterator<String> it = Rooms.iterator(); it.hasNext();) {
 			String element = it.next();
@@ -93,13 +73,9 @@ public class ComplexQuery {
 				sb.append(" OR ");
 			}
 		}
-		// if (!Rooms.isEmpty())
-		// sb.append(")");
 
 		if (!rooms.toString().equals(""))
 			sb.append(" ( ").append(rooms.toString()).append(" ) AND ");
-
-		// sb.append(" AND (");
 
 		if (getEnd() != null)
 			sb.append("( a.TimeS >'" + getInitial() + "' AND a.TimeS <'" + getEnd() + "')");
@@ -107,6 +83,5 @@ public class ComplexQuery {
 			sb.append("( a.TimeS='" + getInitial() + "')");
 
 		return sb.toString();
-
 	}
 }

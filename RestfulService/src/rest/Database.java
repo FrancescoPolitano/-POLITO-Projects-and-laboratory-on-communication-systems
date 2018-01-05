@@ -7,19 +7,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-
-import com.google.gson.Gson;
 
 public class Database {
 	private static Database instance = null;
 
 	private Database() {
 		try {
-			Class.forName("com.mysql.jdbc.Driver").newInstance();			
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
 
 		} catch (ClassNotFoundException ex) {
 			System.out.println("Error: unable to load driver class!");
@@ -311,12 +309,13 @@ public class Database {
 		try {
 			if (conn != null) {
 				stmt = (Statement) conn.createStatement();
-				ResultSet rs,rsCode, rsEmployee;
+				ResultSet rs, rsCode, rsEmployee;
 				String newCode;
 				stmt.executeQuery("SELECT COUNT(*) as total FROM Employes WHERE SerialNumber='" + id + "'");
 				rsEmployee = stmt.getResultSet();
 				rsEmployee.first();
-				if(rsEmployee.getInt("total")!=1) return null;
+				if (rsEmployee.getInt("total") != 1)
+					return null;
 				do {
 					newCode = Utils.randomCodeGen();
 					stmt.executeQuery("SELECT COUNT(*) as total FROM auth WHERE Code='" + newCode + "'");
@@ -528,10 +527,8 @@ public class Database {
 				stmt.executeQuery(query.toValidSQLQuery());
 				results = stmt.getResultSet();
 
-				Access temp;
-
+				Access temp = null;
 				while (results.next()) {
-
 					temp = new Access();
 					temp.setEmployeeId(results.getString("e.SerialNumber"));
 					temp.setEmployeeName(results.getString("e.Name"));
@@ -540,7 +537,6 @@ public class Database {
 					temp.setTime(results.getTimestamp("a.TimeS"));
 					temp.setResult(results.getBoolean("a.Result"));
 					accessResults.add(temp);
-
 				}
 			}
 		} catch (SQLException ex) {
@@ -559,45 +555,37 @@ public class Database {
 		return accessResults;
 	}
 
-	public String login(LoginData lg) {
+	public String login(LoginData lg, String ExpiryDate) {
 		Statement stmt = null;
 		String temp = null;
 		ResultSet results, exists;
 		Connection conn = connect();
+		if (conn == null)
+			return null;
 		String hash = Utils.hashString(lg.getPassword());
 		try {
-			if (conn != null) {
-				stmt = (Statement) conn.createStatement();
-				stmt.executeQuery("SELECT COUNT(*) as total FROM users WHERE Username='" + lg.getUsername()
-						+ "' and Password='" + hash + "'");
-				results = stmt.getResultSet();
-				results.first();
-				if (results.getInt("total") == 1) {
-					do {
-						temp = Utils.createToken(lg.getUsername());
-						stmt.executeQuery("SELECT COUNT(*) as total FROM tokens WHERE Token='" + temp+ "'");
-						exists = stmt.getResultSet();
-						exists.first();
+			stmt = (Statement) conn.createStatement();
+			stmt.executeQuery("SELECT COUNT(*) as total FROM users WHERE Username='" + lg.getUsername()
+					+ "' and Password='" + hash + "'");
+			results = stmt.getResultSet();
+			results.first();
+			if (results.getInt("total") == 1) {
+				do {
+					temp = Utils.createToken(lg.getUsername());
+					stmt.executeQuery("SELECT COUNT(*) as total FROM tokens WHERE Token='" + temp + "'");
+					exists = stmt.getResultSet();
+					exists.first();
 
-					} while (exists.getInt("total")==1);
-					Calendar cal = Calendar.getInstance(); // creates calendar
-				    cal.setTime(new Date()); // sets calendar time/date
-				    cal.add(Calendar.HOUR_OF_DAY, 1); // adds one hour
-//					tokens.put(lg.getUsername(), temp);
-				    java.text.SimpleDateFormat sdf = 
-				    	     new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				} while (exists.getInt("total") == 1);
 
-				    	String time = sdf.format(cal.getTime());
-				    stmt.executeUpdate("INSERT into tokens (Token, User, Expiration) values ('"+temp+"','"+lg.getUsername()+"','"+ time+"' )");
-				}
+				stmt.executeUpdate("INSERT into tokens (Token, User, Expiration) values ('" + temp + "','"
+						+ lg.getUsername() + "','" + ExpiryDate + "' )");
 			}
-
 		} catch (SQLException ex) {
 			System.out.println("999 " + ex.getMessage());
 			return null;
 		} finally {
 			try {
-
 				if (conn != null)
 					conn.close();
 				if (stmt != null)
@@ -608,77 +596,118 @@ public class Database {
 		}
 		return temp;
 	}
-	
-	public  boolean isValidToken(String token) {
+
+	public boolean logout(String token) {
+		Connection conn = connect();
+		if (conn == null)
+			return false;
+		PreparedStatement ps = null;
+		try {
+			String sql = "DELETE FROM tokens WHERE Token = ?";
+			ps = conn.prepareStatement(sql);
+			ps.setString(1, token);
+			ps.executeUpdate();
+		} catch (SQLException ex) {
+			System.out.println("LOGOUT " + ex.getMessage());
+			return false;
+		} finally {
+			try {
+				if (conn != null)
+					conn.close();
+				if (ps != null)
+					ps.close();
+			} catch (SQLException e) {
+				System.out.println("Error closing " + e.getMessage());
+			}
+		}
+		return true;
+	}
+
+	public boolean isValidToken(String token) {
 		Statement stmt = null;
-		String temp = null;
 		ResultSet results;
 		Connection conn = connect();
+		if (conn == null)
+			return false;
 		String time = null;
+		PreparedStatement ps = null;
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(new Date()); // sets calendar time/date
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		time = sdf.format(cal.getTime());
 		try {
-			if (conn != null) {
-				stmt = (Statement) conn.createStatement();
-				Calendar cal = Calendar.getInstance(); // creates calendar
-			    cal.setTime(new Date()); // sets calendar time/date
-//				tokens.put(lg.getUsername(), temp);
-			    java.text.SimpleDateFormat sdf = 
-			    	     new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-			    	 time = sdf.format(cal.getTime());
-				stmt.executeQuery("SELECT COUNT(*) as total FROM tokens WHERE Token='" +token
-						+ "' and Expiration>'" + time + "'");
-				results = stmt.getResultSet();
-				results.first();
-				if (results.getInt("total") == 1) {
-					return true;
-			}
+			stmt = (Statement) conn.createStatement();
+			stmt.executeQuery(
+					"SELECT COUNT(*) as total FROM tokens WHERE Token='" + token + "' AND Expiration >='" + time + "'");
+			results = stmt.getResultSet();
+			results.first();
+			if (results.getInt("total") == 1)
+				return true;
+			else {
+				String sql = "DELETE FROM tokens WHERE Token = ? OR Expiration < ?";
+				ps = conn.prepareStatement(sql);
+				ps.setString(1, token);
+				ps.setString(2, time);
+				ps.executeUpdate();
 			}
 		} catch (SQLException e) {
-			System.out.println(time);
 			return false;
+		} finally {
+			try {
+				if (conn != null)
+					conn.close();
+				if (stmt != null)
+					stmt.close();
+				if (ps != null)
+					ps.close();
+			} catch (SQLException e) {
+				System.out.println("Error closing " + e.getMessage());
+			}
 		}
 		return false;
 	}
-//	public String loginold(LoginData lg) {
-//		Statement stmt = null;
-//		String temp = null;
-//		ResultSet results;
-//		Connection conn = connect();
-//		String hash = Utils.hashString(lg.getPassword());
-//		try {
-//			if (conn != null) {
-//				stmt = (Statement) conn.createStatement();
-//				stmt.executeQuery("SELECT COUNT(*) as total FROM users WHERE Username='" + lg.getUsername()
-//						+ "' and Password='" + hash + "'");
-//				results = stmt.getResultSet();
-//				results.first();
-//				if (results.getInt("total") == 1) {
-//					do {
-//						temp = Utils.createToken(lg.getUsername());
-//					} while (tokens.containsValue(temp));
-//					Calendar cal = Calendar.getInstance(); // creates calendar
-//				    cal.setTime(new Date()); // sets calendar time/date
-//				    cal.add(Calendar.HOUR_OF_DAY, 1); // adds one hour
-//					tokens.put(lg.getUsername(), temp);
-//				}
-//			}
-//
-//		} catch (SQLException ex) {
-//			System.out.println("999 " + ex.getMessage());
-//			return null;
-//		} finally {
-//			try {
-//
-//				if (conn != null)
-//					conn.close();
-//				if (stmt != null)
-//					stmt.close();
-//			} catch (SQLException e) {
-//				System.out.println("Error closing " + e.getMessage());
-//			}
-//		}
-//		return temp;
-//	}
+
+	// public String loginold(LoginData lg) {
+	// Statement stmt = null;
+	// String temp = null;
+	// ResultSet results;
+	// Connection conn = connect();
+	// String hash = Utils.hashString(lg.getPassword());
+	// try {
+	// if (conn != null) {
+	// stmt = (Statement) conn.createStatement();
+	// stmt.executeQuery("SELECT COUNT(*) as total FROM users WHERE Username='" +
+	// lg.getUsername()
+	// + "' and Password='" + hash + "'");
+	// results = stmt.getResultSet();
+	// results.first();
+	// if (results.getInt("total") == 1) {
+	// do {
+	// temp = Utils.createToken(lg.getUsername());
+	// } while (tokens.containsValue(temp));
+	// Calendar cal = Calendar.getInstance(); // creates calendar
+	// cal.setTime(new Date()); // sets calendar time/date
+	// cal.add(Calendar.HOUR_OF_DAY, 1); // adds one hour
+	// tokens.put(lg.getUsername(), temp);
+	// }
+	// }
+	//
+	// } catch (SQLException ex) {
+	// System.out.println("999 " + ex.getMessage());
+	// return null;
+	// } finally {
+	// try {
+	//
+	// if (conn != null)
+	// conn.close();
+	// if (stmt != null)
+	// stmt.close();
+	// } catch (SQLException e) {
+	// System.out.println("Error closing " + e.getMessage());
+	// }
+	// }
+	// return temp;
+	// }
 	public int changeAuthLevel(AuthLevel al) {
 		Connection conn = connect();
 		ResultSet results;
@@ -721,15 +750,4 @@ public class Database {
 		return affectedRows;
 	}
 
-	// TODO TESTARE QUESTA FUNZIONE
-	public boolean isJSONValid(String jsonInString) {
-		try {
-			new Gson().fromJson(jsonInString, Object.class);
-			return true;
-		} catch (com.google.gson.JsonSyntaxException ex) {
-			return false;
-		}
-	}
-	
-	
 }

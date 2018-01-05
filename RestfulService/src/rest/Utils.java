@@ -73,7 +73,7 @@ public class Utils {
 
 		// write the image to the output stream
 		FileOutputStream fos = null;
-		String URI = "C:\\Users\\franc\\Desktop\\ServerData\\" + UserId + ".jpg";
+		String URI = "C:\\Users\\Administrator\\Desktop\\ServerData\\" + UserId + ".jpg";
 		String URL = "/images/" + UserId + ".jpg";
 		try {
 			fos = new FileOutputStream(URI);
@@ -106,7 +106,7 @@ public class Utils {
 		}
 
 		FileOutputStream fos = null;
-		String URI = "C:\\Users\\franc\\Desktop\\ServerData\\profiles\\" + id + ".jpg";
+		String URI = "C:\\Users\\Administrator\\Desktop\\ServerData\\profiles\\" + id + ".jpg";
 		try {
 			fos = new FileOutputStream(URI);
 		} catch (FileNotFoundException e1) {

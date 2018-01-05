@@ -73,7 +73,7 @@ public class Utils {
 
 		// write the image to the output stream
 		FileOutputStream fos = null;
-		String URI = "C:\\Users\\franc\\Desktop\\ServerData\\" + UserId + ".jpg";
+		String URI = "C:\\Users\\Administrator\\Desktop\\ServerData\\" + UserId + ".jpg";
 		String URL = "/images/" + UserId + ".jpg";
 		try {
 			fos = new FileOutputStream(URI);
@@ -88,7 +88,6 @@ public class Utils {
 		try {
 			fos.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			return null;
 		}
 		return URL;
@@ -106,7 +105,7 @@ public class Utils {
 		}
 
 		FileOutputStream fos = null;
-		String URI = "C:\\Users\\franc\\Desktop\\ServerData\\profiles\\" + id + ".jpg";
+		String URI = "C:\\Users\\Administrator\\Desktop\\ServerData\\profiles\\" + id + ".jpg";
 		try {
 			fos = new FileOutputStream(URI);
 		} catch (FileNotFoundException e1) {
@@ -121,36 +120,34 @@ public class Utils {
 	}
 
 	public static String hashString(String message) {
-	 
-	        MessageDigest digest = null;
-			try {
-				digest = MessageDigest.getInstance( "SHA-256");
-			} catch (NoSuchAlgorithmException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	        byte[] hashedBytes = null;
-			try {
-				hashedBytes = digest.digest(message.getBytes("UTF-8"));
-			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	 
-	        return convertByteArrayToHexString(hashedBytes);
-	 
+
+		MessageDigest digest = null;
+		try {
+			digest = MessageDigest.getInstance("SHA-256");
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		byte[] hashedBytes = null;
+		try {
+			hashedBytes = digest.digest(message.getBytes("UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+
+		return convertByteArrayToHexString(hashedBytes);
+
 	}
+
 	private static String convertByteArrayToHexString(byte[] arrayBytes) {
-	    StringBuffer stringBuffer = new StringBuffer();
-	    for (int i = 0; i < arrayBytes.length; i++) {
-	        stringBuffer.append(Integer.toString((arrayBytes[i] & 0xff) + 0x100, 16)
-	                .substring(1));
-	    }
-	    return stringBuffer.toString();
+		StringBuffer stringBuffer = new StringBuffer();
+		for (int i = 0; i < arrayBytes.length; i++) {
+			stringBuffer.append(Integer.toString((arrayBytes[i] & 0xff) + 0x100, 16).substring(1));
+		}
+		return stringBuffer.toString();
 	}
 
 	public static String createToken(String string) {
-		String token= randomCodeGen();
+		String token = randomCodeGen();
 		return token;
 	}
 }

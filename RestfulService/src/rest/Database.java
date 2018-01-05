@@ -227,6 +227,7 @@ public class Database {
 		if (conn == null)
 			return false;
 		int authGrade = 0, requestedGrade = 0;
+		PreparedStatement ps = null;
 		try {
 			stmt = (Statement) conn.createStatement();
 			stmt.executeQuery("select  SerialNumber, e.AuthGrade , l.AuthGrade " + "from employes e , auth a , locals l"
@@ -239,28 +240,30 @@ public class Database {
 			}
 			if (serial == null)
 				return false;
+			String sql = "INSERT INTO accesses (IdEmployee,IdLocal,Result) VALUES( ?, ?, ?)";
+			boolean result = false;
+			if (authGrade > requestedGrade)
+				result = true;
 
-			if (authGrade < requestedGrade) {
-				stmt.executeUpdate("INSERT INTO accesses (IdEmployee,IdLocal,Result) VALUES ('" + serial + "','" + local
-						+ "', 'false')");
-
-				return false;
-			} else {
-				stmt.executeUpdate("INSERT INTO accesses (IdEmployee,IdLocal,Result) VALUES ('" + serial + "','" + local
-						+ "', 'true')");
-				return true;
-			}
+			ps = conn.prepareStatement(sql);
+			ps.setInt(1, serial);
+			ps.setString(2, local);
+			ps.setString(3, String.valueOf(result));
+			ps.executeUpdate();
+			return result;
 		} catch (SQLException ex) {
 			System.out.println("444 " + ex.getMessage());
+			return false;
 		} finally {
 			try {
 				if (stmt != null)
 					stmt.close();
+				if (ps != null)
+					ps.close();
 			} catch (SQLException e) {
 				System.out.println("Error closing " + e.getMessage());
 			}
 		}
-		return false;
 	}
 
 	public boolean deleteEmployee(String id) {
@@ -691,7 +694,7 @@ public class Database {
 	}
 
 	public boolean isValidToken(String token) {
-		if (token.isEmpty() || token == null)
+		if (token == null || token.isEmpty())
 			return false;
 		Statement stmt = null;
 		ResultSet results;

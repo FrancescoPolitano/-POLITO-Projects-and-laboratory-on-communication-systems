@@ -56,14 +56,24 @@ namespace GUI
                 this.ShowModalMessageExternal("Ops", "Insert a valid Authorization Level");
                 return;
             }
-            if (String.IsNullOrEmpty(Email.Text))
+            if (String.IsNullOrEmpty(user.PathPhoto))
+            {
+                //errore photo
+                this.ShowModalMessageExternal("Ops", "Insert a valid photo");
+                return;
+            }
+            if (String.IsNullOrEmpty(Email.Text) ||!ValidatorExtensions.IsValidEmailAddress(Email.Text))
             {
                 //errore ruolo
                 this.ShowModalMessageExternal("Ops", "Insert a valid Email");
                 return;
             }
-
-            EmployeeResponseClass erc = RestClient.CreateUser(user);
+            EmployeeResponseClass erc=null;
+            try
+            {
+                 erc = RestClient.CreateUser(user);
+            }
+            catch { }
             if (erc == null)
                 this.ShowModalMessageExternal("Ops", "Error creating the user");
             else

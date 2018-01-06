@@ -1,4 +1,5 @@
 ﻿
+<<<<<<< HEAD
 FC:\Users\Gianmaria\Documents\GitKraken\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\App.xaml;;
 FC:\Users\Gianmaria\Documents\GitKraken\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\LoginWindow.xaml;;
 FC:\Users\Gianmaria\Documents\GitKraken\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\BigWindow.xaml;;
@@ -7,4 +8,15 @@ FC:\Users\Gianmaria\Documents\GitKraken\-POLITO-Projects-and-laboratory-on-commu
 FC:\Users\Gianmaria\Documents\GitKraken\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\UserModification.xaml;;
 FC:\Users\Gianmaria\Documents\GitKraken\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\UserCreation.xaml;;
 FC:\Users\Gianmaria\Documents\GitKraken\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\VisitorCreation.xaml;;
+=======
+FC:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\App.xaml;;
+FC:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\History.xaml;;
+FC:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\LoginWindow.xaml;;
+FC:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\BigWindow.xaml;;
+FC:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\QRCode.xaml;;
+FC:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\UserDetails.xaml;;
+FC:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\UserModification.xaml;;
+FC:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\UserCreation.xaml;;
+FC:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\VisitorCreation.xaml;;
+>>>>>>> GUI
 

@@ -72,6 +72,7 @@
     <Compile Include="Access.cs" />
     <Compile Include="AuthLevelClass.cs" />
     <Compile Include="ByteArrayConverter.cs" />
+    <Compile Include="ValidatorExtensions.cs" />
     <Compile Include="ComplexQuery.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="EmployeeRequestClass.cs" />

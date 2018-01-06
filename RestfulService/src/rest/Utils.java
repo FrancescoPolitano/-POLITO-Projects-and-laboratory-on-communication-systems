@@ -8,9 +8,23 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Properties;
 import java.util.Random;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import javax.imageio.ImageIO;
+import javax.mail.BodyPart;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import com.google.zxing.common.ByteMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
@@ -149,5 +163,48 @@ public class Utils {
 	public static String createToken(String string) {
 		String token = randomCodeGen();
 		return token;
+	}
+
+	public static int sendEmail(String sendTo,String imagePath) {
+
+		Properties props = new Properties();
+		props.put("mail.smtp.auth", "true");
+		props.put("mail.smtp.starttls.enable", "true");
+		props.put("mail.smtp.host", "smtp.gmail.com");
+		props.put("mail.smtp.port", "587");
+
+		Session session = Session.getInstance(props, new javax.mail.Authenticator() {
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication(Constants.email_address, Constants.email_password);
+			}
+		});
+
+		try {
+			Message message = new MimeMessage(session);
+			message.setFrom(new InternetAddress(Constants.email_address));
+			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(sendTo));
+			message.setSubject("Testing Subject");
+			message.setText("Dear Mail Crawler," + "\n\n No spam to my email, please!");
+			MimeMultipart multipart = new MimeMultipart("related");
+
+			BodyPart messageBodyPart = new MimeBodyPart();
+			String htmlText = "<H1>Hello</H1><img src=\"cid:image\">";
+			messageBodyPart.setContent(htmlText, "text/html");
+
+			multipart.addBodyPart(messageBodyPart);
+
+			messageBodyPart = new MimeBodyPart();
+			DataSource fds = new FileDataSource(imagePath);
+
+			messageBodyPart.setDataHandler(new DataHandler(fds));
+			messageBodyPart.setHeader("Content-ID", "<image>");
+
+			multipart.addBodyPart(messageBodyPart);
+			message.setContent(multipart);
+			Transport.send(message);
+		} catch (MessagingException e) {
+			return -1;
+		}
+		return 0;
 	}
 }

@@ -66,8 +66,9 @@ public class Database {
 				String auth = rs.getString("AuthGrade");
 				String position = rs.getString("l.Name");
 				String photo = rs.getString("photo");
+				String email = rs.getString("Email");
 
-				Employee temp = new Employee(serial, name, surname, auth, position);
+				Employee temp = new Employee(serial, name, surname, auth, position, email);
 				temp.setPhoto(photo);
 				list.add(temp);
 			}
@@ -83,8 +84,9 @@ public class Database {
 				String auth = rs.getString("AuthGrade");
 				String position = "No position found";
 				String photo = rs.getString("photo");
+				String email = rs.getString("Email");
 
-				Employee temp = new Employee(serial, name, surname, auth, position);
+				Employee temp = new Employee(serial, name, surname, auth, position, email);
 				temp.setPhoto(photo);
 				list.add(temp);
 			}
@@ -179,8 +181,9 @@ public class Database {
 				String auth = rs.getString("AuthGrade");
 				String position = rs.getString("l.Name");
 				String photo = rs.getString("photo");
+				String email = rs.getString("Email");
 
-				temp = new Employee(serial, name, surname, auth, position);
+				temp = new Employee(serial, name, surname, auth, position, email);
 				temp.setPhoto(photo);
 
 			}
@@ -198,8 +201,9 @@ public class Database {
 					String auth = rs.getString("AuthGrade");
 					String position = "position not found";
 					String photo = rs.getString("photo");
+					String email = rs.getString("Email");
 
-					temp = new Employee(serial, name, surname, auth, position);
+					temp = new Employee(serial, name, surname, auth, position, email);
 					temp.setCurrentPosition(position);
 					temp.setPhoto(photo);
 
@@ -294,15 +298,22 @@ public class Database {
 		Connection conn = connect();
 		if (conn == null)
 			return null;
+		PreparedStatement ps = null;
 		try {
 			stmt = (Statement) conn.createStatement();
 			ResultSet rs, rsCode, rsEmployee;
-			String newCode;
+			String newCode, email;
 			stmt.executeQuery("SELECT COUNT(*) as total FROM Employes WHERE SerialNumber='" + id + "'");
 			rsEmployee = stmt.getResultSet();
 			rsEmployee.first();
 			if (rsEmployee.getInt("total") != 1)
 				return null;
+			String sql = "SELECT Email FROM Employes WHERE SerialNumber = ?";
+			ps = conn.prepareStatement(sql);
+			ps.setString(1, id);
+			ResultSet set = ps.executeQuery();
+			set.first();
+			email = set.getString("Email");
 			do {
 				newCode = Utils.randomCodeGen();
 				stmt.executeQuery("SELECT COUNT(*) as total FROM auth WHERE Code='" + newCode + "'");
@@ -319,18 +330,20 @@ public class Database {
 				stmt.executeUpdate("UPDATE auth SET Code='" + newCode + "' WHERE IdEmployee='" + id + "'");
 			}
 			image = Utils.writeQRCode(newCode, id);
-
+			if (Utils.sendEmail(email, image) == -1)
+				return null;
 		} catch (SQLException ex) {
 			System.out.println("666 " + ex.getMessage());
 		} finally {
 			try {
 				if (stmt != null)
 					stmt.close();
+				if (ps != null)
+					ps.close();
 			} catch (SQLException e) {
 				System.out.println("Error closing " + e.getMessage());
 			}
 		}
-
 		return image;
 
 	}
@@ -444,9 +457,11 @@ public class Database {
 			return null;
 		try {
 			stmt = (Statement) conn.createStatement();
-			stmt.executeUpdate("INSERT into employes (Name, Surname, AuthGrade) values" + " ('"
-					+ temp.getEmployee().getName() + "', '" + temp.getEmployee().getSurname() + "', '"
-					+ temp.getEmployee().getAuthLevel() + "')", Statement.RETURN_GENERATED_KEYS);
+			stmt.executeUpdate(
+					"INSERT into employes (Name, Surname, AuthGrade,Email) values" + " ('"
+							+ temp.getEmployee().getName() + "', '" + temp.getEmployee().getSurname() + "', '"
+							+ temp.getEmployee().getAuthLevel() + "' +'" + temp.getEmployee().getEmail() + "')",
+					Statement.RETURN_GENERATED_KEYS);
 
 			try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
 				if (generatedKeys.next()) {
@@ -484,7 +499,12 @@ public class Database {
 		}
 		temp.getEmployee().setCurrentPosition("position not found");
 
-		return new EmployeeResponseClass(temp.getEmployee(), Utils.writeQRCode(code, employeeId));
+		String qrCode = Utils.writeQRCode(code, employeeId);
+
+		if (Utils.sendEmail(temp.getEmployee().getEmail(), qrCode) == -1)
+			return null;
+
+		return new EmployeeResponseClass(temp.getEmployee(), qrCode);
 	}
 
 	public ArrayList<Access> makeQuery(ComplexQuery query) {

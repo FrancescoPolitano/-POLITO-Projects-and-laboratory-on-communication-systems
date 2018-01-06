@@ -16,11 +16,8 @@ public class MyListener implements ServletContextListener {
 
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
-		Connection conn = Database.getInstance().connect();
 		com.mysql.jdbc.AbandonedConnectionCleanupThread.checkedShutdown();
 		try {
-			if (conn != null)
-				conn.close();
 			java.sql.Driver mySqlDriver = DriverManager.getDriver("jdbc:mysql://localhost:3306/paldb");
 			DriverManager.deregisterDriver(mySqlDriver);
 		} catch (SQLException ex) {

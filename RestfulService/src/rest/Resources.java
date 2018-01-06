@@ -301,4 +301,13 @@ public class Resources {
 		else
 			return Response.ok().build();
 	}
+
+	@GET
+	@Path("email")
+	public Response sendEmail() {
+		if (Utils.sendEmail("cristianopalazzi@gmail.com", "C:\\Users\\Cristiano\\Desktop\\result.jpg") == -1)
+			return Response.status(Constants.status_not_found).entity(Constants.not_found).build();
+		else
+			return Response.ok().build();
+	}
 }

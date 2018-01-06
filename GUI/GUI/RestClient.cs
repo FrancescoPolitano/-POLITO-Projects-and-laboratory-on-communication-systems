@@ -39,6 +39,34 @@ namespace GUI
 
         private static readonly HttpClient client = new HttpClient(handler);
 
+        public static bool Login(LoginData logindata)
+        {
+            string json = JsonConvert.SerializeObject(logindata);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = client.PostAsync(myRest + "/login", content).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                CookieCollection responseCookies = cookies.GetCookies(new Uri(myRest + "/login"));
+                if (responseCookies["Token"] != null)
+                    sessionToken = responseCookies["Token"].Value;
+
+                if (String.IsNullOrEmpty(sessionToken))
+                    return false;
+                else
+                    return true;
+            }
+            return false;
+        }
+
+        public static void Logout()
+        {
+            HttpResponseMessage response = client.GetAsync(myRest + "/logout").Result;
+            if (!response.IsSuccessStatusCode)
+                throw new Exception();
+            else
+                sessionToken = String.Empty;
+        }
+
 
         //method for getting all users
         public static List<Employee> GetAllUsers()
@@ -130,12 +158,12 @@ namespace GUI
         }
 
         //method to block accesses from user 
-        public static async Task<bool> BlockAccess(int serial)
+        public static  bool BlockAccess(int serial)
         {
             //TODO test
             string json = JsonConvert.SerializeObject(serial);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync(myRest + "/users/block", content);
+            HttpResponseMessage response =  client.PostAsync(myRest + "/users/block", content).Result;
             if (response.IsSuccessStatusCode)
                 return true;
             else
@@ -143,7 +171,7 @@ namespace GUI
         }
         //TODO chiedere la query corretta e il parametro da passare
         //method to ask for a change of role
-        public static async Task<bool> RoleChange(AuthLevelClass auth)
+        public static bool RoleChange(AuthLevelClass auth)
         {
             string json = JsonConvert.SerializeObject(auth);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -167,26 +195,7 @@ namespace GUI
         }
 
 
-        public static async Task<bool> Login(LoginData logindata)
-        {
-            string json = JsonConvert.SerializeObject(logindata);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-            HttpResponseMessage response = client.PostAsync(myRest + "/login", content).Result;
-            if (response.IsSuccessStatusCode)
-            {
-                CookieCollection responseCookies = cookies.GetCookies(new Uri(myRest + "/login"));
-                if (responseCookies["Token"] != null)
-                    sessionToken = responseCookies["Token"].Value;
-
-                if (String.IsNullOrEmpty(sessionToken))
-                    return false;
-                else
-                    return true;
-            }
-            return false;
-        }
-
-
+     
         public static List<Access> GetHistory(ComplexQuery q)
         {
             string json = JsonConvert.SerializeObject(q);
@@ -199,14 +208,6 @@ namespace GUI
         }
 
 
-        public static void Logout()
-        {
-            HttpResponseMessage response = client.GetAsync(myRest + "/logout").Result;
-            if (!response.IsSuccessStatusCode)
-                throw new Exception();
-            else
-                sessionToken = String.Empty;
-        }
 
         //PER TUTTE LE RICHIEST REST
         //if(response.StatusCode == 804)

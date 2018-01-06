@@ -26,6 +26,8 @@ namespace GUI
             User = u;
             OuterGrid.DataContext = User;
             InnerGrid.DataContext = User;
+            if (String.Compare(User.AuthLevel, "0") == 0)
+                Role.Text = "Access Blocked";
         }
 
         public Employee User { get => user; set => user = value; }
@@ -41,6 +43,10 @@ namespace GUI
             Employee u = b.DataContext as Employee;
             UserModification uw = new UserModification(u);
             uw.ShowDialog();
+            if (String.Compare(User.AuthLevel, "0") == 0)
+                Role.Text = "Access Blocked";
+            else
+                Role.Text = "AuthLevel: " + User.AuthLevel;
         }
     }
 }

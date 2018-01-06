@@ -76,9 +76,6 @@
     <Compile Include="Constants.cs" />
     <Compile Include="EmployeeRequestClass.cs" />
     <Compile Include="EmployeeResponseClass.cs" />
-    <Compile Include="History.xaml.cs">
-      <DependentUpon>History.xaml</DependentUpon>
-    </Compile>
     <Compile Include="LoginData.cs" />
     <Compile Include="QRCode.xaml.cs">
       <DependentUpon>QRCode.xaml</DependentUpon>
@@ -100,10 +97,6 @@
     <Compile Include="VisitorCreation.xaml.cs">
       <DependentUpon>VisitorCreation.xaml</DependentUpon>
     </Compile>
-    <Page Include="History.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="LoginWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

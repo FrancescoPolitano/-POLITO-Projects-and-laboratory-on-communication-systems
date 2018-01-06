@@ -217,7 +217,7 @@ namespace GUI
         }
 
 
-        private async void requestData()
+        private  void requestData()
         {
             List<Access> result;
             if (listRooms.Count == 0)
@@ -227,8 +227,13 @@ namespace GUI
 
             result = RestClient.GetHistory(createArrays(fromDate.SelectedDate, toDate.SelectedDate));
             if (result != null)
+            {
+                Contenuto.Clear();
                 foreach (Access acc in result)
                     Contenuto.Add(acc);
+            }
+            else
+                this.ShowModalMessageExternal("Ops", "Qualcosa non è andato a buon fine");
         }
 
         private ComplexQuery createArrays(DateTime? t, DateTime? t1)
@@ -257,10 +262,12 @@ namespace GUI
                     temp2.Add(st);
             }
             qr.Rooms = temp2;
-            if (t != null)
-                qr.Initial = t ?? DateTime.MinValue;
-            if (t1 != null)
-                qr.End = t1 ?? DateTime.MaxValue;
+            //if (t != null)
+            //    qr.Initial = t ?? DateTime.MinValue;
+            //if (t1 != null)
+            //    qr.End = t1 ?? DateTime.MaxValue;
+            qr.Initial = t;
+            qr.End = t1;
             return qr;
         }
 
@@ -273,5 +280,23 @@ namespace GUI
                 MessageBox.Show("nome del visitor" + visitor.Name);
             }
         }
+
+        //TODO AGGIUNGERE SIZECHANGED PER USARE QUESTO + accendere gridview
+        //private void ProductsListView_SizeChanged(object sender, SizeChangedEventArgs e)
+        //{
+        //    ListView listView = sender as ListView;
+        //    GridView gView = listView.View as GridView;
+
+        //    var workingWidth = listView.ActualWidth - SystemParameters.VerticalScrollBarWidth; // take into account vertical scrollbar
+        //    var col1 = 0.166;
+           
+
+        //    gView.Columns[0].Width = workingWidth * col1;
+        //    gView.Columns[1].Width = workingWidth * col1;
+        //    gView.Columns[2].Width = workingWidth * col1;
+        //    gView.Columns[3].Width = workingWidth * col1;
+        //    gView.Columns[4].Width = workingWidth * col1;
+        //    gView.Columns[5].Width = workingWidth * col1;
+        //}
     }
 }

@@ -45,7 +45,7 @@ namespace GUI
             //PageChange("ADMIN");
             //Close();
 
-            if (RestClient.Login(myLoginData).Result)
+            if (RestClient.Login(myLoginData))
             {
                 PageChange(Constants.ADMIN);
                 Close();
@@ -69,7 +69,7 @@ namespace GUI
             //TODO non è proprio cosi nella versione finale, #imbroglio
             myLoginData.Username = "admin";
             myLoginData.Password = "admin";
-            if (RestClient.Login(myLoginData).Result)
+            if (RestClient.Login(myLoginData))
                 PageChange(Constants.ADMIN);
             Close();
         }

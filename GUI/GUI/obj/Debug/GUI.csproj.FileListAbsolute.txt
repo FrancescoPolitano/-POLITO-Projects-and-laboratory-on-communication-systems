@@ -32,8 +32,6 @@ C:\Users\Gianmaria\Documents\GitKraken\-POLITO-Projects-and-laboratory-on-commun
 C:\Users\Gianmaria\Documents\GitKraken\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\obj\Debug\UserDetails.baml
 C:\Users\Gianmaria\Documents\GitKraken\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\obj\Debug\QRCode.g.cs
 C:\Users\Gianmaria\Documents\GitKraken\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\obj\Debug\QRCode.baml
-C:\Users\Gianmaria\Documents\GitKraken\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\obj\Debug\History.g.cs
-C:\Users\Gianmaria\Documents\GitKraken\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\obj\Debug\History.baml
 C:\Users\Gianmaria\Documents\GitKraken\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\obj\Debug\GeneratedInternalTypeHelper.g.cs
 C:\Users\Cristiano\Documents\GitHub\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\bin\Debug\GUI.exe.config
 C:\Users\Cristiano\Documents\GitHub\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\bin\Debug\GUI.exe

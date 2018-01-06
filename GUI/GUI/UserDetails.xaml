@@ -34,18 +34,18 @@
             <TextBlock Grid.Row="0" Name="Name" Text="{Binding Name, StringFormat='Name: {0}'}" />
             <TextBlock Grid.Row="1" Name="Surname" Text="{Binding Surname, StringFormat='Surname: {0}'}" />
             <TextBlock Grid.Row="2" Name="Role" Text="{Binding AuthLevel, StringFormat='AuthLevel: {0}'}" >
-                <TextBlock.Style>
+                <!--<TextBlock.Style>
                     <Style TargetType="TextBlock" >
                         <Style.Triggers>
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
-                                    <Condition Binding="{Binding Path=AuthLevel}" Value="0" />
+                                    <Condition Value="0" Binding="{Binding Path=AuthLevel}" />
                                 </MultiDataTrigger.Conditions>
                                 <Setter Property="Text" Value="Access Blocked"/>
                             </MultiDataTrigger>
                         </Style.Triggers>
                     </Style>
-                </TextBlock.Style>
+                </TextBlock.Style>-->
             </TextBlock>
             <TextBlock Grid.Row="3" Name="Serial" Text="{Binding Serial, StringFormat='Serial: {0}'}" />
             <TextBlock Grid.Row="4" Name="CurrentPosition" Text="{Binding CurrentPosition, StringFormat='CurrentPosition: {0}'}" />

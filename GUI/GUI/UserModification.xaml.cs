@@ -23,10 +23,10 @@ namespace GUI
             if (!string.IsNullOrEmpty(result))
             {
                 AuthLevelClass auth = new AuthLevelClass(result, User.Serial);
-                text.Text = result;
                 //TODO test this
-                if (!RestClient.RoleChange(auth).Result)
+                if (!RestClient.RoleChange(auth))
                     this.ShowModalMessageExternal("Ops", "Cannot change authorization level right now.");
+                else User.AuthLevel = result;
                 Close();
             }
 
@@ -38,7 +38,7 @@ namespace GUI
             string result = RestClient.QRCodeChange(user.Serial.ToString());
             if (!string.IsNullOrEmpty(result))
             {
-                QRCode qr = new QRCode(Constants.IPREMOTE+result);
+                QRCode qr = new QRCode(Constants.IPREMOTE + result);
                 qr.ShowDialog();
             }
             else
@@ -47,9 +47,12 @@ namespace GUI
 
         private void BlockUser_Click(object sender, RoutedEventArgs e)
         {
-            //TODO something with user ID and a date
-            RestClient.BlockAccess(User.Serial);
-            MessageBox.Show("Niente ancora non l'ho fatto");
+            //TODO blocco permanente dell'utente
+            if (RestClient.BlockAccess(User.Serial))
+                User.AuthLevel = "0";
+            else
+                this.ShowModalMessageExternal("Ops", "Cannot block the user right now");
+            Close();
         }
 
     }

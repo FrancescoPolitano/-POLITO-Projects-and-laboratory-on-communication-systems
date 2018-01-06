@@ -166,6 +166,16 @@
                     <DatePicker Name="toDate" Grid.Row="1" Grid.Column="3" SelectedDateChanged="toDate_SelectedDateChanged"/>
                 </Grid>
                 <ListView Name="listContent" Grid.Row="1" >
+                    <!--<ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Id" DisplayMemberBinding="{Binding EmployeeID}" />
+                            <GridViewColumn Header="Name" DisplayMemberBinding="{Binding EmployeeName}" />
+                            <GridViewColumn Header="Surname" DisplayMemberBinding="{Binding EmployeeSurname}" />
+                            <GridViewColumn Header="Room" DisplayMemberBinding="{Binding LocalName}" />
+                            <GridViewColumn Header="Time" DisplayMemberBinding="{Binding Time}" />
+                            <GridViewColumn Header="Result" DisplayMemberBinding="{Binding Result}" />
+                        </GridView>
+                    </ListView.View>-->
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Grid>
@@ -178,12 +188,12 @@
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock Text="Id" Grid.Column="0" />
-                                <TextBlock Text="Nome" Grid.Column="1" />
-                                <TextBlock Text="Cognome" Grid.Column="2" />
-                                <TextBlock Text="stanza" Grid.Column="3" />
-                                <TextBlock Text="orario" Grid.Column="4" />
-                                <TextBlock Text="vero/falso" Grid.Column="5" />
+                                <TextBlock Text="{Binding Path=EmployeeID}" Grid.Column="0" />
+                                <TextBlock Text="{Binding EmployeeName}" Grid.Column="1" />
+                                <TextBlock Text="{Binding EmployeeSurname}" Grid.Column="2" />
+                                <TextBlock Text="{Binding LocalName}" Grid.Column="3" />
+                                <TextBlock Text="{Binding Time}" Grid.Column="4" />
+                                <TextBlock Text="{Binding Result}" Grid.Column="5" />
                             </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>

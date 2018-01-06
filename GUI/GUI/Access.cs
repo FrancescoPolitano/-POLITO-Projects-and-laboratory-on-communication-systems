@@ -8,14 +8,14 @@ namespace GUI
 {
    public class Access
     {
-        private string employeeID, employeeName, employeeSurname, roomName;
+        private string employeeID, employeeName, employeeSurname, localName;
         private DateTime time;
         private bool result;
 
         public string EmployeeID { get => employeeID; set => employeeID = value; }
         public string EmployeeName { get => employeeName; set => employeeName = value; }
         public string EmployeeSurname { get => employeeSurname; set => employeeSurname = value; }
-        public string RoomName { get => roomName; set => roomName = value; }
+        public string LocalName { get => localName; set => localName = value; }
         public DateTime Time { get => time; set => time = value; }
         public bool Result { get => result; set => result = value; }
 
@@ -26,7 +26,7 @@ namespace GUI
             EmployeeID = employeeID;
             EmployeeName = employeeName;
             EmployeeSurname = employeeSurname;
-            RoomName = roomName;
+            LocalName = roomName;
             Time = time;
             Result = result;
         }

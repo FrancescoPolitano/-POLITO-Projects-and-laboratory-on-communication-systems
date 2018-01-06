@@ -2,9 +2,7 @@ package rest;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -17,7 +15,6 @@ import javax.activation.FileDataSource;
 import javax.imageio.ImageIO;
 import javax.mail.BodyPart;
 import javax.mail.Message;
-import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -64,7 +61,6 @@ public class Utils {
 		try {
 			matrix = writer.encode(data, com.google.zxing.BarcodeFormat.QR_CODE, 256, 256);
 		} catch (com.google.zxing.WriterException e) {
-			// exit the method
 			return null;
 		}
 
@@ -91,17 +87,9 @@ public class Utils {
 		String URL = "/images/" + UserId + ".jpg";
 		try {
 			fos = new FileOutputStream(URI);
-		} catch (FileNotFoundException e1) {
-			return null;
-		}
-		try {
 			ImageIO.write(image, "png", fos);
-		} catch (IOException e) {
-			return null;
-		}
-		try {
 			fos.close();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			return null;
 		}
 		return URL;
@@ -112,23 +100,14 @@ public class Utils {
 		String URL = "/images/profiles/" + id + ".jpg";
 		// Converto il byte array in una buffered image
 		ByteArrayInputStream bais = new ByteArrayInputStream(fileContent);
-		try {
-			img = ImageIO.read(bais);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-
 		FileOutputStream fos = null;
 		String URI = "C:\\Users\\Administrator\\Desktop\\ServerData\\profiles\\" + id + ".jpg";
 		try {
+			img = ImageIO.read(bais);
 			fos = new FileOutputStream(URI);
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
-		}
-		try {
 			ImageIO.write(img, "png", fos);
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			return null;
 		}
 		return URL;
 	}
@@ -147,16 +126,14 @@ public class Utils {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
-
 		return convertByteArrayToHexString(hashedBytes);
-
 	}
 
 	private static String convertByteArrayToHexString(byte[] arrayBytes) {
 		StringBuffer stringBuffer = new StringBuffer();
-		for (int i = 0; i < arrayBytes.length; i++) {
+		for (int i = 0; i < arrayBytes.length; i++)
 			stringBuffer.append(Integer.toString((arrayBytes[i] & 0xff) + 0x100, 16).substring(1));
-		}
+
 		return stringBuffer.toString();
 	}
 
@@ -165,7 +142,7 @@ public class Utils {
 		return token;
 	}
 
-	public static int sendEmail(String sendTo,String imagePath) {
+	public static int sendEmail(String sendTo, String employeeId) {
 
 		Properties props = new Properties();
 		props.put("mail.smtp.auth", "true");
@@ -183,26 +160,24 @@ public class Utils {
 			Message message = new MimeMessage(session);
 			message.setFrom(new InternetAddress(Constants.email_address));
 			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(sendTo));
-			message.setSubject("Testing Subject");
-			message.setText("Dear Mail Crawler," + "\n\n No spam to my email, please!");
+			message.setSubject("New Access Code");
 			MimeMultipart multipart = new MimeMultipart("related");
 
 			BodyPart messageBodyPart = new MimeBodyPart();
-			String htmlText = "<H1>Hello</H1><img src=\"cid:image\">";
+			String htmlText = "<img src=\"cid:image\">";
 			messageBodyPart.setContent(htmlText, "text/html");
 
 			multipart.addBodyPart(messageBodyPart);
 
 			messageBodyPart = new MimeBodyPart();
-			DataSource fds = new FileDataSource(imagePath);
-
+			DataSource fds = new FileDataSource("C:\\Users\\Administrator\\Desktop\\ServerData" + employeeId + ".jpg");
 			messageBodyPart.setDataHandler(new DataHandler(fds));
 			messageBodyPart.setHeader("Content-ID", "<image>");
 
 			multipart.addBodyPart(messageBodyPart);
 			message.setContent(multipart);
 			Transport.send(message);
-		} catch (MessagingException e) {
+		} catch (Exception e) {
 			return -1;
 		}
 		return 0;

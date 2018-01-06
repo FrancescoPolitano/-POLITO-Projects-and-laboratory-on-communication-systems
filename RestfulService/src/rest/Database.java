@@ -73,9 +73,9 @@ public class Database {
 				list.add(temp);
 			}
 			stmt.executeQuery("SELECT e.*, photo from employes e, photos p \r\n"
-					+ "                		                       where  p.IdEmployee=e.SerialNumber and e.Causal IS NULL and e.SerialNumber not  in(SELECT e.SerialNumber from employes e , locals l, accesses a \r\n"
-					+ "                		                                          where a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal GROUP BY e.SerialNumber)\r\n"
-					+ "                		                     GROUP BY e.SerialNumber");
+					+ " where  p.IdEmployee=e.SerialNumber and e.Causal IS NULL and e.SerialNumber not  in(SELECT e.SerialNumber from employes e , locals l, accesses a \r\n"
+					+ " where a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal GROUP BY e.SerialNumber)\r\n"
+					+ " GROUP BY e.SerialNumber");
 			rs = stmt.getResultSet();
 			while (rs.next()) {
 				String serial = rs.getString("SerialNumber");
@@ -112,7 +112,7 @@ public class Database {
 			return null;
 		try {
 			stmt = (Statement) conn.createStatement();
-			stmt.executeQuery("SELECT e.*, l.Name, max(a.TimeS)\r\n" + "from employes e , locals l, accesses a \r\n"
+			stmt.executeQuery("SELECT e.*, l.Name, max(a.TimeS) from employes e , locals l, accesses a \r\n"
 					+ "where e.Causal IS NOT NULL and a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal\r\n"
 					+ "GROUP BY e.SerialNumber");
 			ResultSet rs = stmt.getResultSet();
@@ -131,8 +131,7 @@ public class Database {
 			}
 			stmt.executeQuery("SELECT e.* from employes e\r\n"
 					+ "where e.Causal IS NOT NULL and e.SerialNumber not  in(SELECT e.SerialNumber from employes e , locals l, accesses a \r\n"
-					+ "						where a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal GROUP BY e.SerialNumber)\r\n"
-					+ "");
+					+ "where a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal GROUP BY e.SerialNumber)");
 			rs = stmt.getResultSet();
 			while (rs.next()) {
 				String serial = rs.getString("SerialNumber");
@@ -162,18 +161,18 @@ public class Database {
 
 	public Employee getEmployee(String id) throws SQLException {
 		Employee temp = null;
-		Statement stmt = null;
 		Connection conn = connect();
+		PreparedStatement ps = null;
 		if (conn == null)
 			return null;
 		try {
-			stmt = (Statement) conn.createStatement();
-			stmt.executeQuery(
-					"SELECT e.*, l.Name, a.TimeS , photo from employes e , locals l, accesses a, photos p \r\n"
-							+ "where p.IdEmployee= e.SerialNumber and a.TimeS= (select max(TimeS) from accesses a where a.IdEmployee='"
-							+ id + "') \r\n"
-							+ "and a.IdEmployee=e.SerialNumber and a.Result='true' and l.Id=a.IdLocal\r\n" + "");
-			ResultSet rs = stmt.getResultSet();
+			String sql = "SELECT e.*, l.Name, a.TimeS , photo from employes e , locals l, accesses a, photos p "
+					+ "where p.IdEmployee= e.SerialNumber and a.TimeS= (select max(TimeS) from accesses a where a.IdEmployee= ? "
+					+ "and a.IdEmployee=e.SerialNumber and a.Result='true' and l.Id=a.IdLocal) ";
+			ps = conn.prepareStatement(sql);
+			ps.setString(1, id);
+			ps.executeQuery();
+			ResultSet rs = ps.getResultSet();
 			while (rs.next()) {
 				String serial = rs.getString("SerialNumber");
 				String name = rs.getString("Name");
@@ -190,10 +189,13 @@ public class Database {
 			if (temp != null)
 				return temp;
 			else {
-				stmt.executeQuery(
-						"SELECT e.* , photo from employes e, photos p where p.IdEmployee= e.SerialNumber and e.SerialNumber='"
-								+ id + "' and e.SerialNumber  not  in(SELECT a.IdEmployee from accesses a) ");
-				rs = stmt.getResultSet();
+				String sql1 = "SELECT e.* , photo from employes e, photos p where p.IdEmployee= e.SerialNumber and e.SerialNumber= ? "
+						+ " and e.SerialNumber  not  in(SELECT a.IdEmployee from accesses a) ";
+				ps.close();
+				ps = conn.prepareStatement(sql1);
+				ps.setInt(1, Integer.parseInt(id));
+				ps.executeQuery();
+				rs = ps.getResultSet();
 				while (rs.next()) {
 					String serial = rs.getString("SerialNumber");
 					String name = rs.getString("Name");
@@ -206,17 +208,15 @@ public class Database {
 					temp = new Employee(serial, name, surname, auth, position, email);
 					temp.setCurrentPosition(position);
 					temp.setPhoto(photo);
-
 					temp.setSerial(serial);
-
 				}
 			}
 		} catch (SQLException ex) {
 			System.out.println("333 " + ex.getMessage());
 		} finally {
 			try {
-				if (stmt != null)
-					stmt.close();
+				if (ps != null)
+					ps.close();
 			} catch (SQLException e) {
 				System.out.println("Error closing " + e.getMessage());
 			}
@@ -226,17 +226,19 @@ public class Database {
 
 	public boolean isAuth(String local, String code) {
 		Integer serial = null;
-		Statement stmt = null;
 		Connection conn = connect();
 		if (conn == null)
 			return false;
 		int authGrade = 0, requestedGrade = 0;
 		PreparedStatement ps = null;
 		try {
-			stmt = (Statement) conn.createStatement();
-			stmt.executeQuery("select  SerialNumber, e.AuthGrade , l.AuthGrade " + "from employes e , auth a , locals l"
-					+ " where a.Code ='" + code + "' and a.IdEmployee= e.SerialNumber and l.Id='" + local + "'");
-			ResultSet rs = stmt.getResultSet();
+			String sql1 = "select SerialNumber, e.AuthGrade , l.AuthGrade from employes e , auth a , locals l"
+					+ " where a.Code = ? and a.IdEmployee= e.SerialNumber and l.Id= ?";
+			ps = conn.prepareStatement(sql1);
+			ps.setString(1, code);
+			ps.setString(2, local);
+			ps.executeQuery();
+			ResultSet rs = ps.getResultSet();
 			while (rs.next()) {
 				serial = rs.getInt("SerialNumber");
 				authGrade = rs.getInt("e.Authgrade");
@@ -248,7 +250,7 @@ public class Database {
 			boolean result = false;
 			if (authGrade > requestedGrade)
 				result = true;
-
+			ps.close();
 			ps = conn.prepareStatement(sql);
 			ps.setInt(1, serial);
 			ps.setString(2, local);
@@ -260,8 +262,6 @@ public class Database {
 			return false;
 		} finally {
 			try {
-				if (stmt != null)
-					stmt.close();
 				if (ps != null)
 					ps.close();
 			} catch (SQLException e) {
@@ -271,21 +271,23 @@ public class Database {
 	}
 
 	public boolean deleteEmployee(String id) {
-		Statement stmt = null;
+		PreparedStatement ps = null;
 		Connection conn = connect();
 		if (conn == null)
 			return false;
 		try {
-			stmt = (Statement) conn.createStatement();
-			stmt.executeUpdate("DELETE FROM employes  WHERE SerialNumber='" + id + "'");
+			String sql = "DELETE FROM employes WHERE SerialNumber= ? ";
+			ps = conn.prepareStatement(sql);
+			ps.setString(1, id);
+			ps.executeUpdate();
 			return true;
 		} catch (SQLException ex) {
 			System.out.println("555 " + ex.getMessage());
 			return false;
 		} finally {
 			try {
-				if (stmt != null)
-					stmt.close();
+				if (ps != null)
+					ps.close();
 			} catch (SQLException e) {
 				System.out.println("Error closing " + e.getMessage());
 			}
@@ -294,21 +296,26 @@ public class Database {
 
 	public String newCode(String id) {
 		String image = null;
-		Statement stmt = null;
 		Connection conn = connect();
 		if (conn == null)
 			return null;
 		PreparedStatement ps = null;
 		try {
-			stmt = (Statement) conn.createStatement();
+			conn.setAutoCommit(false);
+			String sql1 = "SELECT COUNT(*) as total FROM Employes WHERE SerialNumber= ?";
+			ps = conn.prepareStatement(sql1);
+			ps.setString(1, id);
+			ps.executeQuery();
 			ResultSet rs, rsCode, rsEmployee;
 			String newCode, email;
-			stmt.executeQuery("SELECT COUNT(*) as total FROM Employes WHERE SerialNumber='" + id + "'");
-			rsEmployee = stmt.getResultSet();
+
+			rsEmployee = ps.getResultSet();
 			rsEmployee.first();
 			if (rsEmployee.getInt("total") != 1)
 				return null;
+
 			String sql = "SELECT Email FROM Employes WHERE SerialNumber = ?";
+			ps.close();
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, id);
 			ResultSet set = ps.executeQuery();
@@ -316,28 +323,44 @@ public class Database {
 			email = set.getString("Email");
 			do {
 				newCode = Utils.randomCodeGen();
-				stmt.executeQuery("SELECT COUNT(*) as total FROM auth WHERE Code='" + newCode + "'");
-				rsCode = stmt.getResultSet();
+				String sql2 = "SELECT COUNT(*) as total FROM auth WHERE Code= ? ";
+				ps.close();
+				ps = conn.prepareStatement(sql2);
+				ps.setString(1, newCode);
+				ps.executeQuery();
+				rsCode = ps.getResultSet();
 				rsCode.first();
 			} while (rsCode.getInt("total") == 1);
-			stmt.executeQuery("SELECT COUNT(*) as total FROM auth WHERE IdEmployee='" + id + "'");
-			rs = stmt.getResultSet();
+			ps.close();
+			ps = conn.prepareStatement("SELECT COUNT(*) as total FROM auth WHERE IdEmployee= ?");
+			ps.setString(1, id);
+			ps.executeQuery();
+			rs = ps.getResultSet();
 			rs.first();
-
-			if (rs.getInt("total") == 0) {
-				stmt.executeUpdate("INSERT INTO auth (IdEmployee, Code) VALUES('" + id + "','" + newCode + "')");
+			int total = rs.getInt("total");
+			ps.close();
+			if (total == 0) {
+				ps = conn.prepareStatement("INSERT INTO auth (IdEmployee, Code) VALUES( ? ,? )");
+				ps.setString(1, id);
+				ps.setString(2, newCode);
+				ps.executeUpdate();
 			} else {
-				stmt.executeUpdate("UPDATE auth SET Code='" + newCode + "' WHERE IdEmployee='" + id + "'");
+				ps = conn.prepareStatement("UPDATE auth SET Code= ? WHERE IdEmployee= ? ");
+				ps.setString(1, newCode);
+				ps.setString(2, id);
+				ps.executeUpdate();
+			}
+			if (Utils.sendEmail(email, id) == -1) {
+				conn.rollback();
+				return null;
 			}
 			image = Utils.writeQRCode(newCode, id);
-			if (Utils.sendEmail(email, image) == -1)
-				return null;
+			conn.commit();
+
 		} catch (SQLException ex) {
 			System.out.println("666 " + ex.getMessage());
 		} finally {
 			try {
-				if (stmt != null)
-					stmt.close();
 				if (ps != null)
 					ps.close();
 			} catch (SQLException e) {
@@ -345,7 +368,6 @@ public class Database {
 			}
 		}
 		return image;
-
 	}
 
 	public ArrayList<Local> getAllLocals() {
@@ -380,41 +402,47 @@ public class Database {
 
 	public String createVisitor(Visitor visitor) {
 		Integer visitorId = null;
-		Statement stmt = null;
+		PreparedStatement ps = null;
 		Connection conn = connect();
 		if (conn == null)
 			return null;
 		try {
-			stmt = (Statement) conn.createStatement();
-			stmt.executeUpdate("INSERT into employes (Name, Surname, Causal, expiration) values" + " ('"
-					+ visitor.getName() + "', '" + visitor.getSurname() + "', '" + visitor.getCausal() + "', '"
-					+ visitor.getExpiration() + "')", Statement.RETURN_GENERATED_KEYS);
+			ps = conn.prepareStatement("INSERT into employes (Name, Surname, Causal, Expiration) values (?,?,?,?)",
+					Statement.RETURN_GENERATED_KEYS);
+			ps.setString(1, visitor.getName());
+			ps.setString(2, visitor.getSurname());
+			ps.setString(3, visitor.getCausal());
+			ps.setString(4, visitor.getExpiration());
+			ps.executeUpdate();
 
-			try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+			try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
 				if (generatedKeys.next()) {
 					visitorId = generatedKeys.getInt(1);
-
 					ResultSet rs;
 					String code;
 					do {
 						code = Utils.randomCodeGen();
-						stmt.executeQuery("SELECT COUNT(*) as total FROM auth WHERE Code='" + code + "'");
-						rs = stmt.getResultSet();
+						ps = conn.prepareStatement("SELECT COUNT(*) as total FROM auth WHERE Code= ?");
+						ps.setString(1, code);
+						ps.executeQuery();
+						rs = ps.getResultSet();
 						rs.first();
 					} while (rs.getInt("total") == 1);
-
-					stmt.executeUpdate(
-							"INSERT into auth (IdEmployee, Code) values" + " ('" + visitorId + "', '" + code + "')");
-
-					return Utils.writeQRCode(code, String.valueOf(visitorId));
+					ps.close();
+					ps = conn.prepareStatement("INSERT into auth (IdEmployee, Code) values (?,?)");
+					ps.setInt(1, visitorId);
+					ps.setString(2, code);
+					ps.executeUpdate();
+					String result = Utils.writeQRCode(code, String.valueOf(visitorId));
+					return result;
 				}
 			}
 		} catch (SQLException ex) {
 			System.out.println("888" + ex.getMessage());
 		} finally {
 			try {
-				if (stmt != null)
-					stmt.close();
+				if (ps != null)
+					ps.close();
 			} catch (SQLException e) {
 				System.out.println("Error closing " + e.getMessage());
 			}
@@ -423,24 +451,26 @@ public class Database {
 	}
 
 	public int createNewLocal(Local local) {
-		Statement stmt = null;
+		PreparedStatement ps = null;
 		Connection conn = connect();
 		if (conn == null)
 			return -2;
 		try {
-			stmt = (Statement) conn.createStatement();
-			stmt.executeUpdate("INSERT into locals (Id, AuthGrade, Name) values ('" + local.getIdLocal() + "', '"
-					+ local.getAuthGrade() + "', '" + local.getName() + "' )");
+			ps = conn.prepareStatement("INSERT into locals (Id, AuthGrade, Name) values (?,?,?)");
+			ps.setString(1, local.getIdLocal());
+			ps.setString(2, local.getAuthGrade());
+			ps.setString(3, local.getName());
+			ps.executeUpdate();
 		} catch (SQLIntegrityConstraintViolationException ex) {
-			System.out.println("SQLException " + ex.getMessage());
+			ex.printStackTrace();
 			return -1;
 		} catch (SQLException ex) {
 			System.out.println("999 " + ex.getMessage());
 			return -2;
 		} finally {
 			try {
-				if (stmt != null)
-					stmt.close();
+				if (ps != null)
+					ps.close();
 			} catch (SQLException e) {
 				System.out.println("Error closing " + e.getMessage());
 			}
@@ -449,61 +479,74 @@ public class Database {
 	}
 
 	public EmployeeResponseClass createEmployee(EmployeeRequestClass temp) {
+		temp.getEmployee().setCurrentPosition("position not found");
 		String employeeId = null;
-		Statement stmt = null;
-		String code = null;
+		PreparedStatement ps = null;
+		String code = null, qrCode;
 		Connection conn = connect();
 		if (conn == null)
 			return null;
 		try {
-			stmt = (Statement) conn.createStatement();
-			stmt.executeUpdate(
-					"INSERT into employes (Name, Surname, AuthGrade,Email) values" + " ('"
-							+ temp.getEmployee().getName() + "', '" + temp.getEmployee().getSurname() + "', '"
-							+ temp.getEmployee().getAuthLevel() + "' +'" + temp.getEmployee().getEmail() + "')",
+			conn.setAutoCommit(false);
+			ps = conn.prepareStatement("INSERT into employes (Name, Surname, AuthGrade,Email) values (?,?,?,?)",
 					Statement.RETURN_GENERATED_KEYS);
+			ps.setString(1, temp.getEmployee().getName());
+			ps.setString(2, temp.getEmployee().getSurname());
+			ps.setString(3, temp.getEmployee().getAuthLevel());
+			ps.setString(4, temp.getEmployee().getEmail());
+			ps.executeUpdate();
 
-			try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+			try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
 				if (generatedKeys.next()) {
 					employeeId = generatedKeys.getString(1);
 					temp.getEmployee().setPhoto(Utils.StoreEmployeePhoto(temp.getPhoto(), employeeId));
 
 					ResultSet rs;
+					ps.close();
 					do {
 						code = Utils.randomCodeGen();
-						stmt.executeQuery("SELECT COUNT(*) as total FROM auth WHERE Code='" + code + "'");
-						rs = stmt.getResultSet();
+						ps = conn.prepareStatement("SELECT COUNT(*) as total FROM auth WHERE Code= ? ");
+						ps.setString(1, code);
+						ps.executeQuery();
+						rs = ps.getResultSet();
 						rs.first();
 					} while (rs.getInt("total") == 1);
+					ps.close();
+					ps = conn.prepareStatement("INSERT into auth (IdEmployee, Code) values (?,?)");
+					ps.setString(1, employeeId);
+					ps.setString(2, code);
+					ps.executeUpdate();
+					ps.close();
 
-					stmt.executeUpdate(
-							"INSERT into auth (IdEmployee, Code) values" + " ('" + employeeId + "', '" + code + "')");
-					stmt.executeUpdate("INSERT into photos (IdEmployee, Photo) values" + " ('" + employeeId + "', '"
-							+ temp.getEmployee().getPhoto() + "')");
+					ps = conn.prepareStatement("INSERT into photos (IdEmployee, Photo) values (?,?)");
+					ps.setString(1, employeeId);
+					ps.setString(2, temp.getEmployee().getPhoto());
+					ps.executeUpdate();
 				}
 			}
-			if (employeeId != null) {
-				temp.getEmployee().setSerial(employeeId);
-			} else
+			if (employeeId == null)
 				return null;
+
+			temp.getEmployee().setSerial(employeeId);
+
+			if (Utils.sendEmail(temp.getEmployee().getEmail(), employeeId) == -1) {
+				conn.rollback();
+				return null;
+			}
+			qrCode = Utils.writeQRCode(code, employeeId);
+			conn.commit();
+
 		} catch (SQLException ex) {
 			System.out.println("101010 " + ex.getMessage());
 			return null;
 		} finally {
 			try {
-				if (stmt != null)
-					stmt.close();
+				if (ps != null)
+					ps.close();
 			} catch (SQLException e) {
 				System.out.println("Error closing " + e.getMessage());
 			}
 		}
-		temp.getEmployee().setCurrentPosition("position not found");
-
-		String qrCode = Utils.writeQRCode(code, employeeId);
-
-		if (Utils.sendEmail(temp.getEmployee().getEmail(), qrCode) == -1)
-			return null;
-
 		return new EmployeeResponseClass(temp.getEmployee(), qrCode);
 	}
 
@@ -546,7 +589,7 @@ public class Database {
 	}
 
 	public String login(LoginData lg, String ExpiryDate) {
-		Statement stmt = null;
+		PreparedStatement ps = null;
 		String temp = null;
 		ResultSet results, exists;
 		Connection conn = connect();
@@ -554,30 +597,37 @@ public class Database {
 			return null;
 		String hash = Utils.hashString(lg.getPassword());
 		try {
-			stmt = (Statement) conn.createStatement();
-			stmt.executeQuery("SELECT COUNT(*) as total FROM users WHERE Username='" + lg.getUsername()
-					+ "' and Password='" + hash + "'");
-			results = stmt.getResultSet();
+			ps = conn.prepareStatement("SELECT COUNT(*) as total FROM users WHERE Username= ? and Password= ? ");
+			ps.setString(1, lg.getUsername());
+			ps.setString(2, hash);
+			ps.executeQuery();
+			results = ps.getResultSet();
 			results.first();
-			if (results.getInt("total") == 1) {
+			int total = results.getInt("total");
+			ps.close();
+			if (total == 1) {
 				do {
 					temp = Utils.createToken(lg.getUsername());
-					stmt.executeQuery("SELECT COUNT(*) as total FROM tokens WHERE Token='" + temp + "'");
-					exists = stmt.getResultSet();
+					ps = conn.prepareStatement("SELECT COUNT(*) as total FROM tokens WHERE Token= ?");
+					ps.setString(1, temp);
+					ps.executeQuery();
+					exists = ps.getResultSet();
 					exists.first();
-
 				} while (exists.getInt("total") == 1);
-
-				stmt.executeUpdate("INSERT into tokens (Token, User, Expiration) values ('" + temp + "','"
-						+ lg.getUsername() + "','" + ExpiryDate + "' )");
+				ps.close();
+				ps = conn.prepareStatement("INSERT into tokens (Token, User, Expiration) values ( ?,?,?)");
+				ps.setString(1, temp);
+				ps.setString(2, lg.getUsername());
+				ps.setString(3, ExpiryDate);
+				ps.executeUpdate();
 			}
 		} catch (SQLException ex) {
 			System.out.println("999 " + ex.getMessage());
 			return null;
 		} finally {
 			try {
-				if (stmt != null)
-					stmt.close();
+				if (ps != null)
+					ps.close();
 			} catch (SQLException e) {
 				System.out.println("Error closing " + e.getMessage());
 			}
@@ -716,7 +766,7 @@ public class Database {
 	public boolean isValidToken(String token) {
 		if (token == null || token.isEmpty())
 			return false;
-		Statement stmt = null;
+		PreparedStatement ps = null;
 		ResultSet results;
 		Connection conn = connect();
 		if (conn == null)
@@ -726,10 +776,11 @@ public class Database {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		time = sdf.format(now);
 		try {
-			stmt = (Statement) conn.createStatement();
-			stmt.executeQuery(
-					"SELECT COUNT(*) as total FROM tokens WHERE Token='" + token + "' AND Expiration >='" + time + "'");
-			results = stmt.getResultSet();
+			ps = conn.prepareStatement("SELECT COUNT(*) as total FROM tokens WHERE Token= ? AND Expiration >= ?");
+			ps.setString(1, token);
+			ps.setString(2, time);
+			ps.executeQuery();
+			results = ps.getResultSet();
 			results.first();
 			if (results.getInt("total") == 1)
 				return true;
@@ -737,8 +788,8 @@ public class Database {
 			return false;
 		} finally {
 			try {
-				if (stmt != null)
-					stmt.close();
+				if (ps != null)
+					ps.close();
 			} catch (SQLException e) {
 				System.out.println("Error closing " + e.getMessage());
 			}

@@ -282,21 +282,21 @@ namespace GUI
         }
 
         //TODO AGGIUNGERE SIZECHANGED PER USARE QUESTO + accendere gridview
-        //private void ProductsListView_SizeChanged(object sender, SizeChangedEventArgs e)
-        //{
-        //    ListView listView = sender as ListView;
-        //    GridView gView = listView.View as GridView;
+        private void ProductsListView_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            ListView listView = sender as ListView;
+            GridView gView = listView.View as GridView;
 
-        //    var workingWidth = listView.ActualWidth - SystemParameters.VerticalScrollBarWidth; // take into account vertical scrollbar
-        //    var col1 = 0.166;
-           
+            var workingWidth = listView.ActualWidth - SystemParameters.VerticalScrollBarWidth; // take into account vertical scrollbar
+            var col1 = 0.166;
 
-        //    gView.Columns[0].Width = workingWidth * col1;
-        //    gView.Columns[1].Width = workingWidth * col1;
-        //    gView.Columns[2].Width = workingWidth * col1;
-        //    gView.Columns[3].Width = workingWidth * col1;
-        //    gView.Columns[4].Width = workingWidth * col1;
-        //    gView.Columns[5].Width = workingWidth * col1;
-        //}
+
+            gView.Columns[0].Width = workingWidth * col1;
+            gView.Columns[1].Width = workingWidth * col1;
+            gView.Columns[2].Width = workingWidth * col1;
+            gView.Columns[3].Width = workingWidth * col1;
+            gView.Columns[4].Width = workingWidth * col1;
+            gView.Columns[5].Width = workingWidth * col1;
+        }
     }
 }

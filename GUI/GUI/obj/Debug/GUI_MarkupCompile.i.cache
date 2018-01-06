@@ -4,30 +4,17 @@
 winexe
 C#
 .cs
-<<<<<<< HEAD
 C:\Users\Gianmaria\Documents\GitKraken\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\obj\Debug\
-=======
-C:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\obj\Debug\
->>>>>>> GUI
 GUI
 none
 false
 DEBUG;TRACE
-<<<<<<< HEAD
 C:\Users\Gianmaria\Documents\GitKraken\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\App.xaml
 7900238647
 
-28-199966350
+29-1200171102
 221171869736
 LoginWindow.xaml;BigWindow.xaml;QRCode.xaml;UserDetails.xaml;UserModification.xaml;UserCreation.xaml;VisitorCreation.xaml;
-=======
-C:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\App.xaml
-8-948758462
-
-30874333717
-221873687975
-History.xaml;LoginWindow.xaml;BigWindow.xaml;QRCode.xaml;UserDetails.xaml;UserModification.xaml;UserCreation.xaml;VisitorCreation.xaml;
->>>>>>> GUI
 
 True
 

@@ -69,7 +69,7 @@ namespace GUI
        
             users.Add("Tutti");
             rooms.Add("Tutte");
-            
+            ListaStanza1.ItemsSource = users;
             Utenti.ItemsSource = users;
             Rooms.ItemsSource = rooms;
             SelectedEmployees.ItemsSource = listUsers;
@@ -77,7 +77,6 @@ namespace GUI
             listContent.ItemsSource = Contenuto;
         }
 
-      
 
         private void newUser_Click(object sender, RoutedEventArgs e)
         {
@@ -298,5 +297,7 @@ namespace GUI
             gView.Columns[4].Width = workingWidth * col1;
             gView.Columns[5].Width = workingWidth * col1;
         }
+
+        
     }
 }

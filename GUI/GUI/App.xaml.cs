@@ -110,5 +110,9 @@ namespace GUI
             if (String.Compare(userType, Constants.ADMIN) == 0)
                 RestClient.Logout();
         }
+
+
+
+
     }
 }

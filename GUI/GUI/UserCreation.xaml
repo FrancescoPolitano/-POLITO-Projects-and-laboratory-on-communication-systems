@@ -7,7 +7,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GUI"
         mc:Ignorable="d"
-        Title="UserCreation" Height="450" Width="400">
+        Title="UserCreation" Height="550" Width="400">
     <Grid Name="myGrid" Background="AliceBlue" DataContext="User">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -38,6 +38,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Text="Authorization Level" />
             <TextBox Grid.Row="1"  Name="Role" Text="{Binding AuthLevel}" />
@@ -49,11 +50,12 @@
     </Grid>
     <Window.Resources>
         <Style TargetType="Button" BasedOn="{StaticResource MetroButton}">
-            <Setter Property="Margin" Value="15" />
+            <Setter Property="Margin" Value="15,30" />
         </Style>
         <Style TargetType="TextBox">
             <Setter Property="Margin" Value="5" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="FontSize" Value="16" />
         </Style>
         <Style TargetType="TextBlock">
             <Setter Property="FontSize" Value="20" />

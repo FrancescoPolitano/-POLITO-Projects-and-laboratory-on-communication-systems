@@ -41,6 +41,7 @@ namespace GUI
 
         public static bool Login(LoginData logindata)
         {
+            client.Timeout = new TimeSpan(0, 0, 60);
             string json = JsonConvert.SerializeObject(logindata);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             HttpResponseMessage response = client.PostAsync(myRest + "/login", content).Result;

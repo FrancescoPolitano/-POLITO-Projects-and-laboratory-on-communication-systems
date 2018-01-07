@@ -15,9 +15,76 @@
         <local:UriConverter x:Key="UriConverter" />
     </Controls:MetroWindow.Resources>
 
-    <TabControl Width="Auto">
+    <TabControl>
         <TabItem Header="Planimetry" Name="Planimetry">
             <Grid >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Grid.Column="0" Background="AliceBlue">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Nome Stanza" />
+                    <ListView Grid.Row="1" Name="ListaStanza1">
+                        <ListView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="3" />
+                            </ItemsPanelTemplate>
+                        </ListView.ItemsPanel>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Background="Aquamarine">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Ellipse Width="24" Height="24" HorizontalAlignment="Center" >
+                                        <Ellipse.Fill>
+                                            <ImageBrush ImageSource="F:\Downloads\farmer.png" Stretch="UniformToFill"/>
+                                        </Ellipse.Fill>
+                                    </Ellipse>
+                                    <TextBlock Grid.Column="1" Text="SERIAL" FontSize="18" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+                <Grid Grid.Row="0" Grid.Column="1" Background="AliceBlue">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Nome Stanza" />
+                   
+                </Grid>
+                <Grid Grid.Row="1" Grid.Column="0" Background="AliceBlue">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Nome Stanza" />
+                </Grid>
+                <Grid Grid.Row="1" Grid.Column="1" Background="AliceBlue">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Nome Stanza" />
+                </Grid>
+
+
+                <Rectangle Grid.Row="0" Grid.Column="0" StrokeThickness="4" Stroke="Black" />
+                <Rectangle Grid.Row="1" Grid.Column="0" StrokeThickness="4" Stroke="Black" />
+                <Rectangle Grid.Row="0" Grid.Column="1" StrokeThickness="4" Stroke="Black" />
+                <Rectangle Grid.Row="1" Grid.Column="1" StrokeThickness="4" Stroke="Black" />
                 <!--<Grid.Background>
                     <ImageBrush ImageSource="F:\Downloads\planimetry.jpg" Stretch="UniformToFill"/>
                 </Grid.Background>-->
@@ -50,7 +117,7 @@
                         <TextBlock Text="IDENTIFIER" Grid.Column="3" />
                         <TextBlock Text="CURRENT POSITION" Grid.Column="4" />
                     </Grid>
-                    <ListView Grid.Row="1" Name="Users" ItemsSource="{Binding UserList}" Width="Auto" Height="Auto" BorderThickness="0">
+                    <ListView Grid.Row="1" Name="Users" ItemsSource="{Binding UserList}" Width="Auto" Height="Auto" BorderThickness="0" >
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <Grid>

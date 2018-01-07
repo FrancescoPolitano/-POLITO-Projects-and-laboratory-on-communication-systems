@@ -170,7 +170,7 @@ public class Utils {
 			multipart.addBodyPart(messageBodyPart);
 
 			messageBodyPart = new MimeBodyPart();
-			DataSource fds = new FileDataSource("C:\\Users\\Administrator\\Desktop\\ServerData" + employeeId + ".jpg");
+			DataSource fds = new FileDataSource("C:\\Users\\Administrator\\Desktop\\ServerData\\" + employeeId + ".jpg");
 			messageBodyPart.setDataHandler(new DataHandler(fds));
 			messageBodyPart.setHeader("Content-ID", "<image>");
 
@@ -178,6 +178,7 @@ public class Utils {
 			message.setContent(multipart);
 			Transport.send(message);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return -1;
 		}
 		return 0;

@@ -313,7 +313,6 @@ public class Database {
 			rsEmployee.first();
 			if (rsEmployee.getInt("total") != 1)
 				return null;
-
 			String sql = "SELECT Email FROM Employes WHERE SerialNumber = ?";
 			ps.close();
 			ps = conn.prepareStatement(sql);
@@ -350,11 +349,11 @@ public class Database {
 				ps.setString(2, id);
 				ps.executeUpdate();
 			}
+			image = Utils.writeQRCode(newCode, id);
 			if (Utils.sendEmail(email, id) == -1) {
 				conn.rollback();
 				return null;
 			}
-			image = Utils.writeQRCode(newCode, id);
 			conn.commit();
 
 		} catch (SQLException ex) {

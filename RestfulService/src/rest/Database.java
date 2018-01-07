@@ -57,7 +57,14 @@ public class Database {
 		try {
 			stmt = (Statement) conn.createStatement();
 			stmt.executeQuery(
-					"SELECT e.*, l.Name, max(a.TimeS), photo from employes e , photos p, locals l, accesses a  where p.IdEmployee= e.SerialNumber AND e.Causal IS NULL and a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal GROUP BY e.SerialNumber");
+					"SELECT e.*, l.Name, a.TimeS, photo\r\n" + 
+					"FROM employes e , photos p, locals l, accesses a\r\n" + 
+					"WHERE p.IdEmployee= e.SerialNumber AND\r\n" + 
+					"e.Causal IS NULL AND a.IdEmployee=e.SerialNumber AND l.Id=a.IdLocal\r\n" + 
+					"AND a.TimeS in (SELECT MAX(TimeS)\r\n" + 
+					"FROM accesses\r\n" + 
+					"GROUP BY IdEmployee)\r\n" + 
+					"GROUP BY e.SerialNumber");
 			ResultSet rs = stmt.getResultSet();
 			while (rs.next()) {
 				String serial = rs.getString("SerialNumber");

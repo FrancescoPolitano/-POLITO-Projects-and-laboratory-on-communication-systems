@@ -135,8 +135,6 @@ public class Resources {
 			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
 
 		String code = database.newCode(new Gson().fromJson(request, String.class));
-		if(code == null)
-			System.out.println("NULLO");
 		if (code == null)
 			return Response.status(Constants.status_generic_error).entity(Constants.generic_error).build();
 		return Response.ok(code).build();

@@ -43,6 +43,7 @@ namespace ServerFEZ
             {
                 //TODO change
                 byte[] pictureData;
+                byte[] responseToFEZ = new byte[Constants.EVALUATION.ACCEPT.ToString().Length];
                 int pictureSize = 0, received = 0, sent = 0; ;
                 SocketError error;
                 try
@@ -62,7 +63,6 @@ namespace ServerFEZ
                     pictureSize = BitConverter.ToInt32(pictureByteSize, 0);
                     pictureData = new byte[pictureSize];
                     received = 0;
-
                     while (received < pictureSize)
                     {
                         if (pictureSize - received > Constants.PACKET_SIZE)
@@ -82,9 +82,6 @@ namespace ServerFEZ
                     Bitmap bitmap;
                     MemoryStream ms = new MemoryStream(pictureData);
                     bitmap = new Bitmap(ms);
-
-                    byte[] responseToFEZ = new byte[Constants.EVALUATION.ACCEPT.ToString().Length];
-
 
                     var barcodeReader = new BarcodeReader();
                     //var barcodeBitmap = (Bitmap)Bitmap.FromFile(@"C:\Users\Cristiano\Desktop\jpeg.jpg");
@@ -113,7 +110,6 @@ namespace ServerFEZ
 
 
                     sent = handler.Send(responseToFEZ, 0, responseToFEZ.Length, SocketFlags.None, out error);
-                    Console.WriteLine("RESPONSE SENT");
                     if (error != SocketError.Success)
                     {
                         Console.WriteLine("errore " + error.ToString());
@@ -130,9 +126,17 @@ namespace ServerFEZ
                     Console.WriteLine("errore " + s.Message);
                     return;
                 }
+                catch (ArgumentException ae)
+                {
+                    Console.WriteLine("errore " + ae.Message);
+                    handler.Close();
+                    return;
+                }
                 catch (Exception e)
                 {
                     Console.WriteLine("errore " + e.Message);
+                    handler.Close();
+                    return;
                 }
 
             }

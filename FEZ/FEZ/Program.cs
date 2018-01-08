@@ -33,12 +33,29 @@ namespace FEZ
 
         private void initializeWifi()
         {
+            bool joinSuccess = true;
             ledStrip.SetBitmask(28);
-            if(!wifiRS21.NetworkInterface.Opened)
-            wifiRS21.NetworkInterface.Open();
+            if (!wifiRS21.NetworkInterface.Opened)
+                wifiRS21.NetworkInterface.Open();
             wifiRS21.UseStaticIP(Constants.STATIC_IP, Constants.MASK, Constants.STATIC_IP);
-
-            wifiRS21.NetworkInterface.Join(Constants.WIFI_SSID, Constants.WIFI_PASSWORD);
+            GHI.Networking.WiFiRS9110.NetworkParameters[] info;
+            while (joinSuccess)
+            {
+                try
+                {
+                    info = wifiRS21.NetworkInterface.Scan(Constants.WIFI_SSID);
+                    if (info != null && info.Length != 0)
+                    {
+                        wifiRS21.NetworkInterface.Join(info[0].Ssid, Constants.WIFI_PASSWORD);
+                        joinSuccess = false;
+                    }
+                }
+                catch (GHI.Networking.WiFiRS9110.JoinException je)
+                {
+                    Debug.Print(je.StackTrace);
+                    joinSuccess = true;
+                }
+            }
             while (wifiRS21.NetworkInterface.IPAddress == "0.0.0.0")
             {
                 Debug.Print("ASPETTANDO IP");
@@ -64,8 +81,7 @@ namespace FEZ
             {
                 byte[] image = e.PictureData;
                 int pictureSize = image.Length;
-                if (pictureSize == 0)
-                    Debug.Print("STOP");
+
                 //TODO CHANGE
                 sockSender.ReceiveTimeout = 8000;
                 sockSender.SendTimeout = 8000;
@@ -126,7 +142,6 @@ namespace FEZ
                 Thread.Sleep(1000);
             }
 
-
             while (true)
             {
                 bool isConnected = true;
@@ -140,25 +155,23 @@ namespace FEZ
                 {
                     isConnected = false;
                     Debug.Print("ECCEZIONE DURANTE CONNECT");
-                    if (e.ErrorCode == 11003)
-                    {
-                        //succede solo se stacco il wifi e poi nn riparte
-                    }
-                    //TODO Risolvere error code 11003
-                    //TODO aggiungere più controlli in initializeWifi
+                    //if (e.ErrorCode == 11003)
+                    //{
+                    //    //succede solo se stacco il wifi e poi nn riparte
+                    //}
+                    ////TODO Risolvere error code 11003
+                    ////TODO aggiungere più controlli in initializeWifi
                 }
                 if (isConnected)
                     break;
-                Thread.Sleep(400);
             }
             ledStrip.TurnAllLedsOff();
 
             while (!camera.CameraReady)
             {
                 Debug.Print("CAMERA NOT READY");
-                Thread.Sleep(30);
+                Thread.Sleep(100);
             }
-
             camera.TakePicture();
         }
 

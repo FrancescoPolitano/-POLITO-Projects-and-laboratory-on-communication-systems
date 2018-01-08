@@ -61,6 +61,7 @@ public class Utils {
 		try {
 			matrix = writer.encode(data, com.google.zxing.BarcodeFormat.QR_CODE, 256, 256);
 		} catch (com.google.zxing.WriterException e) {
+			System.out.println(e.getMessage());
 			return null;
 		}
 
@@ -83,13 +84,14 @@ public class Utils {
 
 		// write the image to the output stream
 		FileOutputStream fos = null;
-		String URI = "C:\\Users\\Administrator\\Desktop\\ServerData\\" + UserId + ".jpg";
+		String URI = "C:\\Users\\franc\\Desktop\\ServerData\\" + UserId + ".jpg";
 		String URL = "/images/" + UserId + ".jpg";
 		try {
 			fos = new FileOutputStream(URI);
 			ImageIO.write(image, "png", fos);
 			fos.close();
 		} catch (Exception e) {
+			System.out.println("file non scritto "+e.getMessage());
 			return null;
 		}
 		return URL;
@@ -101,7 +103,7 @@ public class Utils {
 		// Converto il byte array in una buffered image
 		ByteArrayInputStream bais = new ByteArrayInputStream(fileContent);
 		FileOutputStream fos = null;
-		String URI = "C:\\Users\\Administrator\\Desktop\\ServerData\\profiles\\" + id + ".jpg";
+		String URI = "C:\\Users\\franc\\Desktop\\ServerData\\profiles\\" + id + ".jpg";
 		try {
 			img = ImageIO.read(bais);
 			fos = new FileOutputStream(URI);
@@ -170,7 +172,7 @@ public class Utils {
 			multipart.addBodyPart(messageBodyPart);
 
 			messageBodyPart = new MimeBodyPart();
-			DataSource fds = new FileDataSource("C:\\Users\\Administrator\\Desktop\\ServerData\\" + employeeId + ".jpg");
+			DataSource fds = new FileDataSource("C:\\Users\\franc\\Desktop\\ServerData\\" + employeeId + ".jpg");
 			messageBodyPart.setDataHandler(new DataHandler(fds));
 			messageBodyPart.setHeader("Content-ID", "<image>");
 
@@ -183,4 +185,41 @@ public class Utils {
 		}
 		return 0;
 	}
+	public static int sendConfirmationEmail(String sendTo, String employeeId) {
+
+		Properties props = new Properties();
+		props.put("mail.smtp.auth", "true");
+		props.put("mail.smtp.starttls.enable", "true");
+		props.put("mail.smtp.host", "smtp.gmail.com");
+		props.put("mail.smtp.port", "587");
+
+		Session session = Session.getInstance(props, new javax.mail.Authenticator() {
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication(Constants.email_address, Constants.email_password);
+			}
+		});
+
+		try {
+			Message message = new MimeMessage(session);
+			message.setFrom(new InternetAddress(Constants.email_address));
+			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(sendTo));
+			message.setSubject("EasyAccess: Please confirm your email address");
+			MimeMultipart multipart = new MimeMultipart("related");
+
+			BodyPart messageBodyPart = new MimeBodyPart();
+			String htmlText = "If you doesn't know the origin of this email please ignore it.<br>"
+					+ "<a href=\"http://localhost:8082/RestfulService/resources/confirm/"+employeeId+"\">Click here to confirm</a>";
+			messageBodyPart.setContent(htmlText, "text/html");
+
+			multipart.addBodyPart(messageBodyPart);
+
+			message.setContent(multipart);
+			Transport.send(message);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -1;
+		}
+		return 0;
+	}
+
 }

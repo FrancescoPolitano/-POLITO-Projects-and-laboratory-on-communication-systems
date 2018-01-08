@@ -100,6 +100,15 @@ public class Resources {
 	public Response getAccess(@PathParam("local") String door, @PathParam("code") String code) {
 		return Response.ok(database.isAuth(door, code)).build();
 	}
+	
+	// email confirmation link
+	@GET
+	@Path("confirm/{code}")
+	@Produces(MediaType.TEXT_PLAIN)
+	public Response confirm(@PathParam("code") String code) {
+		database.confirmEmail(code);
+		return Response.ok().build();
+	}
 
 	// create a temporary user and grant him the lowest level of permission, returns
 	// the user as a json

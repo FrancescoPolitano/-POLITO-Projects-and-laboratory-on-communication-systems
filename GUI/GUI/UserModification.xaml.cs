@@ -13,47 +13,53 @@ namespace GUI
         public UserModification(Employee u)
         {
             InitializeComponent();
+            AuthLevel.Items.Add("1");
+            AuthLevel.Items.Add("2");
+            AuthLevel.Items.Add("3");
             User = u;
-            myGrd.DataContext = User;
+            name.Text = User.Name;
+            surname.Text = User.Surname;
+            email.Text = User.Email;
+            switch (User.AuthLevel)
+            {
+                case "1": AuthLevel.SelectedIndex = 0; break;
+                case "2": AuthLevel.SelectedIndex = 1; break;
+                case "3": AuthLevel.SelectedIndex = 2; break;
+            }
         }
 
-        private async void RoleChange_Click(object sender, RoutedEventArgs e)
+        private void Confirm_Click(object sender, RoutedEventArgs e)
         {
-            string result = await this.ShowInputAsync("Changing Authorization level", "Please insert a new Authorhization Level", new MetroDialogSettings());
-            if (!string.IsNullOrEmpty(result))
+            if (string.IsNullOrEmpty(name.Text))
             {
-                AuthLevelClass auth = new AuthLevelClass(result, User.Serial);
-                //TODO test this
-                if (!RestClient.RoleChange(auth))
-                    this.ShowModalMessageExternal("Ops", "Cannot change authorization level right now.");
-                else User.AuthLevel = result;
-                Close();
+                this.ShowModalMessageExternal("Ops", "Insert a name");
+                return;
+            }
+            if (string.IsNullOrEmpty(surname.Text))
+            {
+                this.ShowModalMessageExternal("Ops", "Insert a surname");
+                return;
+            }
+            if (string.IsNullOrEmpty(email.Text))
+            {
+                this.ShowModalMessageExternal("Ops", "Insert a email");
+                return;
             }
 
+            User.Name = name.Text;
+            User.Surname = surname.Text;
+            User.Email = email.Text;
+            User.AuthLevel = AuthLevel.SelectedItem as string;
+
+            if (!RestClient.ModifyUser(User))
+                this.ShowModalMessageExternal("Ops", "Something went wrong");
+            Close();
+
         }
 
-        private void QRChange_Click(object sender, RoutedEventArgs e)
+        private void Cancel_Click(object sender, RoutedEventArgs e)
         {
-            this.ShowModalMessageExternal("ChangingQRCode", "A new QRCode is being generated");
-            string result = RestClient.QRCodeChange(user.Serial.ToString());
-            if (!string.IsNullOrEmpty(result))
-            {
-                QRCode qr = new QRCode(Constants.IPREMOTE + result);
-                qr.ShowDialog();
-            }
-            else
-                this.ShowModalMessageExternal("Ops", "An error occurred while changing the code");
-        }
-
-        private void BlockUser_Click(object sender, RoutedEventArgs e)
-        {
-            //TODO blocco permanente dell'utente
-            if (RestClient.BlockAccess(User.Serial))
-                User.AuthLevel = "0";
-            else
-                this.ShowModalMessageExternal("Ops", "Cannot block the user right now");
             Close();
         }
-
     }
 }

@@ -31,9 +31,10 @@ namespace GUI
         public UserCreation()
         {
             InitializeComponent();
-            //TODO mettere un placeholder vero
-            //User.PathPhoto = "F:\\Downloads\\farmer.png";
             myGrid.DataContext = User;
+            Role.Items.Add("1");
+            Role.Items.Add("2");
+            Role.Items.Add("3");
         }
 
         private void Confirm_Click(object sender, RoutedEventArgs e)
@@ -107,6 +108,12 @@ namespace GUI
             {
                 User.PathPhoto = openFileDialog1.FileName;
             }
+        }
+
+        private void Role_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            string auth = Role.SelectedItem as string;
+            User.AuthLevel = Role.SelectedItem as string;
         }
     }
 }

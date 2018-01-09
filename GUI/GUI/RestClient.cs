@@ -14,20 +14,6 @@ namespace GUI
 {
     class RestClient
     {
-        ////example
-        //public static string Get(string uri)
-        //{
-        //    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
-        //    request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-
-        //    using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-        //    using (Stream stream = response.GetResponseStream())
-        //    using (StreamReader reader = new StreamReader(stream))
-        //    {
-        //        return reader.ReadToEnd();
-        //    }
-        //}
-
         private static string myRest = Constants.myRest;
         private static string sessionToken = String.Empty;
 
@@ -39,6 +25,7 @@ namespace GUI
 
         private static readonly HttpClient client = new HttpClient(handler);
 
+        //Login, saves a "cookie"
         public static bool Login(LoginData logindata)
         {
             client.Timeout = new TimeSpan(0, 0, 60);
@@ -59,6 +46,7 @@ namespace GUI
             return false;
         }
 
+        //logout
         public static void Logout()
         {
             HttpResponseMessage response = client.GetAsync(myRest + "/logout").Result;
@@ -73,7 +61,6 @@ namespace GUI
         public static List<Employee> GetAllUsers()
         {
             string json = String.Empty;
-            //TODO why this and not await?
             HttpResponseMessage response = client.GetAsync(myRest + "/users/employees").Result;
 
             if (response.IsSuccessStatusCode)
@@ -88,7 +75,6 @@ namespace GUI
         public static List<Visitor> GetAllVisitors()
         {
             string json = String.Empty;
-            //TODO why this and not await?
             HttpResponseMessage response = client.GetAsync(myRest + "/users/visitors").Result;
 
             if (response.IsSuccessStatusCode)
@@ -99,11 +85,10 @@ namespace GUI
             return null;
         }
 
-
+        //method for getting all rooms
         public static List<Room> GetAllRooms()
         {
             string json = String.Empty;
-            //TODO why this and not await? + CHANGE LOCALS WITH ROOMS
             HttpResponseMessage response = client.GetAsync(myRest + "/locals").Result;
             if (response.IsSuccessStatusCode)
             {
@@ -122,23 +107,17 @@ namespace GUI
                 Photo = File.ReadAllBytes(u.PathPhoto)
             };
             string json = JsonConvert.SerializeObject(eRC);
-            //Console.WriteLine(json);
-
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-
             HttpResponseMessage response = client.PostAsync(myRest + "/users/employees", content).Result;
-            //TODO change the return parameter
             if (response.IsSuccessStatusCode)
                 return JsonConvert.DeserializeObject<EmployeeResponseClass>(response.Content.ReadAsStringAsync().Result);
             return null;
         }
 
         //method to create a visitor
-        //TODO test this
         public static async Task<string> CreateVisitor(Visitor v)
         {
             string json = JsonConvert.SerializeObject(v);
-            //Console.WriteLine(json);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             HttpResponseMessage response = await client.PostAsync(myRest + "/users/visitors", content);
             if (response.IsSuccessStatusCode)
@@ -147,10 +126,9 @@ namespace GUI
                 return String.Empty;
         }
 
-        //TODO method to GET a list of users from the service
+        //method to get a single user (never used)
         public static async Task<Employee> GetSingleUser(string id)
         {
-            //only works for 1 guy, how to get more than one?
             string json = String.Empty;
             HttpResponseMessage response = await client.GetAsync(myRest + "/users/" + id);
             if (response.IsSuccessStatusCode)
@@ -170,7 +148,8 @@ namespace GUI
             else
                 return false;
         }
-        //TODO chiedere la query corretta e il parametro da passare
+
+        //TODO CHANGE THIS WITH MODIFY USERS
         //method to ask for a change of role
         public static bool RoleChange(AuthLevelClass auth)
         {
@@ -196,7 +175,7 @@ namespace GUI
         }
 
 
-     
+       //method to get the accesses. 
         public static List<Access> GetHistory(ComplexQuery q)
         {
             string json = JsonConvert.SerializeObject(q);
@@ -208,7 +187,17 @@ namespace GUI
             return null;
         }
 
+        public static bool ModifyUser(Employee e)
+        {
+            string json = JsonConvert.SerializeObject(e);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = client.PostAsync(myRest + "/users/modify", content).Result;
+            if (response.IsSuccessStatusCode)
+                return true;
+            else
+                return false;
 
+        }
 
         //PER TUTTE LE RICHIEST REST
         //if(response.StatusCode == 804)

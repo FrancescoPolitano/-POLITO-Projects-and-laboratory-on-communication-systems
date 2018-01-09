@@ -8,16 +8,16 @@ namespace GUI
 {
    public class Room
     {
-        private string name, idRoom,authGrade;
+        private string name, idLocal,authGrade;
 
         public string Name { get => name; set => name = value; }
-        public string IdRoom { get => idRoom; set => idRoom = value; }
+        public string IdLocal { get => idLocal; set => idLocal = value; }
         public string AuthGrade { get => authGrade; set => authGrade = value; }
 
         public Room(string name, string idRoom, string authGrade)
         {
             Name = name;
-            IdRoom = idRoom;
+            IdLocal = idRoom;
             AuthGrade = authGrade;
         }
 

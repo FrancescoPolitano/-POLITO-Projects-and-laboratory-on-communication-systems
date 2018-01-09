@@ -24,16 +24,26 @@ namespace GUI
     public partial class BigWindow : MetroWindow
     {
         public static ObservableCollection<string> users = new ObservableCollection<string>();
-        private ObservableCollection<string> rooms = new ObservableCollection<string>();
+        private ObservableCollection<Room> rooms = new ObservableCollection<Room>();
         private ObservableCollection<string> listUsers = new ObservableCollection<string>();
         private ObservableCollection<string> listRooms = new ObservableCollection<string>();
         private ObservableCollection<Access> contenuto = new ObservableCollection<Access>();
         private static ObservableCollection<Employee> userList;
         private static ObservableCollection<Visitor> visitorList;
+        private static ObservableCollection<Employee> room1;
+        private static ObservableCollection<Employee> room2;
+        private static ObservableCollection<Employee> room3;
+        private static ObservableCollection<Employee> room4;
+
 
         public static ObservableCollection<Employee> UserList { get => userList; set => userList = value; }
         internal static ObservableCollection<Visitor> VisitorList { get => visitorList; set => visitorList = value; }
         public ObservableCollection<Access> Contenuto { get => contenuto; set => contenuto = value; }
+   
+        public static ObservableCollection<Employee> Room1 { get => room1; set => room1 = value; }
+        public static ObservableCollection<Employee> Room2 { get => room2; set => room2 = value; }
+        public static ObservableCollection<Employee> Room3 { get => room3; set => room3 = value; }
+        public static ObservableCollection<Employee> Room4 { get => room4; set => room4 = value; }
 
         public BigWindow(string UserType)
         {
@@ -44,8 +54,12 @@ namespace GUI
                 UserTab.Visibility = Visibility.Collapsed;
                 History.Visibility = Visibility.Collapsed;
             }
-            UserList = new ObservableCollection<Employee>();
-            VisitorList = new ObservableCollection<Visitor>();
+
+            users.Add("Tutti");
+            rooms.Add(new Room
+            {
+                Name = "Tutte"
+            });
 
             if (App.userList != null)
             {
@@ -53,23 +67,31 @@ namespace GUI
                 foreach (Employee user in UserList)
                     users.Add(user.Name + " " + user.Surname + " " + user.Serial);
             }
+            else 
+            UserList = new ObservableCollection<Employee>();
             if (App.visitorList != null)
                 VisitorList = new ObservableCollection<Visitor>(App.visitorList);
-
+            else
+            VisitorList = new ObservableCollection<Visitor>();
             CalendarDateRange cdr = new CalendarDateRange(DateTime.Today.AddDays(1), DateTime.MaxValue);
             fromDate.BlackoutDates.Add(cdr);
             toDate.BlackoutDates.Add(cdr);
             if (App.roomList != null)
                 foreach (Room room in App.roomList)
-                    rooms.Add(room.Name);
+                    rooms.Add(room);
            
             Users.ItemsSource = UserList;
             Visitors.ItemsSource = VisitorList;
 
-       
-            users.Add("Tutti");
-            rooms.Add("Tutte");
-            ListaStanza1.ItemsSource = users;
+            Room1 = new ObservableCollection<Employee>();
+            Room2 = new ObservableCollection<Employee>();
+            Room3 = new ObservableCollection<Employee>();
+            Room4 = new ObservableCollection<Employee>();
+
+            ListaStanza1.ItemsSource = Room1;
+            ListaStanza2.ItemsSource = Room2;
+            ListaStanza3.ItemsSource = Room3;
+            ListaStanza4.ItemsSource = Room4;
             Utenti.ItemsSource = users;
             Rooms.ItemsSource = rooms;
             SelectedEmployees.ItemsSource = listUsers;
@@ -147,20 +169,20 @@ namespace GUI
         private void Room_click(object sender, MouseButtonEventArgs e)
         {
             StackPanel sp = sender as StackPanel;
-            string stanza = sp.DataContext.ToString();
-            if (listRooms.Contains(stanza))
+            Room stanza = sp.DataContext as Room;
+            if (listRooms.Contains(stanza.Name))
                 return;
-            if (String.Compare(stanza, "Tutte") == 0)
+            if (String.Compare(stanza.Name, "Tutte") == 0)
             {
                 listRooms.Clear();
-                listRooms.Add(stanza);
+                listRooms.Add(stanza.Name);
             }
 
             else
             {
                 if (listRooms.Contains("Tutte"))
                     listRooms.Remove("Tutte");
-                listRooms.Add(sp.DataContext.ToString());
+                listRooms.Add(stanza.Name);
             }
             requestData();
 
@@ -174,6 +196,10 @@ namespace GUI
             {
                 string employee = SelectedEmployees.SelectedItem as string;
                 listUsers.Remove(employee);
+                if (SelectedEmployees.Items.Count != 0)
+                    requestData();
+                else
+                    Contenuto.Clear();
             }
         }
 
@@ -185,6 +211,10 @@ namespace GUI
             {
                 string room = SelectedRooms.SelectedItem as string;
                 listRooms.Remove(room);
+                if (SelectedRooms.Items.Count != 0)
+                    requestData();
+                else
+                    Contenuto.Clear();
             }
         }
 
@@ -258,7 +288,12 @@ namespace GUI
                 if (String.Compare("Tutte", st) == 0)
                     continue;
                 else
-                    temp2.Add(st);
+                {
+                    foreach(Room r in rooms)
+                        if (String.Compare(r.Name,st) == 0 )
+                            temp2.Add(r.IdLocal);
+                }
+                  //  temp2.Add(st);
             }
             qr.Rooms = temp2;
             //if (t != null)
@@ -268,34 +303,6 @@ namespace GUI
             qr.Initial = t;
             qr.End = t1;
             return qr;
-        }
-
-        private void ListViewItem_PreviewMouseLeftButtonDown_1(object sender, MouseButtonEventArgs e)
-        {
-            var item = sender as ListViewItem;
-            if (item != null)
-            {
-                Visitor visitor = item.DataContext as Visitor;
-                MessageBox.Show("nome del visitor" + visitor.Name);
-            }
-        }
-
-        //TODO AGGIUNGERE SIZECHANGED PER USARE QUESTO + accendere gridview
-        private void ProductsListView_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            ListView listView = sender as ListView;
-            GridView gView = listView.View as GridView;
-
-            var workingWidth = listView.ActualWidth - SystemParameters.VerticalScrollBarWidth; // take into account vertical scrollbar
-            var col1 = 0.166;
-
-
-            gView.Columns[0].Width = workingWidth * col1;
-            gView.Columns[1].Width = workingWidth * col1;
-            gView.Columns[2].Width = workingWidth * col1;
-            gView.Columns[3].Width = workingWidth * col1;
-            gView.Columns[4].Width = workingWidth * col1;
-            gView.Columns[5].Width = workingWidth * col1;
         }
 
         

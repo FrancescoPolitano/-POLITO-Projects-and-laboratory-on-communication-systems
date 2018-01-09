@@ -55,6 +55,12 @@ namespace GUI
                 this.ShowModalMessageExternal("Ops", "Insert a valid surname");
                 return;
             }
+            if (String.IsNullOrEmpty(MotivationBox.Text))
+            {
+                //errore Cognome
+                this.ShowModalMessageExternal("Ops", "Insert a valid motivation");
+                return;
+            }
             if (String.IsNullOrEmpty(DatePick.Text))
             {
                 //errore data
@@ -65,7 +71,6 @@ namespace GUI
 
             
             myVisitor.Expiration = String.Format("{0:yyyy-MM-dd HH:mm:ss}", DatePick.SelectedDate);
-            //TODO CHANGE : cambiare valore di ritorno, per prendere il path del QR code nuovo
             string QRcodeNew = await RestClient.CreateVisitor(myVisitor);
             if (!String.IsNullOrEmpty(QRcodeNew))
             {
@@ -77,7 +82,6 @@ namespace GUI
             }
             else
             {
-                //stampare fallimento
                 this.ShowModalMessageExternal("Ops", "Error while creating this visitor");
                 Close();
             }

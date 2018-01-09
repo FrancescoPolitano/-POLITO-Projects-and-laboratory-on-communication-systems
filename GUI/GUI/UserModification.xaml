@@ -8,17 +8,40 @@
         xmlns:local="clr-namespace:GUI"
         mc:Ignorable="d"
         Height="450" Width="450" BorderThickness="0" GlowBrush="Black">
-    <Grid Name="myGrd" DataContext="User">
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="2*" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <TextBlock Name="text" Text="{Binding Surname, StringFormat='Modifying data for {0}'}" Grid.Row="0" />
-        <Button Grid.Row="1" Name="RoleChange" Content="Change Authorization Level" Click="RoleChange_Click" />
-        <Button Grid.Row="2" Name="QRChange"  Content="Change QRCode" Click="QRChange_Click" />
-        <Button Grid.Row="3" Name="BlockUser" Content="Block user" Click="BlockUser_Click" />
+        <Grid Grid.Row="0" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="Name" />
+            <TextBlock Grid.Row="2" Text="Surname" />
+            <TextBlock Grid.Row="4" Text="Email" />
+            <TextBlock Grid.Row="6" Text="Authorization Level" />
+            <TextBox Grid.Row="1" Name="name"/>
+            <TextBox Grid.Row="3" Name="surname"/>
+            <TextBox Grid.Row="5" Name="email"/>
+            <ComboBox Grid.Row="7" Name="AuthLevel" />
+
+        </Grid>
+        <Grid Grid.Row="1" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Button Content="Confirm" Name ="Confirm" Click="Confirm_Click" />
+            <Button Grid.Column="1" Content="Cancel" Name ="Cancel" Click="Cancel_Click" />
+        </Grid>
     </Grid>
     <Window.Resources>
         <Style TargetType="TextBlock" >
@@ -26,9 +49,11 @@
             <Setter Property="FontSize" Value="16" />
             <Setter Property="HorizontalAlignment" Value="Center" />
         </Style>
-        
+        <Style TargetType="TextBox" BasedOn="{StaticResource MetroTextBox}">
+            <Setter Property="FontSize" Value="16" />
+        </Style>
         <Style TargetType="Button" BasedOn="{StaticResource MetroButton}" >
-            <Setter Property="Margin" Value="10" />
+            <Setter Property="Margin" Value="10,30" />
         </Style>
     </Window.Resources>
 </Controls:MetroWindow>

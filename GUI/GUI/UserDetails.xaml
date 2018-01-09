@@ -1,27 +1,30 @@
-﻿<Window x:Class="GUI.UserDetails"
+﻿<Controls:MetroWindow x:Class="GUI.UserDetails"
+        xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GUI"
         mc:Ignorable="d"
-        Title="UserDetails" Height="550" Width="450">
-    <Window.Resources>
+        Title="UserDetails" Height="550" Width="450" GlowBrush="Black" BorderThickness="0">
+    <Controls:MetroWindow.Resources>
         <Style TargetType="Button" BasedOn="{StaticResource MetroButton}">
-            <Setter Property="Margin" Value="15" />
+            <Setter Property="Margin" Value="10,50" />
         </Style>
         <local:UriConverter x:Key="UriConverter" />
-    </Window.Resources>
+    </Controls:MetroWindow.Resources>
     
     <Grid Name="OuterGrid" >
         <Grid.RowDefinitions>
             <RowDefinition Height="2*" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
+        <Grid Grid.Row ="0" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+     
         <Grid Grid.Row="0" Grid.Column="0"  Name="InnerGrid">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
@@ -60,9 +63,19 @@
             </Grid.Resources>
         </Grid>
         <Image Grid.Row="0" Grid.Column="1" Source="{Binding Path=PathPhoto,Converter={StaticResource UriConverter}}" Stretch="Fill"/>
-        <Button Grid.Row="1" Grid.Column="0" Name="History" Content="History" Click="History_Click"  Margin="30,50"/>
-        <Button Grid.Row="1" Grid.Column="1" Name="modify" Content="Modify" Click="modify_Click" Margin="30,50"/>
+        </Grid>
+        <Grid Grid.Row="1" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Name="modify" Content="Modify" Click="modify_Click" />
+            <Button Grid.Column="1" Name="QRChange" Content="Change QR Code" Click="QRChange_Click" />
+            <Button Grid.Column="2" Name="block" Content="Block" Click="BlockUser_Click" />
+           
+        </Grid>
     </Grid>
   
     
-</Window>
+</Controls:MetroWindow>

@@ -22,6 +22,7 @@ namespace GUI
         public static List<Employee> userList;
         public static List<Room> roomList;
         public static List<Visitor> visitorList;
+
         private Thread t;
 
         private void Application_Startup(object sender, StartupEventArgs e)
@@ -36,6 +37,8 @@ namespace GUI
                 Name = "thread Aggiornamenti",
                 IsBackground = true
             };
+
+
         }
 
         private void SystemEvents_SessionEnded(object sender, SessionEndedEventArgs e)
@@ -69,6 +72,8 @@ namespace GUI
                 t.Start();
             userType = UserType;
             mw = new BigWindow(UserType);
+            createRooms();
+
             mw.Show();
         }
 
@@ -88,8 +93,10 @@ namespace GUI
 
         private void UserListUpdate()
         {
+           
             while (true)
             {
+                Thread.Sleep(30000);
                 List<Employee> temp = RestClient.GetAllUsers();
                 foreach (Employee e in temp)
                 {
@@ -97,11 +104,13 @@ namespace GUI
                         if (e.Serial == user.Serial)
                         {
                             if (String.Compare(e.CurrentPosition, user.CurrentPosition) != 0)
+                            {
+                                changeRooms(user, e.CurrentPosition);
                                 user.CurrentPosition = e.CurrentPosition;
+                            }
                             break;
                         }
                 }
-                Thread.Sleep(60000);
             }
         }
 
@@ -112,7 +121,110 @@ namespace GUI
         }
 
 
+        private void createRooms()
+        {
 
+            foreach (Employee e in userList)
+            {
+                switch (e.CurrentPosition)
+                {
+                    case Constants.stanza1:
+                        App.Current.Dispatcher.Invoke(new Action(() =>
+                        {
+                            BigWindow.Room1.Add(e);
+                        }));
+                        break;
+                    case Constants.stanza2:
+                        App.Current.Dispatcher.Invoke(new Action(() =>
+                        {
+                            BigWindow.Room2.Add(e);
+                        }));
+                        break;
+                    case Constants.stanza3:
+                        App.Current.Dispatcher.Invoke(new Action(() =>
+                        {
+                            BigWindow.Room3.Add(e);
+                        }));
+                        break;
+                    case Constants.stanza4:
+                        App.Current.Dispatcher.Invoke(new Action(() =>
+                        {
+                            BigWindow.Room4.Add(e);
+                        }));
+                        break;
+
+                }
+            }
+
+            mw.NomeStanza1.Text = Constants.stanza1;
+            mw.NomeStanza2.Text = Constants.stanza2;
+            mw.NomeStanza3.Text = Constants.stanza3;
+            mw.NomeStanza4.Text = Constants.stanza4;
+        }
+
+
+        private void changeRooms(Employee user, string arrivo)
+        {
+            switch (user.CurrentPosition)
+            {
+                case Constants.stanza1:
+                    App.Current.Dispatcher.Invoke(new Action(() =>
+                    {
+                        BigWindow.Room1.Remove(user);
+                    }));
+                    break;
+                case Constants.stanza2:
+                    App.Current.Dispatcher.Invoke(new Action(() =>
+                    {
+                        BigWindow.Room2.Remove(user);
+                    }));
+                    break;
+                case Constants.stanza3:
+                    App.Current.Dispatcher.Invoke(new Action(() =>
+                    {
+                        BigWindow.Room3.Remove(user);
+                    }));
+                    break;
+                case Constants.stanza4:
+                    App.Current.Dispatcher.Invoke(new Action(() =>
+                    {
+                        BigWindow.Room4.Remove(user);
+                    }));
+                    break;
+
+            }
+
+            user.CurrentPosition = arrivo;
+            switch (arrivo)
+            {
+                case Constants.stanza1:
+                    App.Current.Dispatcher.Invoke(new Action(() =>
+                    {
+                        BigWindow.Room1.Add(user);
+                    }));
+                    break;
+                case Constants.stanza2:
+                    App.Current.Dispatcher.Invoke(new Action(() =>
+                    {
+                        BigWindow.Room2.Add(user);
+                    }));
+                    break;
+                case Constants.stanza3:
+                    App.Current.Dispatcher.Invoke(new Action(() =>
+                    {
+                        BigWindow.Room3.Add(user);
+                    }));
+                    break;
+                case Constants.stanza4:
+                    App.Current.Dispatcher.Invoke(new Action(() =>
+                    {
+                        BigWindow.Room4.Add(user);
+                    }));
+                    break;
+
+            }
+
+        }
 
     }
 }

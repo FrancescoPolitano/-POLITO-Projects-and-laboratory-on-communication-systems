@@ -41,10 +41,6 @@ namespace GUI
             }
 
             myLoginData.Password = password.Password;
-            ////TODO temporary, while fixing login
-            //PageChange("ADMIN");
-            //Close();
-
             if (RestClient.Login(myLoginData))
             {
                 PageChange(Constants.ADMIN);

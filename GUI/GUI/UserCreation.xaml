@@ -41,7 +41,9 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Text="Authorization Level" />
-            <TextBox Grid.Row="1"  Name="Role" Text="{Binding AuthLevel}" />
+            <ComboBox Grid.Row="1"  Name="Role" SelectionChanged="Role_SelectionChanged">
+            </ComboBox>
+
         </Grid>
         <Button Grid.Row="2" Grid.Column="0" Name="Confirm" Content="Confirm" Click="Confirm_Click" />
         <Button Grid.Row="2" Grid.Column="1" Name="Cancel" Content="Cancel" Click="Cancel_Click" />

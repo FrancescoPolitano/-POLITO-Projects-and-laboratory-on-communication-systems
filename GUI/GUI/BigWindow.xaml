@@ -27,13 +27,13 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <Grid Grid.Row="0" Grid.Column="0" Background="AliceBlue">
+                <Grid Grid.Row="0" Grid.Column="0" Background="AliceBlue" Name="Grid1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <TextBlock Text="Nome Stanza" />
-                    <ListView Grid.Row="1" Name="ListaStanza1">
+                    <TextBlock Name="NomeStanza1" />
+                    <ListView Grid.Row="1" Name="ListaStanza1" >
                         <ListView.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <UniformGrid Columns="3" />
@@ -51,33 +51,101 @@
                                             <ImageBrush ImageSource="F:\Downloads\farmer.png" Stretch="UniformToFill"/>
                                         </Ellipse.Fill>
                                     </Ellipse>
-                                    <TextBlock Grid.Column="1" Text="SERIAL" FontSize="18" />
+                                    <TextBlock Grid.Column="1" Text="{Binding Serial}" FontSize="18" />
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
                 </Grid>
-                <Grid Grid.Row="0" Grid.Column="1" Background="AliceBlue">
+                <Grid Grid.Row="1" Grid.Column="1" Background="AliceBlue" Name="Grid4">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <TextBlock Text="Nome Stanza" />
-                   
+                    <TextBlock Name="NomeStanza4" />
+                    <ListView Grid.Row="1" Name="ListaStanza4" >
+                        <ListView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="3" />
+                            </ItemsPanelTemplate>
+                        </ListView.ItemsPanel>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Background="Aquamarine">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Ellipse Width="24" Height="24" HorizontalAlignment="Center" >
+                                        <Ellipse.Fill>
+                                            <ImageBrush ImageSource="F:\Downloads\farmer.png" Stretch="UniformToFill"/>
+                                        </Ellipse.Fill>
+                                    </Ellipse>
+                                    <TextBlock Grid.Column="1" Text="{Binding Serial}" FontSize="18" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
                 </Grid>
-                <Grid Grid.Row="1" Grid.Column="0" Background="AliceBlue">
+                <Grid Grid.Row="0" Grid.Column="1" Background="AliceBlue" Name="Grid2">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <TextBlock Text="Nome Stanza" />
+                    <TextBlock Name="NomeStanza2" />
+                    <ListView Grid.Row="1" Name="ListaStanza2" >
+                        <ListView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="3" />
+                            </ItemsPanelTemplate>
+                        </ListView.ItemsPanel>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Background="Aquamarine">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Ellipse Width="24" Height="24" HorizontalAlignment="Center" >
+                                        <Ellipse.Fill>
+                                            <ImageBrush ImageSource="F:\Downloads\farmer.png" Stretch="UniformToFill"/>
+                                        </Ellipse.Fill>
+                                    </Ellipse>
+                                    <TextBlock Grid.Column="1" Text="{Binding Serial}" FontSize="18" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
                 </Grid>
-                <Grid Grid.Row="1" Grid.Column="1" Background="AliceBlue">
+                <Grid Grid.Row="1" Grid.Column="0" Background="AliceBlue" Name="Grid3">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <TextBlock Text="Nome Stanza" />
+                    <TextBlock Name="NomeStanza3" />
+                    <ListView Grid.Row="1" Name="ListaStanza3" >
+                        <ListView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="3" />
+                            </ItemsPanelTemplate>
+                        </ListView.ItemsPanel>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Background="Aquamarine">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Ellipse Width="24" Height="24" HorizontalAlignment="Center" >
+                                        <Ellipse.Fill>
+                                            <ImageBrush ImageSource="F:\Downloads\farmer.png" Stretch="UniformToFill"/>
+                                        </Ellipse.Fill>
+                                    </Ellipse>
+                                    <TextBlock Grid.Column="1" Text="{Binding Serial}" FontSize="18" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
                 </Grid>
 
 
@@ -170,10 +238,12 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="NAME"/>
                         <TextBlock Grid.Column="1" Text="SURNAME"/>
                         <TextBlock Grid.Column="2"  Text="EXPIRATION"/>
+                        <TextBlock Grid.Column="3" Text="MOTIVATION" />
                     </Grid>
                     <ListView Grid.Row="1" Name="Visitors" ItemsSource="{Binding VisitorList}" Width="Auto" Height="Auto" BorderThickness="0">
                         <ListView.ItemTemplate>
@@ -183,10 +253,12 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Text="{Binding Name}" Grid.Column="0" Margin="3" VerticalAlignment="Center"/>
                                     <TextBlock Text="{Binding Surname}" Grid.Column="1" Margin="3" VerticalAlignment="Center"/>
                                     <TextBlock Text="{Binding Expiration}" Grid.Column="2" Margin="3" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding Causal}" Grid.Column="3" Margin="3" VerticalAlignment="Center" />
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>
@@ -195,7 +267,6 @@
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                                 <Setter Property="BorderBrush" Value="LightGray" />
                                 <Setter Property="BorderThickness" Value="0,0,0,1" />
-                                <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListViewItem_PreviewMouseLeftButtonDown_1" />
                             </Style>
 
                         </ListView.ItemContainerStyle>
@@ -234,7 +305,7 @@
                         <Controls:DropDownButton.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel DataContext="{Binding}" PreviewMouseDown="Room_click" >
-                                    <TextBlock Text="{Binding}" />
+                                    <TextBlock Text="{Binding Name}" />
                                 </StackPanel>
                             </DataTemplate>
                         </Controls:DropDownButton.ItemTemplate>

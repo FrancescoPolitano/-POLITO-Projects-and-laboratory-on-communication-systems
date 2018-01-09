@@ -206,12 +206,10 @@ public class Utils {
 			MimeMultipart multipart = new MimeMultipart("related");
 
 			BodyPart messageBodyPart = new MimeBodyPart();
-			String htmlText = "If you doesn't know the origin of this email please ignore it.<br>"
+			String htmlText = "If you don't know the origin of this email please ignore it.<br>"
 					+ "<a href=\"http://13.59.45.212:8082/RestfulService/resources/confirm/"+employeeId+"\">Click here to confirm</a>";
 			messageBodyPart.setContent(htmlText, "text/html");
-
 			multipart.addBodyPart(messageBodyPart);
-
 			message.setContent(multipart);
 			Transport.send(message);
 		} catch (Exception e) {

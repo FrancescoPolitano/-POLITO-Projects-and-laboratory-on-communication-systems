@@ -57,8 +57,9 @@ public class Resources {
 	@Path("users/{id}")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response sendEmployee(@PathParam("id") String request) throws SQLException {
+		if (request.trim().isEmpty())
+			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
 		Gson gson = new Gson();
-
 		String id = gson.fromJson(request, String.class);
 		Employee temp = database.getEmployee(id);
 		if (temp == null)
@@ -93,6 +94,29 @@ public class Resources {
 		return Response.ok(Json).build();
 	}
 
+	// modify some fields of an existing employee
+	@POST
+	@Path("users/modify")
+	public Response modifyEmployee(String request, @CookieParam("Token") String token) {
+		if (request.trim().isEmpty())
+			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
+		if (!database.isValidToken(token))
+			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
+
+		Gson gson = new Gson();
+		Employee newEmployee = gson.fromJson(request, Employee.class);
+		if (newEmployee == null || newEmployee.getName() == null || newEmployee.getSurname() == null
+				|| newEmployee.getEmail() == null || newEmployee.getAuthLevel() == null
+				|| newEmployee.getSerial() == null)
+			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
+
+		boolean result = database.modifyEmployee(newEmployee);
+		if (!result)
+			return Response.status(Constants.status_generic_error).entity(Constants.generic_error).build();
+		else
+			return Response.ok().build();
+	}
+
 	// return if the code is valid or not for the selected locals
 	@GET
 	@Path("auth/{local}/{code}")
@@ -100,7 +124,7 @@ public class Resources {
 	public Response getAccess(@PathParam("local") String door, @PathParam("code") String code) {
 		return Response.ok(database.isAuth(door, code)).build();
 	}
-	
+
 	// email confirmation link
 	@GET
 	@Path("confirm/{code}")
@@ -306,15 +330,6 @@ public class Resources {
 		if (database.blockUsers(serial) == -1)
 			return Response.status(Constants.status_generic_error).entity(Constants.generic_error).build();
 		else if (database.blockUsers(serial) == 0)
-			return Response.status(Constants.status_not_found).entity(Constants.not_found).build();
-		else
-			return Response.ok().build();
-	}
-
-	@GET
-	@Path("email")
-	public Response sendEmail() {
-		if (Utils.sendEmail("cristianopalazzi@gmail.com", "C:\\Users\\Cristiano\\Desktop\\result.jpg") == -1)
 			return Response.status(Constants.status_not_found).entity(Constants.not_found).build();
 		else
 			return Response.ok().build();

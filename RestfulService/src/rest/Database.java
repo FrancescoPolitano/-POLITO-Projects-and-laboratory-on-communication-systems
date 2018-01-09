@@ -11,6 +11,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+
 public class Database {
 	private static Database instance = null;
 	private static Connection conn = null;
@@ -55,14 +58,11 @@ public class Database {
 		try {
 			stmt = (Statement) conn.createStatement();
 			stmt.executeQuery(
-					"SELECT e.*, l.Name, a.TimeS, photo\r\n" + 
-					"FROM employes e , photos p, locals l, accesses a\r\n" + 
-					"WHERE p.IdEmployee= e.SerialNumber AND\r\n" + 
-					"e.Causal IS NULL AND a.IdEmployee=e.SerialNumber AND l.Id=a.IdLocal\r\n" + 
-					"AND a.TimeS in (SELECT MAX(TimeS)\r\n" + 
-					"FROM accesses\r\n" + 
-					"GROUP BY IdEmployee)\r\n" + 
-					"GROUP BY e.SerialNumber");
+					"SELECT e.*, l.Name, a.TimeS, photo\r\n" + "FROM employes e , photos p, locals l, accesses a\r\n"
+							+ "WHERE p.IdEmployee= e.SerialNumber AND\r\n"
+							+ "e.Causal IS NULL AND e.Expiration IS NULL AND a.IdEmployee=e.SerialNumber AND l.Id=a.IdLocal\r\n"
+							+ "AND a.TimeS in (SELECT MAX(TimeS)\r\n" + "FROM accesses\r\n" + "GROUP BY IdEmployee)\r\n"
+							+ "GROUP BY e.SerialNumber");
 			ResultSet rs = stmt.getResultSet();
 			while (rs.next()) {
 				String serial = rs.getString("SerialNumber");
@@ -78,7 +78,7 @@ public class Database {
 				list.add(temp);
 			}
 			stmt.executeQuery("SELECT e.*, photo from employes e, photos p \r\n"
-					+ " where  p.IdEmployee=e.SerialNumber and e.Causal IS NULL and e.SerialNumber not  in(SELECT e.SerialNumber from employes e , locals l, accesses a \r\n"
+					+ " where  p.IdEmployee=e.SerialNumber and e.Causal IS NULL AND e.Expiration IS NULL and e.SerialNumber not  in(SELECT e.SerialNumber from employes e , locals l, accesses a \r\n"
 					+ " where a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal GROUP BY e.SerialNumber)\r\n"
 					+ " GROUP BY e.SerialNumber");
 			rs = stmt.getResultSet();
@@ -118,7 +118,7 @@ public class Database {
 		try {
 			stmt = (Statement) conn.createStatement();
 			stmt.executeQuery("SELECT e.*, l.Name, max(a.TimeS) from employes e , locals l, accesses a \r\n"
-					+ "where e.Causal IS NOT NULL and a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal\r\n"
+					+ "where e.Causal IS NOT NULL AND e.Expiration IS NOT NULL and a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal\r\n"
 					+ "GROUP BY e.SerialNumber");
 			ResultSet rs = stmt.getResultSet();
 			while (rs.next()) {
@@ -355,16 +355,13 @@ public class Database {
 				ps.executeUpdate();
 			}
 			image = Utils.writeQRCode(newCode, id);
-			if(this.isConfirmedEmail(id)) {
+			if (this.isConfirmedEmail(id)) {
 				if (Utils.sendEmail(email, id) == -1) {
 					conn.rollback();
 					return null;
 				}
-			}
-			else {
-				Utils.sendConfirmationEmail(email,id);
-
-			}
+			} else
+				Utils.sendConfirmationEmail(email, id);
 			conn.commit();
 
 		} catch (SQLException ex) {
@@ -489,8 +486,13 @@ public class Database {
 	}
 
 	public EmployeeResponseClass createEmployee(EmployeeRequestClass temp) {
+		try {
+			InternetAddress emailAddr = new InternetAddress(temp.getEmployee().getEmail());
+			emailAddr.validate();
+		} catch (AddressException ex) {
+			return null;
+		}
 		temp.getEmployee().setCurrentPosition("position not found");
-		System.out.println(temp.getEmployee().getName()+" "+ temp.getEmployee().getSurname());
 		String employeeId = null;
 		PreparedStatement ps = null;
 		String code = null, qrCode;
@@ -544,7 +546,7 @@ public class Database {
 				conn.rollback();
 				return null;
 			}
-			
+
 			conn.commit();
 
 		} catch (SQLException ex) {
@@ -559,6 +561,42 @@ public class Database {
 			}
 		}
 		return new EmployeeResponseClass(temp.getEmployee(), qrCode);
+	}
+
+	public boolean modifyEmployee(Employee newEmployee) {
+		try {
+			InternetAddress emailAddr = new InternetAddress(newEmployee.getEmail());
+			emailAddr.validate();
+		} catch (AddressException ex) {
+			return false;
+		}
+		Connection conn = connect();
+		if (conn == null)
+			return false;
+		PreparedStatement ps = null;
+		try {
+			String sql = "UPDATE Employes SET Name = ? , Surname = ? , AuthGrade = ?, Email = ? WHERE SerialNumber = ?";
+			ps = conn.prepareStatement(sql);
+			ps.setString(1, newEmployee.getName());
+			ps.setString(2, newEmployee.getSurname());
+			ps.setString(3, newEmployee.getAuthLevel());
+			ps.setString(4, newEmployee.getEmail());
+			ps.setString(5, newEmployee.getSerial());
+			int affected = ps.executeUpdate();
+			if (affected != 1)
+				return false;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			try {
+				if (ps != null)
+					ps.close();
+			} catch (SQLException e) {
+				System.out.println("Error closing: " + e.getMessage());
+			}
+		}
+		return true;
 	}
 
 	public ArrayList<Access> makeQuery(ComplexQuery query) {
@@ -678,7 +716,6 @@ public class Database {
 		if (conn == null)
 			return -1;
 		String sqlSearchUsers = "SELECT COUNT(*) as total from employes WHERE SerialNumber = ?";
-
 		try {
 			ps = conn.prepareStatement(sqlSearchUsers);
 			ps.setInt(1, al.getSerialNumber());
@@ -733,7 +770,6 @@ public class Database {
 			ps1.setInt(2, serialNumber);
 			affectedRows = ps1.executeUpdate();
 		} catch (SQLException e) {
-			System.out.println("BLOCK USER EXCEPTION");
 			e.printStackTrace();
 		} finally {
 			try {
@@ -773,121 +809,109 @@ public class Database {
 		}
 		return true;
 	}
-	
-	//only for testing use
-public boolean isValidToken(String token) {return true;}
 
-
-//	public boolean isValidToken(String token) {
-//		if (token == null || token.isEmpty())
-//			return false;
-//		PreparedStatement ps = null;
-//		ResultSet results;
-//		Connection conn = connect();
-//		if (conn == null)
-//			return false;
-//		String time = null;
-//		Date now = new Date();
-//		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//		time = sdf.format(now);
-//		try {
-//			ps = conn.prepareStatement("SELECT COUNT(*) as total FROM tokens WHERE Token= ? AND Expiration >= ?");
-//			ps.setString(1, token);
-//			ps.setString(2, time);
-//			ps.executeQuery();
-//			results = ps.getResultSet();
-//			results.first();
-//			if (results.getInt("total") == 1)
-//				return true;
-//		} catch (SQLException e) {
-//			return false;
-//		} finally {
-//			try {
-//				if (ps != null)
-//					ps.close();
-//			} catch (SQLException e) {
-//				System.out.println("Error closing " + e.getMessage());
-//			}
-//		}
-//		return false;
-//	}
-
-
-//returns true if the mail has been confirmed
-private boolean isConfirmedEmail(String employeeId) {
-	if (employeeId == null || employeeId.isEmpty())
-		return false;
-	PreparedStatement ps = null;
-	ResultSet results;
-	Connection conn = connect();
-	if (conn == null)
-		return false;
-	
-	try {
-		ps = conn.prepareStatement("SELECT COUNT(*) as total FROM employes WHERE SerialNumber= ? AND Confirmed = ?");
-		ps.setString(1, employeeId);
-		ps.setBoolean(2, true);
-		ps.executeQuery();
-		results = ps.getResultSet();
-		results.first();
-		if (results.getInt("total") == 1)
-			return true;
-	} catch (SQLException e) {
-		return false;
-	} finally {
+	public boolean isValidToken(String token) {
+		if (token == null || token.isEmpty())
+			return false;
+		PreparedStatement ps = null;
+		ResultSet results;
+		Connection conn = connect();
+		if (conn == null)
+			return false;
+		String time = null;
+		Date now = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		time = sdf.format(now);
 		try {
-			if (ps != null)
-				ps.close();
-		} catch (SQLException e) {
-			System.out.println("Error closing " + e.getMessage());
-		}
-	}
-	return false;
-	}
-
-public boolean confirmEmail(String employeeId) {
-	if (employeeId == null || employeeId.isEmpty()) {
-		System.out.println("null qualcosa");
-		return false;
-	}
-	PreparedStatement ps = null, ps1 = null;
-	ResultSet results;
-	Connection conn = connect();
-	if (conn == null) {
-		System.out.println("null la connection");
-
-		return false;
-	}
-	try {
-		ps = conn.prepareStatement("UPDATE employes " + 
-									"SET Confirmed = 'true'" + 
-									"where SerialNumber=?");
-		ps.setString(1, employeeId);
-		int rows=ps.executeUpdate();
-		if(rows>0) {
-			ps1 = conn.prepareStatement("SELECT Email from employes WHERE SerialNumber= ?");
-			ps1.setString(1, employeeId);
-			ps1.executeQuery();
-			results = ps1.getResultSet();
+			ps = conn.prepareStatement("SELECT COUNT(*) as total FROM tokens WHERE Token= ? AND Expiration >= ?");
+			ps.setString(1, token);
+			ps.setString(2, time);
+			ps.executeQuery();
+			results = ps.getResultSet();
 			results.first();
-			String sendTo=results.getString("Email");
-			System.out.println(Utils.sendEmail(sendTo, employeeId));
-			
-			return true;
-		}
-	
-	} catch (SQLException e) {
-		return false;
-	} finally {
-		try {
-			if (ps != null )
-				ps.close();
-			if (ps1 != null )
-				ps1.close();
+			if (results.getInt("total") == 1)
+				return true;
 		} catch (SQLException e) {
-			System.out.println("Error closing " + e.getMessage());
+			return false;
+		} finally {
+			try {
+				if (ps != null)
+					ps.close();
+			} catch (SQLException e) {
+				System.out.println("Error closing " + e.getMessage());
+			}
 		}
+		return false;
 	}
-	return false;
+
+	// returns true if the mail has been confirmed
+	private boolean isConfirmedEmail(String employeeId) {
+		if (employeeId == null || employeeId.isEmpty())
+			return false;
+		PreparedStatement ps = null;
+		ResultSet results;
+		Connection conn = connect();
+		if (conn == null)
+			return false;
+		try {
+			ps = conn
+					.prepareStatement("SELECT COUNT(*) as total FROM employes WHERE SerialNumber= ? AND Confirmed = ?");
+			ps.setString(1, employeeId);
+			ps.setBoolean(2, true);
+			ps.executeQuery();
+			results = ps.getResultSet();
+			results.first();
+			if (results.getInt("total") == 1)
+				return true;
+		} catch (SQLException e) {
+			return false;
+		} finally {
+			try {
+				if (ps != null)
+					ps.close();
+			} catch (SQLException e) {
+				System.out.println("Error closing " + e.getMessage());
+			}
+		}
+		return false;
+	}
+
+	public boolean confirmEmail(String employeeId) {
+		if (employeeId == null || employeeId.isEmpty())
+			return false;
+
+		PreparedStatement ps = null, ps1 = null;
+		ResultSet results;
+		Connection conn = connect();
+		if (conn == null)
+			return false;
+		try {
+			ps = conn.prepareStatement("UPDATE employes SET Confirmed = 'true' where SerialNumber=?");
+			ps.setString(1, employeeId);
+			int rows = ps.executeUpdate();
+			if (rows > 0) {
+				ps1 = conn.prepareStatement("SELECT Email from employes WHERE SerialNumber= ?");
+				ps1.setString(1, employeeId);
+				ps1.executeQuery();
+				results = ps1.getResultSet();
+				results.first();
+				String sendTo = results.getString("Email");
+				if (Utils.sendEmail(sendTo, employeeId) == -1)
+					return false;
+				return true;
+			}
+		} catch (SQLException e) {
+			return false;
+		} finally {
+			try {
+				if (ps != null)
+					ps.close();
+				if (ps1 != null)
+					ps1.close();
+			} catch (SQLException e) {
+				System.out.println("Error closing " + e.getMessage());
+			}
+		}
+		return false;
 	}
 }

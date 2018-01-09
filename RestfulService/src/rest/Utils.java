@@ -91,7 +91,6 @@ public class Utils {
 			ImageIO.write(image, "png", fos);
 			fos.close();
 		} catch (Exception e) {
-			System.out.println("file non scritto "+e.getMessage());
 			return null;
 		}
 		return URL;

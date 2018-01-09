@@ -36,8 +36,6 @@ public class Database {
 	public Connection connect() {
 		String user = "root";
 		String password = user;
-		if (conn != null)
-			return conn;
 		try {
 			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/paldb", user, password);
 		} catch (SQLException e) {

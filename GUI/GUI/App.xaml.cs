@@ -69,9 +69,11 @@ namespace GUI
                     visitorList = new List<Visitor>();
             }
             if (t != null)
-                t.Start();
+                if (!t.IsAlive)
+                    t.Start();
             userType = UserType;
-            mw = new BigWindow(UserType);
+            if (mw == null)
+                mw = new BigWindow(UserType);
             createRooms();
 
             mw.Show();
@@ -93,7 +95,7 @@ namespace GUI
 
         private void UserListUpdate()
         {
-           
+
             while (true)
             {
                 Thread.Sleep(30000);

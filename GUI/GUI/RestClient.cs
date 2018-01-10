@@ -15,20 +15,20 @@ namespace GUI
     class RestClient
     {
         private static string myRest = Constants.myRest;
-        private static string sessionToken = String.Empty;
-
         private static CookieContainer cookies = new CookieContainer();
         private static HttpClientHandler handler = new HttpClientHandler()
         {
             CookieContainer = cookies
         };
 
-        private static readonly HttpClient client = new HttpClient(handler);
+        private static readonly HttpClient client = new HttpClient(handler)
+        {
+            Timeout = TimeSpan.FromSeconds(30)
+        };
 
         //Login, saves a "cookie"
         public static bool Login(LoginData logindata)
         {
-            client.Timeout = TimeSpan.FromSeconds(30);
             string json = JsonConvert.SerializeObject(logindata);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             try
@@ -37,14 +37,16 @@ namespace GUI
                 if (response.IsSuccessStatusCode)
                 {
                     CookieCollection responseCookies = cookies.GetCookies(new Uri(myRest + "/login"));
-                    if (responseCookies["Token"] != null)
-                        sessionToken = responseCookies["Token"].Value;
-
-                    if (String.IsNullOrEmpty(sessionToken))
+                    if (responseCookies["Token"] == null)
                         return false;
                     else
                         return true;
                 }
+            }
+            catch (AggregateException tk)
+            {
+                MessageBox.Show("Il service è offline");
+                Application.Current.Shutdown();
             }
             catch (Exception e)
             {
@@ -62,8 +64,6 @@ namespace GUI
                 HttpResponseMessage response = client.GetAsync(myRest + "/logout").Result;
                 if (!response.IsSuccessStatusCode)
                     throw new Exception();
-                else
-                    sessionToken = String.Empty;
             }
             catch (Exception e)
             {
@@ -85,6 +85,12 @@ namespace GUI
                 {
                     List<Employee> lista = JsonConvert.DeserializeObject<List<Employee>>(response.Content.ReadAsStringAsync().Result);
                     return lista;
+                }
+                else if (response.StatusCode == (HttpStatusCode)804)
+                {
+                    LoginWindow lw = new LoginWindow();
+                    lw.ShowDialog();
+                    return GetAllUsers();
                 }
             }
             catch (Exception e)
@@ -110,6 +116,12 @@ namespace GUI
                     List<Visitor> lista = JsonConvert.DeserializeObject<List<Visitor>>(response.Content.ReadAsStringAsync().Result);
                     return lista;
                 }
+                if (response.StatusCode == (HttpStatusCode)804)
+                {
+                    LoginWindow lw = new LoginWindow();
+                    lw.ShowDialog();
+                    return GetAllVisitors();
+                }
             }
             catch (Exception e)
             {
@@ -129,6 +141,12 @@ namespace GUI
                 if (response.IsSuccessStatusCode)
                 {
                     return JsonConvert.DeserializeObject<List<Room>>(response.Content.ReadAsStringAsync().Result);
+                }
+                else if (response.StatusCode == (HttpStatusCode)804)
+                {
+                    LoginWindow lw = new LoginWindow();
+                    lw.ShowDialog();
+                    return GetAllRooms();
                 }
             }
             catch (Exception e)
@@ -155,6 +173,12 @@ namespace GUI
                 HttpResponseMessage response = client.PostAsync(myRest + "/users/employees", content).Result;
                 if (response.IsSuccessStatusCode)
                     return JsonConvert.DeserializeObject<EmployeeResponseClass>(response.Content.ReadAsStringAsync().Result);
+                else if (response.StatusCode == (HttpStatusCode)804)
+                {
+                    LoginWindow lw = new LoginWindow();
+                    lw.ShowDialog();
+                    return CreateUser(u);
+                }
             }
             catch (Exception e)
             {
@@ -165,16 +189,22 @@ namespace GUI
         }
 
         //method to create a visitor
-        public static async Task<string> CreateVisitor(Visitor v)
+        public static string CreateVisitor(Visitor v)
         {
             string json = JsonConvert.SerializeObject(v);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             try
             {
 
-                HttpResponseMessage response = await client.PostAsync(myRest + "/users/visitors", content);
+                HttpResponseMessage response = client.PostAsync(myRest + "/users/visitors", content).Result;
                 if (response.IsSuccessStatusCode)
                     return response.Content.ReadAsStringAsync().Result;
+                else if (response.StatusCode == (HttpStatusCode)804)
+                {
+                    LoginWindow lw = new LoginWindow();
+                    lw.ShowDialog();
+                    return CreateVisitor(v);
+                }
             }
             catch (Exception e)
             {
@@ -205,6 +235,12 @@ namespace GUI
                 HttpResponseMessage response = client.PostAsync(myRest + "/users/block", content).Result;
                 if (response.IsSuccessStatusCode)
                     return true;
+                else if (response.StatusCode == (HttpStatusCode)804)
+                {
+                    LoginWindow lw = new LoginWindow();
+                    lw.ShowDialog();
+                    return BlockAccess(serial);
+                }
             }
             catch (Exception e)
             {
@@ -225,6 +261,12 @@ namespace GUI
                 HttpResponseMessage response = client.PostAsync(myRest + "/users/authLevel", content).Result;
                 if (response.IsSuccessStatusCode)
                     return true;
+                else if (response.StatusCode == (HttpStatusCode)804)
+                {
+                    LoginWindow lw = new LoginWindow();
+                    lw.ShowDialog();
+                    return RoleChange(auth);
+                }
             }
             catch (Exception e)
             {
@@ -244,6 +286,12 @@ namespace GUI
                 HttpResponseMessage response = client.PostAsync(myRest + "/users/new_code", content).Result;
                 if (response.IsSuccessStatusCode)
                     return response.Content.ReadAsStringAsync().Result;
+                else if (response.StatusCode == (HttpStatusCode)804)
+                {
+                    LoginWindow lw = new LoginWindow();
+                    lw.ShowDialog();
+                    return QRCodeChange(id);
+                }
             }
             catch (Exception e)
             {
@@ -265,6 +313,12 @@ namespace GUI
                 HttpResponseMessage response = client.PostAsync(myRest + "/query", content).Result;
                 if (response.IsSuccessStatusCode)
                     return JsonConvert.DeserializeObject<List<Access>>(response.Content.ReadAsStringAsync().Result);
+                else if (response.StatusCode == (HttpStatusCode)804)
+                {
+                    LoginWindow lw = new LoginWindow();
+                    lw.ShowDialog();
+                    return GetHistory(q);
+                }
             }
             catch (Exception e)
             {
@@ -283,6 +337,12 @@ namespace GUI
                 HttpResponseMessage response = client.PostAsync(myRest + "/users/modify", content).Result;
                 if (response.IsSuccessStatusCode)
                     return true;
+                else if (response.StatusCode == (HttpStatusCode)804)
+                {
+                    LoginWindow lw = new LoginWindow();
+                    lw.ShowDialog();
+                    return ModifyUser(e);
+                }
             }
             catch (Exception ex)
             {

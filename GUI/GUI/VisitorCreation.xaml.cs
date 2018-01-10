@@ -71,7 +71,7 @@ namespace GUI
 
             
             myVisitor.Expiration = String.Format("{0:yyyy-MM-dd HH:mm:ss}", DatePick.SelectedDate);
-            string QRcodeNew = await RestClient.CreateVisitor(myVisitor);
+            string QRcodeNew =  RestClient.CreateVisitor(myVisitor);
             if (!String.IsNullOrEmpty(QRcodeNew))
             {
                 QRCode qr = new QRCode(Constants.IPREMOTE + QRcodeNew);

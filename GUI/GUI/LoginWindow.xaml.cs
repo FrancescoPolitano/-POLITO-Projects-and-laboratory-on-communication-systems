@@ -1,4 +1,5 @@
 ﻿using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,11 +21,13 @@ namespace GUI
     /// </summary>
     public partial class LoginWindow : MetroWindow
     {
+        private static bool restart = false;
         private LoginData myLoginData = new LoginData();
         public LoginWindow()
         {
             InitializeComponent();
             myGrid.DataContext = myLoginData;
+          
         }
 
         private void Confirm_Click(object sender, RoutedEventArgs e)
@@ -73,5 +76,19 @@ namespace GUI
 
         public delegate void myDelegate(string UserType);
         public static event myDelegate PageChange;
+
+        private void MetroWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (restart)
+            {
+                MessageDialogResult mr = this.ShowModalMessageExternal("Ops", "è necessario effettuare l'accesso per continuare, il programma verrà terminato cliccando ok", MessageDialogStyle.AffirmativeAndNegative);
+                if (mr == MessageDialogResult.Affirmative)
+                    Application.Current.Shutdown();
+                else
+                    e.Cancel = true;
+            }
+            else
+                restart = true;
+        }
     }
 }

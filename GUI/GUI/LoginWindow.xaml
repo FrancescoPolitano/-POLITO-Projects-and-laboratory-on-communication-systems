@@ -6,7 +6,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GUI"
         mc:Ignorable="d"
-        Title="LoginWindow" Height="450" Width="550" BorderThickness="0" GlowBrush="Black">
+        Title="LoginWindow" Height="450" Width="550" BorderThickness="0" GlowBrush="Black" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Closing="MetroWindow_Closing"
+                      >
     <Grid Background="#FF4B4242" Name="myGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />

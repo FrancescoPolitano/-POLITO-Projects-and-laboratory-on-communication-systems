@@ -7,8 +7,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GUI"
         mc:Ignorable="d"
-        Title="UserCreation" Height="550" Width="400">
-    <Grid Name="myGrid" Background="AliceBlue" DataContext="User">
+        Title="UserCreation" Height="500" Width="450" GlowBrush="Black" BorderThickness="0" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+    <Grid Name="myGrid" DataContext="User">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
@@ -18,7 +18,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0" Grid.Column="0" Margin="5">
+        <Grid Grid.Row="0" Grid.Column="0" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
@@ -41,18 +41,30 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Text="Authorization Level" />
-            <ComboBox Grid.Row="1"  Name="Role" SelectionChanged="Role_SelectionChanged">
+            <ComboBox Grid.Row="1"  Name="Role" SelectionChanged="Role_SelectionChanged" Margin="5,0">
             </ComboBox>
 
         </Grid>
         <Button Grid.Row="2" Grid.Column="0" Name="Confirm" Content="Confirm" Click="Confirm_Click" />
         <Button Grid.Row="2" Grid.Column="1" Name="Cancel" Content="Cancel" Click="Cancel_Click" />
         <Button Grid.Row="1" Grid.Column="1" Name="ChoosePic" Content="Choose a picture" Click="ChoosePic_Click" />
-        <Image Grid.Row="0" Grid.Column="1" Name="imageBox" Source="{Binding PathPhoto}" Margin="10" />
+        <Image  Grid.Row="0" Grid.Column="1" Name="imageBox" Margin="15" >
+            <Image.Source>
+                <Binding Path="PathPhoto">
+                    <Binding.TargetNullValue>
+                        F:\Downloads\guest.png
+                    </Binding.TargetNullValue>
+                </Binding>
+            </Image.Source>
+        </Image>
+
     </Grid>
     <Window.Resources>
         <Style TargetType="Button" BasedOn="{StaticResource MetroButton}">
-            <Setter Property="Margin" Value="15,30" />
+            <Setter Property="Margin" Value="15,35" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Background" Value="CornflowerBlue" />
+            <Setter Property="Foreground" Value="White" />
         </Style>
         <Style TargetType="TextBox">
             <Setter Property="Margin" Value="5" />
@@ -60,7 +72,8 @@
             <Setter Property="FontSize" Value="16" />
         </Style>
         <Style TargetType="TextBlock">
-            <Setter Property="FontSize" Value="20" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontWeight" Value="DemiBold" />
             <Setter Property="Margin" Value="5" />
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>

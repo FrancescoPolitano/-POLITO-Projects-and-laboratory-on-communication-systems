@@ -26,7 +26,7 @@
                     </Style>
                 </Grid.Resources>
                 <!--<Grid.Background>
-                    <ImageBrush ImageSource="F:\Downloads\planimetry.jpg" Stretch="UniformToFill" />
+                    <ImageBrush ImageSource="F:\Downloads\planimetry.jpg" Stretch="Uniform" />
                 </Grid.Background>-->
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -46,12 +46,12 @@
                     <ListView Grid.Row="1" Name="ListaStanza1" Background="Transparent">
                         <ListView.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <UniformGrid Columns="3" Background="Transparent" />
+                                <UniformGrid Columns="3" Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </ItemsPanelTemplate>
                         </ListView.ItemsPanel>
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <Grid Background="Transparent">
+                                <Grid Background="Aquamarine">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="*" />
@@ -171,18 +171,18 @@
 
 
         <TabItem Header="Employees" Name="UserTab" FontSize="18">
-            <Grid >
+            <Grid Margin="3" >
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="7*" />
                 </Grid.RowDefinitions>
-                <Button Grid.Row="0" Name="newUser" Content="New Employee" HorizontalAlignment="Right" Margin="3,20" Click="newUser_Click" FontSize="16" Background="Blue" Foreground="White"/>
-                <Grid Background="AliceBlue" Grid.Row="1" Margin="3">
+                <Button Grid.Row="0" Name="newUser" Content="New Employee" HorizontalAlignment="Right" Margin="3,35" Click="newUser_Click" FontSize="16" Background="CornflowerBlue" Foreground="White"/>
+                <Grid Background="AliceBlue" Grid.Row="1">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <Grid>
+                    <Grid Margin="0,0,16,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
@@ -190,12 +190,47 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="NAME" Grid.Column="1" />
-                        <TextBlock Text="SURNAME" Grid.Column="2" />
+                        <TextBlock Text="NAME" Grid.Column="1"  />
+                        <TextBlock Text="SURNAME" Grid.Column="2"  />
                         <TextBlock Text="IDENTIFIER" Grid.Column="3" />
-                        <TextBlock Text="CURRENT POSITION" Grid.Column="4" />
+                        <TextBlock Text="CURRENT POSITION" Grid.Column="4"  />
+                        <Grid.Resources>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                            </Style>
+                        </Grid.Resources>
                     </Grid>
-                    <ListView Grid.Row="1" Name="Users" ItemsSource="{Binding UserList}" Width="Auto" Height="Auto" BorderThickness="0" AlternationCount="2">
+                    <!--<ListView Name="Users" Grid.Row="1" ItemsSource="{Binding UserList}" Width="Auto" Height="Auto">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn >
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                        <Ellipse Grid.Column ="0" Width="64" Height="64" >
+                                            <Ellipse.Fill>
+                                                <ImageBrush ImageSource="{Binding Path=PathPhoto,Converter={StaticResource UriConverter}}" Stretch="Fill" />
+                                            </Ellipse.Fill>
+                                        </Ellipse>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn DisplayMemberBinding="{Binding Name}" Width="300">
+                                    Name
+                                </GridViewColumn>
+                                <GridViewColumn DisplayMemberBinding="{Binding Surname}" Width="300">
+                                    Surname
+                                </GridViewColumn>
+                                <GridViewColumn DisplayMemberBinding="{Binding Serial}" Width="300">
+                                    ID
+                                </GridViewColumn>
+                                <GridViewColumn DisplayMemberBinding="{Binding CurrentPosition}" Width="300">
+                                    CurrentPosition
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>-->
+                                
+                    <ListView Grid.Row="1"  Name="Users" ItemsSource="{Binding UserList}" Width="Auto" Height="Auto" BorderThickness="0" AlternationCount="2" >
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <Grid x:Name="EmployeeGrid">
@@ -206,15 +241,15 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <Ellipse Grid.Column ="0" Width="64" Height="64">
+                                    <Ellipse Grid.Column ="0" Width="64" Height="64" >
                                         <Ellipse.Fill>
                                             <ImageBrush ImageSource="{Binding Path=PathPhoto,Converter={StaticResource UriConverter}}" Stretch="Fill" />
                                         </Ellipse.Fill>
                                     </Ellipse>
-                                    <TextBlock Text="{Binding Name}" Grid.Column="1" Margin="3" VerticalAlignment="Center"/>
-                                    <TextBlock Text="{Binding Surname}" Grid.Column="2" Margin="3" VerticalAlignment="Center"/>
-                                    <TextBlock Text="{Binding Serial}" Grid.Column="3" Margin="3" VerticalAlignment="Center" />
-                                    <TextBlock Text="{Binding CurrentPosition}" Grid.Column="4" Margin="3" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding Name}" Grid.Column="1"  VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Surname}" Grid.Column="2" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Serial}" Grid.Column="3"  VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding CurrentPosition}" Grid.Column="4"  VerticalAlignment="Center" />
                                 </Grid>
                                 
                             </DataTemplate>
@@ -236,6 +271,7 @@
                             </Style>
 
                         </ListView.ItemContainerStyle>
+                        
                     </ListView>
                 </Grid>
             </Grid>
@@ -246,13 +282,13 @@
                     <RowDefinition Height="*" />
                     <RowDefinition Height="7*" />
                 </Grid.RowDefinitions>
-                <Button Name="newVisitor" Grid.Row="0" Content="New visitor"  HorizontalAlignment="Right" Margin="3,20" FontSize="16" Click="newVisitor_Click" Background="Blue" Foreground="White"/>
+                <Button Name="newVisitor" Grid.Row="0" Content="New visitor"  HorizontalAlignment="Right" Margin="3,35" FontSize="16" Click="newVisitor_Click" Background="CornflowerBlue" Foreground="White"/>
                 <Grid Grid.Row="1" Background="AliceBlue" Margin="3">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <Grid>
+                    <Grid Margin="0,0,16,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
@@ -264,6 +300,7 @@
                         <TextBlock Grid.Column="2"  Text="EXPIRATION"/>
                         <TextBlock Grid.Column="3" Text="MOTIVATION" />
                     </Grid>
+                   
                     <ListView Grid.Row="1" Name="Visitors" ItemsSource="{Binding VisitorList}" Width="Auto" Height="Auto" BorderThickness="0">
                         <ListView.ItemTemplate>
                             <DataTemplate>
@@ -374,7 +411,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <Grid Margin="0,10" Background="AliceBlue">
+                    <Grid Margin="2,5,19,0" Background="AliceBlue">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
@@ -390,14 +427,14 @@
                         <TextBlock Text="SURNAME" Grid.Column="2"  HorizontalAlignment="Center"/>
                         <TextBlock Text="ROOM" Grid.Column="3"  HorizontalAlignment="Center"/>
                         <TextBlock Text="TIME" Grid.Column="4"  HorizontalAlignment="Center"/>
-                        <TextBlock Text="RESULT" Grid.Column="5"  HorizontalAlignment="Center"/>
+                        <TextBlock Text="ACCESS GRANTED" Grid.Column="5"  HorizontalAlignment="Center"/>
                         <Grid.Resources>
                             <Style TargetType="TextBlock">
                                 <Setter Property="FontWeight" Value="Bold" />
                             </Style>
                         </Grid.Resources>
                     </Grid>
-                    <ListView Name="listContent" Grid.Row="1" BorderThickness="0" AlternationCount="2" >
+                    <ListView Name="listContent" Grid.Row="1" BorderThickness="0" AlternationCount="2" Margin="2,0">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <Grid>

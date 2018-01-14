@@ -45,28 +45,34 @@
                     <TextBlock Name="NomeStanza1" />
 
 					
-                    <ListView Grid.Row="1" Name="ListaStanza1" Background="Aquamarine" >
+                    <ListView Grid.Row="1" Name="ListaStanza1">
                         <ListView.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <UniformGrid Columns="3" Rows="2" Background="Transparent"/>
-							</ItemsPanelTemplate>
+                                <UniformGrid   Columns="3"   />
+                            </ItemsPanelTemplate>
                         </ListView.ItemsPanel>
-                        <ListView.ItemTemplate >
+                        <ListView.ItemTemplate>
                             <DataTemplate>
                                 <Grid Background="Aquamarine">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="*" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <Ellipse Width="128" Height="128" HorizontalAlignment="Center" Margin="0,3,0,0"  >
+                                    <Ellipse Width="128" Height="128" HorizontalAlignment="Center" Margin="0,3,0,0" >
                                         <Ellipse.Fill>
-											<ImageBrush  Stretch="UniformToFill" ImageSource="{Binding Path=PathPhoto,Converter={StaticResource UriConverter}}"/>
+                                            <ImageBrush  Stretch="UniformToFill" ImageSource="{Binding Path=PathPhoto,Converter={StaticResource UriConverter}}"/>
                                         </Ellipse.Fill>
                                     </Ellipse>
-                                    <TextBlock Grid.Row="1" Text="{Binding Serial}" FontSize="20" HorizontalAlignment="Center" />
+                                    <TextBlock Grid.Row="1" Text="{Binding Serial}" FontSize="18" HorizontalAlignment="Center" />
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <EventSetter Event="PreviewMouseLeftButtonDown" Handler="PlanimetryClick" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
                     </ListView>
                 </Grid>
                 
@@ -79,25 +85,31 @@
                     <ListView Grid.Row="1" Name="ListaStanza2" >
                         <ListView.ItemsPanel>
                             <ItemsPanelTemplate>
-								<UniformGrid  Rows="2" Columns="3" />
+                                <UniformGrid   Columns="3"   />
                             </ItemsPanelTemplate>
                         </ListView.ItemsPanel>
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <Grid Background="Aquamarine">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Ellipse Width="24" Height="24" HorizontalAlignment="Center" >
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <Ellipse Width="128" Height="128" HorizontalAlignment="Center" Margin="0,3,0,0" >
                                         <Ellipse.Fill>
-											<ImageBrush  Stretch="UniformToFill" ImageSource="{Binding Path=PathPhoto,Converter={StaticResource UriConverter}}"/>
+                                            <ImageBrush  Stretch="UniformToFill" ImageSource="{Binding Path=PathPhoto,Converter={StaticResource UriConverter}}"/>
                                         </Ellipse.Fill>
                                     </Ellipse>
-                                    <TextBlock Grid.Column="1" Text="{Binding Serial}" FontSize="18" />
+                                    <TextBlock Grid.Row="1" Text="{Binding Serial}" FontSize="18" HorizontalAlignment="Center" />
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListViewItem_PreviewMouseLeftButtonDown" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
                     </ListView>
                 </Grid>
                 <Grid Grid.Row="1" Grid.Column="0" Background="AliceBlue" Name="Grid3">
@@ -128,6 +140,12 @@
                                 </Grid>
 							</DataTemplate>
                         </ListView.ItemTemplate>
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListViewItem_PreviewMouseLeftButtonDown" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
                     </ListView>
                 </Grid>
 				<Grid Grid.Row="1" Grid.Column="1" Background="AliceBlue" Name="Grid4">
@@ -137,29 +155,35 @@
 					</Grid.RowDefinitions>
 					<TextBlock Name="NomeStanza4" />
 					<ListView Grid.Row="1" Name="ListaStanza4" >
-						<ListView.ItemsPanel>
-							<ItemsPanelTemplate>
-								<UniformGrid Columns="3"  Rows="2" />
-							</ItemsPanelTemplate>
-						</ListView.ItemsPanel>
-						<ListView.ItemTemplate>
-							<DataTemplate>
-								<Grid Background="Aquamarine">
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition Width="*" />
-										<ColumnDefinition Width="*" />
-									</Grid.ColumnDefinitions>
-									<Ellipse Width="24" Height="24" HorizontalAlignment="Center" >
-										<Ellipse.Fill>
-											<ImageBrush  Stretch="UniformToFill" ImageSource="{Binding Path=PathPhoto,Converter={StaticResource UriConverter}}"/>
-										</Ellipse.Fill>
-									</Ellipse>
-									<TextBlock Grid.Column="1" Text="{Binding Serial}" FontSize="18" />
-								</Grid>
-							</DataTemplate>
-						</ListView.ItemTemplate>
-					</ListView>
-				</Grid>
+                        <ListView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid   Columns="3"   />
+                            </ItemsPanelTemplate>
+                        </ListView.ItemsPanel>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Background="Aquamarine">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <Ellipse Width="128" Height="128" HorizontalAlignment="Center" Margin="0,3,0,0" >
+                                        <Ellipse.Fill>
+                                            <ImageBrush  Stretch="UniformToFill" ImageSource="{Binding Path=PathPhoto,Converter={StaticResource UriConverter}}"/>
+                                        </Ellipse.Fill>
+                                    </Ellipse>
+                                    <TextBlock Grid.Row="1" Text="{Binding Serial}" FontSize="18" HorizontalAlignment="Center" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListViewItem_PreviewMouseLeftButtonDown" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                    </ListView>
+                </Grid>
 
 
 				<Rectangle Grid.Row="0" Grid.Column="0" StrokeThickness="4" Stroke="Black"/>
@@ -291,8 +315,10 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <Grid Margin="0,0,16,0">
+                    <!--<Grid Margin="0,0,16,0">-->
+                    <Grid>
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
@@ -300,8 +326,9 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="NAME"/>
                         <TextBlock Grid.Column="1" Text="SURNAME"/>
-                        <TextBlock Grid.Column="2"  Text="EXPIRATION"/>
-                        <TextBlock Grid.Column="3" Text="MOTIVATION" />
+                        <TextBlock Grid.Column="2" Text="ID" />
+                        <TextBlock Grid.Column="3"  Text="EXPIRATION"/>
+                        <TextBlock Grid.Column="4" Text="CURRENT POSITION" />
                     </Grid>
                    
                     <ListView Grid.Row="1" Name="Visitors" ItemsSource="{Binding VisitorList}" Width="Auto" Height="Auto" BorderThickness="0">
@@ -313,11 +340,13 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Text="{Binding Name}" Grid.Column="0" Margin="3" VerticalAlignment="Center"/>
                                     <TextBlock Text="{Binding Surname}" Grid.Column="1" Margin="3" VerticalAlignment="Center"/>
-                                    <TextBlock Text="{Binding Expiration}" Grid.Column="2" Margin="3" VerticalAlignment="Center" />
-                                    <TextBlock Text="{Binding Causal}" Grid.Column="3" Margin="3" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding Serial}" Grid.Column="2" Margin="3" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding Expiration}" Grid.Column="3" Margin="3" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding CurrentPosition}" Grid.Column="5" Margin="3" VerticalAlignment="Center" />
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>
@@ -326,6 +355,7 @@
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                                 <Setter Property="BorderBrush" Value="LightGray" />
                                 <Setter Property="BorderThickness" Value="0,0,0,1" />
+                                <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListViewItem_VisitorClick" />
                                 <Style.Triggers>
                                     <Trigger Property="ItemsControl.AlternationIndex" Value="0">
                                         <Setter Property="Background" Value="Transparent"/>
@@ -335,7 +365,6 @@
                                     </Trigger>
                                 </Style.Triggers>
                             </Style>
-
                         </ListView.ItemContainerStyle>
                     </ListView>
                 </Grid>

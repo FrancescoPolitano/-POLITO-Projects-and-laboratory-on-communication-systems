@@ -189,16 +189,17 @@ namespace GUI
         }
 
         //method to create a visitor
-        public static string CreateVisitor(Visitor v)
+        public static VisitorResponseClass CreateVisitor(Visitor v)
         {
             string json = JsonConvert.SerializeObject(v);
+            Console.WriteLine(json);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             try
             {
 
                 HttpResponseMessage response = client.PostAsync(myRest + "/users/visitors", content).Result;
                 if (response.IsSuccessStatusCode)
-                    return response.Content.ReadAsStringAsync().Result;
+                    return JsonConvert.DeserializeObject<VisitorResponseClass>(response.Content.ReadAsStringAsync().Result);
                 else if (response.StatusCode == (HttpStatusCode)804)
                 {
                     LoginWindow lw = new LoginWindow();
@@ -211,7 +212,7 @@ namespace GUI
                 //TODO find a way to debug it properly
                 Console.WriteLine("TIMEOUT???");
             }
-            return String.Empty;
+            return null;
         }
 
         //method to get a single user (never used)

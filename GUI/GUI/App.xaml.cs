@@ -100,6 +100,10 @@ namespace GUI
             {
                 Thread.Sleep(30000);
                 List<Employee> temp = RestClient.GetAllUsers();
+                //TODO TESTARE BENE
+                List<Visitor> temp2 = RestClient.GetAllVisitors();
+                foreach (Visitor v in temp2)
+                    temp.Add(v);
                 foreach (Employee e in temp)
                 {
                     foreach (Employee user in userList)
@@ -155,6 +159,37 @@ namespace GUI
                         }));
                         break;
 
+                }
+            }
+
+            foreach (Visitor v in visitorList)
+            {
+                switch (v.CurrentPosition)
+                {
+                    case Constants.stanza1:
+                        App.Current.Dispatcher.Invoke(new Action(() =>
+                        {
+                            BigWindow.Room1.Add(v);
+                        }));
+                        break;
+                    case Constants.stanza2:
+                        App.Current.Dispatcher.Invoke(new Action(() =>
+                        {
+                            BigWindow.Room2.Add(v);
+                        }));
+                        break;
+                    case Constants.stanza3:
+                        App.Current.Dispatcher.Invoke(new Action(() =>
+                        {
+                            BigWindow.Room3.Add(v);
+                        }));
+                        break;
+                    case Constants.stanza4:
+                        App.Current.Dispatcher.Invoke(new Action(() =>
+                        {
+                            BigWindow.Room4.Add(v);
+                        }));
+                        break;
                 }
             }
 

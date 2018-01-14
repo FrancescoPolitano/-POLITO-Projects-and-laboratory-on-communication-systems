@@ -10,7 +10,7 @@ namespace GUI
 {
     public class Employee : INotifyPropertyChanged
     {
-        String name, surname, authLevel, currentPosition, pathPhoto, email;
+        string name, surname, authLevel, currentPosition, pathPhoto, email;
         private int serial;
 
         public Employee() { }

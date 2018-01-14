@@ -139,6 +139,27 @@ namespace GUI
 
         }
 
+        private void PlanimetryClick(object sender, MouseButtonEventArgs e)
+        {
+            //TODO TESTARE
+            var item = sender as ListViewItem;
+            if (item != null)
+            {
+                if (item.DataContext.GetType() == typeof(Employee))
+                {
+                    Employee user = item.DataContext as Employee;
+                    UserDetails uD = new UserDetails(user);
+                    uD.ShowDialog();
+                }
+                else
+                {
+                    Visitor visitor = item.DataContext as Visitor;
+                    VisitorDetails vD = new VisitorDetails(visitor);
+                    vD.ShowDialog();
+                }
+            }
+        }
+
         private void Users_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
@@ -306,6 +327,16 @@ namespace GUI
             return qr;
         }
 
-        
+        private void ListViewItem_VisitorClick (object sender, MouseButtonEventArgs e)
+        {
+            var item = sender as ListViewItem;
+            if (item != null)
+            {
+                Visitor user = item.DataContext as Visitor;
+                //todo here
+                VisitorDetails vd = new VisitorDetails(user);
+                vd.ShowDialog();
+            }
+        }
     }
 }

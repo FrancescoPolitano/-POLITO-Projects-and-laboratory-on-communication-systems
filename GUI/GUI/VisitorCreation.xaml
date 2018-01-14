@@ -7,7 +7,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GUI"
         mc:Ignorable="d"
-        Title="VisitorCreation" Height="500" Width="450"  GlowBrush="Black" BorderThickness="0">
+        Title="VisitorCreation" Height="500" Width="450"  GlowBrush="Black" BorderThickness="0" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <Grid Name="myGrid" Margin="10" DataContext="MyVisitor">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -15,6 +15,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="2*" />
             <RowDefinition Height="*" />
@@ -23,11 +24,11 @@
 
         <TextBlock Grid.Row="0" Text="Name" />
         <TextBlock Grid.Row="2" Text="Surname" />
-        <TextBlock Grid.Row="5" Text="Motivation" />
+        <TextBlock Grid.Row="6" Text="Motivation" />
         <TextBox Name="NameBox" Grid.Row="1" Text="{Binding Name}"/>
         <TextBox Name="SurnameBox" Grid.Row="3" Text="{Binding Surname}" />
-        <TextBox Name="MotivationBox" Grid.Row="6"  TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" Text="{Binding Causal}" Margin="10,5,10,10"/>
-        <Grid Grid.Row="7">
+        <TextBox Name="MotivationBox" Grid.Row="7"  TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" Text="{Binding Causal}" Margin="10,5,10,10"/>
+        <Grid Grid.Row="8">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
@@ -43,6 +44,15 @@
             <TextBlock  Grid.Column="0" Text="Expiration date" />
             <DatePicker Grid.Column="1" Name="DatePick"  Grid.Row="1" FontSize="16" Height="35" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Center" Margin="35,5,5,5"/>
         </Grid>
+
+        <Grid Grid.Row="5" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Authentication Level" />
+            <ComboBox Grid.Column="1" Name="VisitorLevels" HorizontalAlignment="Right" Margin="5,10"/>
+        </Grid>
     </Grid>
     <Window.Resources>
         <Style TargetType="TextBlock">
@@ -53,7 +63,7 @@
         </Style>
         <Style TargetType="TextBox" BasedOn="{StaticResource MetroTextBox}" >
             <Setter Property="FontSize" Value="18" />
-            <Setter Property="Margin" Value="10,5,10,25" />
+            <Setter Property="Margin" Value="10,5,10,18" />
         </Style>
         <Style TargetType="Button" BasedOn="{StaticResource MetroButton}">
             <Setter Property="Margin" Value="10,3" />

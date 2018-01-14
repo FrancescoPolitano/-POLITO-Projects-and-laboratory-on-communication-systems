@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace GUI
 {
-    public class Visitor : INotifyPropertyChanged
+    public class Visitor : Employee,INotifyPropertyChanged
     {
-        string name, surname, causal, expiration,authLevel,currentPosition;
+        string name, surname, causal, expiration,authLevel,currentPosition,serial;
 
         public Visitor() { }
 
@@ -22,9 +22,10 @@ namespace GUI
             AuthLevel = level;
         }
 
-        public Visitor(string name, string surname, string motivation, string expiryDate,string level,string currentPos) : this(name, surname, motivation, expiryDate,level)
+        public Visitor(string name, string surname, string motivation, string expiryDate,string level,string currentPos,string serial) : this(name, surname, motivation, expiryDate,level)
         {
             CurrentPosition = currentPos;
+            Serial = serial;
         }
 
 
@@ -35,6 +36,8 @@ namespace GUI
 
         public string AuthLevel { get => authLevel; set { authLevel = value; NotifyPropertyChanged("AuthLevel"); } }
         public string CurrentPosition { get => currentPosition; set { currentPosition = value; NotifyPropertyChanged("CurrentPosition"); } }
+
+        public string Serial { get => serial; set { serial = value; NotifyPropertyChanged("Serial"); } }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

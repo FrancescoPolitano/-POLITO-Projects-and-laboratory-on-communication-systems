@@ -6,23 +6,23 @@ package rest;
  *
  */
 public class Visitor {
-	private String  Id,Name, Surname, Causal, Position;
-	private String Expiration;
+	private String  Serial,Name, Surname, Causal,Expiration, AuthLevel,CurrentPosition;
 	
-	public Visitor(String name, String surname, String causal, String expiration) {
+	public Visitor(String name, String surname, String causal, String expiration,String AuthLevel,String CurrentPosition) {
 		this.Name=name;
 		this.Surname=surname;
 		this.Causal=causal;
 		this.Expiration=expiration;
-		
+		this.CurrentPosition = CurrentPosition;
+		this.AuthLevel = AuthLevel;
 	}
 
-	public String getId() {
-		return Id;
+	public String getSerial() {
+		return Serial;
 	}
 
-	public void setId(String id) {
-		Id = id;
+	public void setSerial(String serial) {
+		Serial = serial;
 	}
 
 	public String getName() {
@@ -49,14 +49,6 @@ public class Visitor {
 		Causal = causal;
 	}
 
-	public String getPosition() {
-		return Position;
-	}
-
-	public void setPosition(String position) {
-		Position = position;
-	}
-
 	public String getExpiration() {
 		return Expiration;
 	}
@@ -64,6 +56,24 @@ public class Visitor {
 	public void setExpiration(String expiration) {
 		Expiration = expiration;
 	}
+
+	public String getAuthLevel() {
+		return AuthLevel;
+	}
+
+	public void setAuthLevel(String authLevel) {
+		AuthLevel = authLevel;
+	}
+
+	public String getCurrentPosition() {
+		return CurrentPosition;
+	}
+
+	public void setCurrentPosition(String currentPosition) {
+		CurrentPosition = currentPosition;
+	}
+	
+	
 	
 
 }

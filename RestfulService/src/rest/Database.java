@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -124,7 +125,9 @@ public class Database {
 			stmt = (Statement) conn.createStatement();
 			stmt.executeQuery("SELECT e.*, l.Name, max(a.TimeS) from employes e , locals l, accesses a \r\n"
 					+ "where e.Causal IS NOT NULL AND e.Expiration IS NOT NULL and a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal\r\n"
+					+ "AND a.TimeS in (SELECT MAX(TimeS)  FROM accesses GROUP BY IdEmployee)"
 					+ "GROUP BY e.SerialNumber");
+
 			ResultSet rs = stmt.getResultSet();
 			while (rs.next()) {
 				String serial = rs.getString("SerialNumber");
@@ -133,10 +136,10 @@ public class Database {
 				String causal = rs.getString("Causal");
 				String expiration = rs.getString("Expiration");
 				String position = rs.getString("l.Name");
+				String authLevel = rs.getString("AuthGrade");
 
-				Visitor temp = new Visitor(name, surname, causal, expiration);
-				temp.setPosition(position);
-				temp.setId(serial);
+				Visitor temp = new Visitor(name, surname, causal, expiration, authLevel, position);
+				temp.setSerial(serial);
 				list.add(temp);
 			}
 			stmt.executeQuery("SELECT e.* from employes e\r\n"
@@ -150,11 +153,11 @@ public class Database {
 				String causal = rs.getString("Causal");
 				String expiration = rs.getString("Expiration");
 				String position = "No position found";
-				Visitor temp = new Visitor(name, surname, causal, expiration);
-				temp.setPosition(position);
-				temp.setId(serial);
-				list.add(temp);
+				String authLevel = rs.getString("AuthGrade");
 
+				Visitor temp = new Visitor(name, surname, causal, expiration, authLevel, position);
+				temp.setSerial(serial);
+				list.add(temp);
 			}
 		} catch (SQLException ex) {
 			System.out.println("222 " + ex.getMessage());
@@ -194,7 +197,6 @@ public class Database {
 
 				temp = new Employee(serial, name, surname, auth, position, email);
 				temp.setPhoto(photo);
-
 			}
 			if (temp != null)
 				return temp;
@@ -223,6 +225,9 @@ public class Database {
 			}
 		} catch (SQLException ex) {
 			System.out.println("333 " + ex.getMessage());
+			return null;
+		} catch (Exception e) {
+			return null;
 		} finally {
 			try {
 				if (ps != null)
@@ -236,15 +241,16 @@ public class Database {
 
 	public boolean isAuth(String local, String code) {
 		Integer serial = null;
+		int authGrade = 0, requestedGrade = 0;
 		Connection conn = connect();
 		if (conn == null)
 			return false;
 
-		int authGrade = 0, requestedGrade = 0;
+		String causal = null, expiration = null;
 		PreparedStatement ps = null;
 		try {
 			conn.setAutoCommit(false);
-			String sql1 = "select SerialNumber, e.AuthGrade , l.AuthGrade from employes e , auth a , locals l"
+			String sql1 = "select SerialNumber, e.AuthGrade , l.AuthGrade, Causal, Expiration from employes e , auth a , locals l"
 					+ " where a.Code = ? and a.IdEmployee= e.SerialNumber and l.Id= ?";
 			ps = conn.prepareStatement(sql1);
 			ps.setString(1, code);
@@ -255,12 +261,21 @@ public class Database {
 				serial = rs.getInt("SerialNumber");
 				authGrade = rs.getInt("e.Authgrade");
 				requestedGrade = rs.getInt("l.Authgrade");
+				causal = rs.getString("Causal");
+				expiration = rs.getString("Expiration");
 			}
 			if (serial == null)
 				return false;
+			if (causal != null) {
+				Date now = new Date();
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				Date expiry = sdf.parse(expiration);
+				if (expiry.before(now))
+					return false;
+			}
 			String sql = "INSERT INTO accesses (IdEmployee,IdLocal,Result) VALUES( ?, ?, ?)";
 			boolean result = false;
-			if (authGrade > requestedGrade)
+			if (authGrade >= requestedGrade)
 				result = true;
 			ps.close();
 			ps = conn.prepareStatement(sql);
@@ -276,6 +291,14 @@ public class Database {
 				conn.rollback();
 			} catch (SQLException e) {
 				e.printStackTrace();
+			}
+			return false;
+		} catch (ParseException e) {
+			System.out.println("444 " + e.getMessage());
+			try {
+				conn.rollback();
+			} catch (SQLException ex) {
+				ex.printStackTrace();
 			}
 			return false;
 		} finally {
@@ -425,9 +448,12 @@ public class Database {
 		return locals;
 	}
 
-	public String createVisitor(Visitor visitor) {
+	public VisitorResponseClass createVisitor(Visitor visitor) {
+		VisitorResponseClass vr = new VisitorResponseClass(visitor, null);
+		vr.getVisitor().setCurrentPosition("position not found");
 		Integer visitorId = null;
 		PreparedStatement ps = null;
+		String serial = null;
 		Connection conn = connect();
 		if (conn == null)
 			return null;
@@ -439,11 +465,12 @@ public class Database {
 			ps.setString(2, visitor.getSurname());
 			ps.setString(3, visitor.getCausal());
 			ps.setString(4, visitor.getExpiration());
-			ps.executeUpdate();
 
 			try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
 				if (generatedKeys.next()) {
 					visitorId = generatedKeys.getInt(1);
+					serial = String.valueOf(visitorId);
+					vr.getVisitor().setSerial(serial);
 					ResultSet rs;
 					String code;
 					do {
@@ -459,8 +486,7 @@ public class Database {
 					ps.setInt(1, visitorId);
 					ps.setString(2, code);
 					ps.executeUpdate();
-					String result = Utils.writeQRCode(code, String.valueOf(visitorId));
-					return result;
+					vr.setQrcodeURL(Utils.writeQRCode(code, serial));
 				}
 			}
 			conn.commit();
@@ -471,6 +497,7 @@ public class Database {
 				e.printStackTrace();
 			}
 			System.out.println("888" + ex.getMessage());
+			return null;
 		} finally {
 			try {
 				if (ps != null)
@@ -479,7 +506,7 @@ public class Database {
 				System.out.println("Error closing " + e.getMessage());
 			}
 		}
-		return null;
+		return vr;
 	}
 
 	public int createNewLocal(Local local) {

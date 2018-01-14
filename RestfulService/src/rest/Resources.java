@@ -149,10 +149,10 @@ public class Resources {
 		rest.Visitor temp = new Gson().fromJson(request, rest.Visitor.class);
 		if (temp == null)
 			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
-		String code = database.createVisitor(temp);
-		if (code == null)
+		VisitorResponseClass vr = database.createVisitor(temp);
+		if (vr == null)
 			return Response.status(Constants.status_generic_error).entity(Constants.generic_error).build();
-		return Response.ok(code).build();
+		return Response.ok(vr).build();
 	}
 
 	// revoke a user QRCode and obtain a new one

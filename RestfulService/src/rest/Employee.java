@@ -6,8 +6,7 @@ package rest;
  *
  */
 public class Employee {
-	private String Name, Surname, AuthLevel, CurrentPosition;
-	private String PathPhoto, Serial, Email;
+	private String Name, Surname, AuthLevel, CurrentPosition,PathPhoto, Serial, Email;
 
 	public Employee() {
 	}

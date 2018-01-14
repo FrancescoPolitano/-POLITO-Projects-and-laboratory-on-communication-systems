@@ -43,60 +43,33 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <TextBlock Name="NomeStanza1" />
-                    <ListView Grid.Row="1" Name="ListaStanza1" Background="Transparent">
+
+					
+                    <ListView Grid.Row="1" Name="ListaStanza1" Background="Aquamarine" >
                         <ListView.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <UniformGrid Columns="3" Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </ItemsPanelTemplate>
+                                <UniformGrid Columns="3" Rows="2" Background="Transparent"/>
+							</ItemsPanelTemplate>
                         </ListView.ItemsPanel>
-                        <ListView.ItemTemplate>
+                        <ListView.ItemTemplate >
                             <DataTemplate>
                                 <Grid Background="Aquamarine">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Ellipse Width="36" Height="36" HorizontalAlignment="Center">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <Ellipse Width="128" Height="128" HorizontalAlignment="Center" Margin="0,3,0,0"  >
                                         <Ellipse.Fill>
-                                            <ImageBrush ImageSource="F:\Downloads\farmer.png" Stretch="UniformToFill"/>
+											<ImageBrush  Stretch="UniformToFill" ImageSource="{Binding Path=PathPhoto,Converter={StaticResource UriConverter}}"/>
                                         </Ellipse.Fill>
                                     </Ellipse>
-                                    <TextBlock Grid.Column="1" Text="{Binding Serial}" FontSize="20" />
+                                    <TextBlock Grid.Row="1" Text="{Binding Serial}" FontSize="20" HorizontalAlignment="Center" />
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
                 </Grid>
-                <Grid Grid.Row="1" Grid.Column="1" Background="AliceBlue" Name="Grid4">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-                    <TextBlock Name="NomeStanza4" />
-                    <ListView Grid.Row="1" Name="ListaStanza4" >
-                        <ListView.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <UniformGrid Columns="3" />
-                            </ItemsPanelTemplate>
-                        </ListView.ItemsPanel>
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Background="Aquamarine">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Ellipse Width="24" Height="24" HorizontalAlignment="Center" >
-                                        <Ellipse.Fill>
-                                            <ImageBrush ImageSource="F:\Downloads\farmer.png" Stretch="UniformToFill"/>
-                                        </Ellipse.Fill>
-                                    </Ellipse>
-                                    <TextBlock Grid.Column="1" Text="{Binding Serial}" FontSize="18" />
-                                </Grid>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                </Grid>
+                
                 <Grid Grid.Row="0" Grid.Column="1" Background="AliceBlue" Name="Grid2">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -106,7 +79,7 @@
                     <ListView Grid.Row="1" Name="ListaStanza2" >
                         <ListView.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <UniformGrid Columns="3" />
+								<UniformGrid  Rows="2" Columns="3" />
                             </ItemsPanelTemplate>
                         </ListView.ItemsPanel>
                         <ListView.ItemTemplate>
@@ -118,7 +91,7 @@
                                     </Grid.ColumnDefinitions>
                                     <Ellipse Width="24" Height="24" HorizontalAlignment="Center" >
                                         <Ellipse.Fill>
-                                            <ImageBrush ImageSource="F:\Downloads\farmer.png" Stretch="UniformToFill"/>
+											<ImageBrush  Stretch="UniformToFill" ImageSource="{Binding Path=PathPhoto,Converter={StaticResource UriConverter}}"/>
                                         </Ellipse.Fill>
                                     </Ellipse>
                                     <TextBlock Grid.Column="1" Text="{Binding Serial}" FontSize="18" />
@@ -135,31 +108,61 @@
                     <TextBlock Name="NomeStanza3" />
                     <ListView Grid.Row="1" Name="ListaStanza3" >
                         <ListView.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <UniformGrid Columns="3" />
-                            </ItemsPanelTemplate>
+							<ItemsPanelTemplate>
+							  <UniformGrid   Columns="3"   />
+							</ItemsPanelTemplate>
                         </ListView.ItemsPanel>
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <Grid Background="Aquamarine">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Ellipse Width="24" Height="24" HorizontalAlignment="Center" >
+                                    <Grid.RowDefinitions>
+										<RowDefinition Height="*" />
+										<RowDefinition Height="*" />
+									</Grid.RowDefinitions>
+                                    <Ellipse Width="128" Height="128" HorizontalAlignment="Center" Margin="0,3,0,0" >
                                         <Ellipse.Fill>
-                                            <ImageBrush ImageSource="F:\Downloads\farmer.png" Stretch="UniformToFill"/>
+											<ImageBrush  Stretch="UniformToFill" ImageSource="{Binding Path=PathPhoto,Converter={StaticResource UriConverter}}"/>
                                         </Ellipse.Fill>
                                     </Ellipse>
-                                    <TextBlock Grid.Column="1" Text="{Binding Serial}" FontSize="18" />
+                                    <TextBlock Grid.Row="1" Text="{Binding Serial}" FontSize="18" HorizontalAlignment="Center" />
                                 </Grid>
-                            </DataTemplate>
+							</DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
                 </Grid>
+				<Grid Grid.Row="1" Grid.Column="1" Background="AliceBlue" Name="Grid4">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="*" />
+					</Grid.RowDefinitions>
+					<TextBlock Name="NomeStanza4" />
+					<ListView Grid.Row="1" Name="ListaStanza4" >
+						<ListView.ItemsPanel>
+							<ItemsPanelTemplate>
+								<UniformGrid Columns="3"  Rows="2" />
+							</ItemsPanelTemplate>
+						</ListView.ItemsPanel>
+						<ListView.ItemTemplate>
+							<DataTemplate>
+								<Grid Background="Aquamarine">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="*" />
+										<ColumnDefinition Width="*" />
+									</Grid.ColumnDefinitions>
+									<Ellipse Width="24" Height="24" HorizontalAlignment="Center" >
+										<Ellipse.Fill>
+											<ImageBrush  Stretch="UniformToFill" ImageSource="{Binding Path=PathPhoto,Converter={StaticResource UriConverter}}"/>
+										</Ellipse.Fill>
+									</Ellipse>
+									<TextBlock Grid.Column="1" Text="{Binding Serial}" FontSize="18" />
+								</Grid>
+							</DataTemplate>
+						</ListView.ItemTemplate>
+					</ListView>
+				</Grid>
 
 
-                <Rectangle Grid.Row="0" Grid.Column="0" StrokeThickness="4" Stroke="Black" />
+				<Rectangle Grid.Row="0" Grid.Column="0" StrokeThickness="4" Stroke="Black"/>
                 <Rectangle Grid.Row="1" Grid.Column="0" StrokeThickness="4" Stroke="Black" />
                 <Rectangle Grid.Row="0" Grid.Column="1" StrokeThickness="4" Stroke="Black" />
                 <Rectangle Grid.Row="1" Grid.Column="1" StrokeThickness="4" Stroke="Black" />
@@ -176,7 +179,7 @@
                     <RowDefinition Height="*" />
                     <RowDefinition Height="7*" />
                 </Grid.RowDefinitions>
-                <Button Grid.Row="0" Name="newUser" Content="New Employee" HorizontalAlignment="Right" Margin="3,35" Click="newUser_Click" FontSize="16" Background="CornflowerBlue" Foreground="White"/>
+				<Button Grid.Row="0" Name="newUser" Content="New Employee" Margin="20" HorizontalAlignment="Right" Click="newUser_Click" FontSize="16" Background="CornflowerBlue" Foreground="White"/>
                 <Grid Background="AliceBlue" Grid.Row="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -282,7 +285,7 @@
                     <RowDefinition Height="*" />
                     <RowDefinition Height="7*" />
                 </Grid.RowDefinitions>
-                <Button Name="newVisitor" Grid.Row="0" Content="New visitor"  HorizontalAlignment="Right" Margin="3,35" FontSize="16" Click="newVisitor_Click" Background="CornflowerBlue" Foreground="White"/>
+                <Button Name="newVisitor" Grid.Row="0" Content="New visitor"  Padding="15,0,15,0" HorizontalAlignment="Right" Margin="20" FontSize="16" Click="newVisitor_Click" Background="CornflowerBlue" Foreground="White"/>
                 <Grid Grid.Row="1" Background="AliceBlue" Margin="3">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>

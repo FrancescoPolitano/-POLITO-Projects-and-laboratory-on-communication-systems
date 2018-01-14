@@ -16,7 +16,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Image Source="F:\Downloads\logo.png" />
+        <Image Source="Resources\logo.png" />
         <StackPanel Grid.Row="1">
             <TextBlock Text="Username"  VerticalAlignment="Center"/>
             <TextBox Name="username" Text="{Binding Username}"/>

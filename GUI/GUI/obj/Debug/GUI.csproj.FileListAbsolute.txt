@@ -80,7 +80,6 @@ C:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-
 C:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\bin\Debug\MahApps.Metro.xml
 C:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\bin\Debug\Newtonsoft.Json.xml
 C:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\obj\Debug\GUI.csprojResolveAssemblyReference.cache
-C:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\obj\Debug\History.g.cs
 C:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\obj\Debug\LoginWindow.g.cs
 C:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\obj\Debug\BigWindow.g.cs
 C:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\obj\Debug\QRCode.g.cs
@@ -93,7 +92,6 @@ C:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-
 C:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\obj\Debug\GUI_MarkupCompile.cache
 C:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\obj\Debug\GUI_MarkupCompile.lref
 C:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\obj\Debug\App.baml
-C:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\obj\Debug\History.baml
 C:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\obj\Debug\LoginWindow.baml
 C:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\obj\Debug\BigWindow.baml
 C:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\obj\Debug\QRCode.baml

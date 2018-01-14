@@ -107,6 +107,8 @@ namespace GUI
             if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 User.PathPhoto = openFileDialog1.FileName;
+                imageBox.Source = new ImageSourceConverter().ConvertFromString(openFileDialog1.FileName) as ImageSource;
+
             }
         }
 

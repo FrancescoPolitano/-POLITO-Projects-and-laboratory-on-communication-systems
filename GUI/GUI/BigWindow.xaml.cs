@@ -92,6 +92,7 @@ namespace GUI
             ListaStanza2.ItemsSource = Room2;
             ListaStanza3.ItemsSource = Room3;
             ListaStanza4.ItemsSource = Room4;
+            
             Utenti.ItemsSource = users;
             Rooms.ItemsSource = rooms;
             SelectedEmployees.ItemsSource = listUsers;

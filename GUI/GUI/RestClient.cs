@@ -23,7 +23,7 @@ namespace GUI
 
         private static readonly HttpClient client = new HttpClient(handler)
         {
-            Timeout = TimeSpan.FromSeconds(30)
+            //Timeout = TimeSpan.FromSeconds(30)
         };
 
         //Login, saves a "cookie"

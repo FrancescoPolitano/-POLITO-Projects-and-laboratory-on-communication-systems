@@ -4,16 +4,16 @@
 winexe
 C#
 .cs
-C:\Users\Gianmaria\Documents\GitKraken\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\obj\Debug\
+C:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\obj\Debug\
 GUI
 none
 false
 DEBUG;TRACE
-C:\Users\Gianmaria\Documents\GitKraken\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\App.xaml
+C:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\App.xaml
 7900238647
 
-301925533961
-221171869736
+301138912610
+23738734652
 LoginWindow.xaml;BigWindow.xaml;QRCode.xaml;UserDetails.xaml;UserModification.xaml;UserCreation.xaml;VisitorCreation.xaml;
 
 True

@@ -288,29 +288,6 @@ public class Resources {
 			return Response.ok().build();
 	}
 
-	// change authLevel
-	@POST
-	@Path("users/authLevel")
-	@Produces(MediaType.TEXT_PLAIN)
-	public Response changeAuthLevel(String request, @CookieParam("Token") String token) {
-		if (request.trim().isEmpty())
-			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
-
-		if (!database.isValidToken(token))
-			return Response.status(Constants.status_access_denied).entity(Constants.access_denied).build();
-
-		AuthLevel al = new Gson().fromJson(request, AuthLevel.class);
-		if (al.getAuthLevel() == null || al == null)
-			return Response.status(Constants.status_invalid_input).entity(Constants.invalid_input).build();
-		int result = database.changeAuthLevel(al);
-		if (result == -1)
-			return Response.status(Constants.status_generic_error).entity(Constants.generic_error).build();
-		else if (result == 0)
-			return Response.status(Constants.status_not_found).entity(Constants.not_found).build();
-		else
-			return Response.ok().build();
-	}
-
 	@POST
 	@Path("users/block")
 	public Response blockUser(String request, @CookieParam("Token") String token) {

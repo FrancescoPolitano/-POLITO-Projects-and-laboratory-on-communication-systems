@@ -17,6 +17,7 @@ import javax.mail.internet.InternetAddress;
 public class Database {
 	private static Database instance = null;
 	private static Connection conn = null;
+	private static Object lock = new Object();
 
 	private Database() {
 		try {
@@ -31,8 +32,12 @@ public class Database {
 	}
 
 	public static Database getInstance() {
-		if (instance == null)
-			instance = new Database();
+		if (instance == null) {
+			synchronized (lock) {
+				if (instance == null)
+					instance = new Database();
+			}
+		}
 		return instance;
 	}
 
@@ -57,12 +62,12 @@ public class Database {
 			return null;
 		try {
 			stmt = (Statement) conn.createStatement();
-			stmt.executeQuery(
-					"SELECT e.*, l.Name, a.TimeS, photo\r\n" + "FROM employes e , photos p, locals l, accesses a\r\n"
-							+ "WHERE p.IdEmployee= e.SerialNumber AND\r\n"
-							+ "e.Causal IS NULL AND e.Expiration IS NULL AND a.IdEmployee=e.SerialNumber AND l.Id=a.IdLocal\r\n"
-							+ "AND a.TimeS in (SELECT MAX(TimeS)\r\n" + "FROM accesses\r\n" + "GROUP BY IdEmployee)\r\n"
-							+ "GROUP BY e.SerialNumber");
+			stmt.executeQuery("SELECT e.*, l.Name, a.TimeS, photo\r\n"
+					+ "FROM employes e , photos p, locals l, accesses a\r\n"
+					+ "WHERE p.IdEmployee= e.SerialNumber AND\r\n"
+					+ "e.Causal IS NULL AND e.Expiration IS NULL AND a.IdEmployee=e.SerialNumber AND l.Id=a.IdLocal\r\n"
+					+ "AND a.TimeS in (SELECT MAX(TimeS)\r\n" + "FROM accesses\r\n" + "GROUP BY IdEmployee)\r\n"
+					+ "GROUP BY e.SerialNumber");
 			ResultSet rs = stmt.getResultSet();
 			while (rs.next()) {
 				String serial = rs.getString("SerialNumber");
@@ -234,9 +239,11 @@ public class Database {
 		Connection conn = connect();
 		if (conn == null)
 			return false;
+
 		int authGrade = 0, requestedGrade = 0;
 		PreparedStatement ps = null;
 		try {
+			conn.setAutoCommit(false);
 			String sql1 = "select SerialNumber, e.AuthGrade , l.AuthGrade from employes e , auth a , locals l"
 					+ " where a.Code = ? and a.IdEmployee= e.SerialNumber and l.Id= ?";
 			ps = conn.prepareStatement(sql1);
@@ -261,9 +268,15 @@ public class Database {
 			ps.setString(2, local);
 			ps.setString(3, String.valueOf(result));
 			ps.executeUpdate();
+			conn.commit();
 			return result;
 		} catch (SQLException ex) {
 			System.out.println("444 " + ex.getMessage());
+			try {
+				conn.rollback();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 			return false;
 		} finally {
 			try {
@@ -365,6 +378,11 @@ public class Database {
 			conn.commit();
 
 		} catch (SQLException ex) {
+			try {
+				conn.rollback();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 			System.out.println("666 " + ex.getMessage());
 		} finally {
 			try {
@@ -414,6 +432,7 @@ public class Database {
 		if (conn == null)
 			return null;
 		try {
+			conn.setAutoCommit(false);
 			ps = conn.prepareStatement("INSERT into employes (Name, Surname, Causal, Expiration) values (?,?,?,?)",
 					Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, visitor.getName());
@@ -444,7 +463,13 @@ public class Database {
 					return result;
 				}
 			}
+			conn.commit();
 		} catch (SQLException ex) {
+			try {
+				conn.rollback();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 			System.out.println("888" + ex.getMessage());
 		} finally {
 			try {
@@ -548,8 +573,12 @@ public class Database {
 			}
 
 			conn.commit();
-
 		} catch (SQLException ex) {
+			try {
+				conn.rollback();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 			System.out.println("101010 " + ex.getMessage());
 			return null;
 		} finally {
@@ -646,6 +675,7 @@ public class Database {
 			return null;
 		String hash = Utils.hashString(lg.getPassword());
 		try {
+			conn.setAutoCommit(false);
 			ps = conn.prepareStatement("SELECT COUNT(*) as total FROM users WHERE Username= ? and Password= ? ");
 			ps.setString(1, lg.getUsername());
 			ps.setString(2, hash);
@@ -670,7 +700,13 @@ public class Database {
 				ps.setString(3, ExpiryDate);
 				ps.executeUpdate();
 			}
+			conn.commit();
 		} catch (SQLException ex) {
+			try {
+				conn.rollback();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 			System.out.println("999 " + ex.getMessage());
 			return null;
 		} finally {
@@ -708,45 +744,6 @@ public class Database {
 		return true;
 	}
 
-	public int changeAuthLevel(AuthLevel al) {
-		Connection conn = connect();
-		ResultSet results;
-		PreparedStatement ps = null, ps1 = null;
-		int affectedRows = 0;
-		if (conn == null)
-			return -1;
-		String sqlSearchUsers = "SELECT COUNT(*) as total from employes WHERE SerialNumber = ?";
-		try {
-			ps = conn.prepareStatement(sqlSearchUsers);
-			ps.setInt(1, al.getSerialNumber());
-			results = ps.executeQuery();
-
-			while (results.next())
-				if (results.getInt("total") == 0)
-					return 0;
-
-			String sql = "UPDATE employes SET AuthGrade = ? WHERE SerialNumber = ?";
-			ps1 = conn.prepareStatement(sql);
-			ps1.setString(1, al.getAuthLevel());
-			ps1.setInt(2, al.getSerialNumber());
-			affectedRows = ps1.executeUpdate();
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return -1;
-		} finally {
-			try {
-				if (ps != null)
-					ps.close();
-				if (ps1 != null)
-					ps1.close();
-			} catch (SQLException e) {
-				System.out.println("Error closing " + e.getMessage());
-			}
-		}
-		return affectedRows;
-	}
-
 	public int blockUsers(int serialNumber) {
 		Connection conn = connect();
 		if (conn == null)
@@ -756,6 +753,7 @@ public class Database {
 		PreparedStatement ps = null, ps1 = null;
 		String searchEmployee = "SELECT COUNT(*) AS total FROM employes WHERE SerialNumber = ?";
 		try {
+			conn.setAutoCommit(false);
 			ps = conn.prepareStatement(searchEmployee);
 			ps.setInt(1, serialNumber);
 			results = ps.executeQuery();
@@ -769,7 +767,13 @@ public class Database {
 			ps1.setString(1, String.valueOf(0));
 			ps1.setInt(2, serialNumber);
 			affectedRows = ps1.executeUpdate();
+			conn.commit();
 		} catch (SQLException e) {
+			try {
+				conn.rollback();
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+			}
 			e.printStackTrace();
 		} finally {
 			try {
@@ -886,6 +890,7 @@ public class Database {
 		if (conn == null)
 			return false;
 		try {
+			conn.setAutoCommit(false);
 			ps = conn.prepareStatement("UPDATE employes SET Confirmed = 'true' where SerialNumber=?");
 			ps.setString(1, employeeId);
 			int rows = ps.executeUpdate();
@@ -896,11 +901,20 @@ public class Database {
 				results = ps1.getResultSet();
 				results.first();
 				String sendTo = results.getString("Email");
-				if (Utils.sendEmail(sendTo, employeeId) == -1)
+				if (Utils.sendEmail(sendTo, employeeId) == -1) {
+					conn.rollback();
 					return false;
+				}
+				conn.commit();
 				return true;
 			}
+			conn.commit();
 		} catch (SQLException e) {
+			try {
+				conn.rollback();
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+			}
 			return false;
 		} finally {
 			try {

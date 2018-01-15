@@ -7,9 +7,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GUI"
         mc:Ignorable="d"
-        Height="450" Width="600" BorderThickness="0" GlowBrush="Black"
+        Height="450" Width="600" 
+        BorderThickness="0" GlowBrush="Black"
         WindowState="Maximized"
-        >
+        ResizeMode="NoResize" >
 
     <Controls:MetroWindow.Resources>
         <local:UriConverter x:Key="UriConverter" />
@@ -25,9 +26,7 @@
                         <Setter Property="VerticalAlignment" Value="Center" />
                     </Style>
                 </Grid.Resources>
-                <!--<Grid.Background>
-                    <ImageBrush ImageSource="F:\Downloads\planimetry.jpg" Stretch="Uniform" />
-                </Grid.Background>-->
+              
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
@@ -37,7 +36,7 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <Grid Grid.Row="0" Grid.Column="0" Background="Transparent" Name="Grid1">
+                <Grid Grid.Row="0" Grid.Column="0" Background="AliceBlue" Name="Grid1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
@@ -60,7 +59,7 @@
                                     </Grid.RowDefinitions>
                                     <Ellipse Width="128" Height="128" HorizontalAlignment="Center" Margin="0,3,0,0" >
                                         <Ellipse.Fill>
-                                            <ImageBrush  Stretch="UniformToFill" ImageSource="{Binding Path=PathPhoto,Converter={StaticResource UriConverter}}"/>
+                                            <ImageBrush ImageSource="{Binding PathPhoto, Converter={StaticResource UriConverter}}" />
                                         </Ellipse.Fill>
                                     </Ellipse>
                                     <TextBlock Grid.Row="1" Text="{Binding Serial}" FontSize="18" HorizontalAlignment="Center" />
@@ -97,7 +96,7 @@
                                     </Grid.RowDefinitions>
                                     <Ellipse Width="128" Height="128" HorizontalAlignment="Center" Margin="0,3,0,0" >
                                         <Ellipse.Fill>
-                                            <ImageBrush  Stretch="UniformToFill" ImageSource="{Binding Path=PathPhoto,Converter={StaticResource UriConverter}}"/>
+                                            <ImageBrush ImageSource="{Binding PathPhoto, Converter={StaticResource UriConverter}}" />
                                         </Ellipse.Fill>
                                     </Ellipse>
                                     <TextBlock Grid.Row="1" Text="{Binding Serial}" FontSize="18" HorizontalAlignment="Center" />
@@ -107,7 +106,7 @@
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem">
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                                <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListViewItem_PreviewMouseLeftButtonDown" />
+                                <EventSetter Event="PreviewMouseLeftButtonDown" Handler="PlanimetryClick"  />
                             </Style>
                         </ListView.ItemContainerStyle>
                     </ListView>
@@ -133,7 +132,7 @@
 									</Grid.RowDefinitions>
                                     <Ellipse Width="128" Height="128" HorizontalAlignment="Center" Margin="0,3,0,0" >
                                         <Ellipse.Fill>
-											<ImageBrush  Stretch="UniformToFill" ImageSource="{Binding Path=PathPhoto,Converter={StaticResource UriConverter}}"/>
+                                            <ImageBrush ImageSource="{Binding PathPhoto, Converter={StaticResource UriConverter}}" />
                                         </Ellipse.Fill>
                                     </Ellipse>
                                     <TextBlock Grid.Row="1" Text="{Binding Serial}" FontSize="18" HorizontalAlignment="Center" />
@@ -143,7 +142,7 @@
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem">
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                                <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListViewItem_PreviewMouseLeftButtonDown" />
+                                <EventSetter Event="PreviewMouseLeftButtonDown" Handler="PlanimetryClick"  />
                             </Style>
                         </ListView.ItemContainerStyle>
                     </ListView>
@@ -169,7 +168,7 @@
                                     </Grid.RowDefinitions>
                                     <Ellipse Width="128" Height="128" HorizontalAlignment="Center" Margin="0,3,0,0" >
                                         <Ellipse.Fill>
-                                            <ImageBrush  Stretch="UniformToFill" ImageSource="{Binding Path=PathPhoto,Converter={StaticResource UriConverter}}"/>
+                                            <ImageBrush ImageSource="{Binding PathPhoto, Converter={StaticResource UriConverter}}" />
                                         </Ellipse.Fill>
                                     </Ellipse>
                                     <TextBlock Grid.Row="1" Text="{Binding Serial}" FontSize="18" HorizontalAlignment="Center" />
@@ -179,7 +178,7 @@
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem">
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                                <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListViewItem_PreviewMouseLeftButtonDown" />
+                                <EventSetter Event="PreviewMouseLeftButtonDown" Handler="PlanimetryClick"  />
                             </Style>
                         </ListView.ItemContainerStyle>
                     </ListView>

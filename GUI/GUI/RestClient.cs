@@ -226,7 +226,7 @@ namespace GUI
         }
 
         //method to block accesses from user 
-        public static bool BlockAccess(int serial)
+        public static bool BlockAccess(string serial)
         {
             //TODO test
             string json = JsonConvert.SerializeObject(serial);

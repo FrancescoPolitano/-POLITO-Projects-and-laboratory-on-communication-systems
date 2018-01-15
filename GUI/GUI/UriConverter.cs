@@ -12,7 +12,10 @@ namespace GUI
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return new Uri(Constants.IPREMOTE + value);
+           
+            if ( value != null)
+                return new Uri(Constants.IPREMOTE + value);
+            else return "Resources\\profile.png";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

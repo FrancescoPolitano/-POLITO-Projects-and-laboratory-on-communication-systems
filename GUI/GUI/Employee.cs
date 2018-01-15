@@ -10,8 +10,7 @@ namespace GUI
 {
     public class Employee : INotifyPropertyChanged
     {
-        string name, surname, authLevel, currentPosition, pathPhoto, email;
-        private int serial;
+        string name, surname, authLevel, currentPosition, pathPhoto, email,serial;
 
         public Employee() { }
 
@@ -30,7 +29,7 @@ namespace GUI
             CurrentPosition = curPos;
         }
 
-        public Employee(string name, string surname, string level, string email, string curPos, string imgPath, int serial) : this(name, surname, level, email, curPos, imgPath)
+        public Employee(string name, string surname, string level, string email, string curPos, string imgPath, string serial) : this(name, surname, level, email, curPos, imgPath)
         {
             Serial = serial;
         }
@@ -71,7 +70,7 @@ namespace GUI
                 NotifyPropertyChanged("CurrentPosition");
             }
         }
-        public int Serial { get => serial; set => serial = value; }
+        public string Serial { get => serial; set => serial = value; }
         public string PathPhoto
         {
             get => pathPhoto;

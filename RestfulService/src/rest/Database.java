@@ -63,11 +63,11 @@ public class Database {
 			return null;
 		try {
 			stmt = (Statement) conn.createStatement();
-			stmt.executeQuery("SELECT e.*, l.Name, a.TimeS, photo\r\n"
+			stmt.executeQuery("SELECT e.*,a.Result, l.Name, a.TimeS, photo\r\n"
 					+ "FROM employes e , photos p, locals l, accesses a\r\n"
-					+ "WHERE p.IdEmployee= e.SerialNumber AND\r\n"
+					+ "WHERE p.IdEmployee= e.SerialNumber AND \r\n"
 					+ "e.Causal IS NULL AND e.Expiration IS NULL AND a.IdEmployee=e.SerialNumber AND l.Id=a.IdLocal\r\n"
-					+ "AND a.TimeS in (SELECT MAX(TimeS)\r\n" + "FROM accesses\r\n" + "GROUP BY IdEmployee)\r\n"
+					+ "AND a.TimeS in (SELECT MAX(TimeS) FROM accesses where Result = 'true' GROUP BY IdEmployee)\r\n"
 					+ "GROUP BY e.SerialNumber");
 			ResultSet rs = stmt.getResultSet();
 			while (rs.next()) {
@@ -85,7 +85,7 @@ public class Database {
 			}
 			stmt.executeQuery("SELECT e.*, photo from employes e, photos p \r\n"
 					+ " where  p.IdEmployee=e.SerialNumber and e.Causal IS NULL AND e.Expiration IS NULL and e.SerialNumber not  in(SELECT e.SerialNumber from employes e , locals l, accesses a \r\n"
-					+ " where a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal GROUP BY e.SerialNumber)\r\n"
+					+ " where a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal and a.Result = 'true' GROUP BY e.SerialNumber)\r\n"
 					+ " GROUP BY e.SerialNumber");
 			rs = stmt.getResultSet();
 			while (rs.next()) {
@@ -93,7 +93,7 @@ public class Database {
 				String name = rs.getString("Name");
 				String surname = rs.getString("Surname");
 				String auth = rs.getString("AuthGrade");
-				String position = "No position found";
+				String position = "Position not found";
 				String photo = rs.getString("photo");
 				String email = rs.getString("Email");
 
@@ -123,9 +123,9 @@ public class Database {
 			return null;
 		try {
 			stmt = (Statement) conn.createStatement();
-			stmt.executeQuery("SELECT e.*, l.Name, max(a.TimeS) from employes e , locals l, accesses a \r\n"
+			stmt.executeQuery("SELECT e.*,a.Result, l.Name, max(a.TimeS) from employes e , locals l, accesses a \r\n"
 					+ "where e.Causal IS NOT NULL AND e.Expiration IS NOT NULL and a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal\r\n"
-					+ "AND a.TimeS in (SELECT MAX(TimeS)  FROM accesses GROUP BY IdEmployee)"
+					+ "AND a.TimeS in (SELECT MAX(TimeS)  FROM accesses WHERE Result = 'true' GROUP BY IdEmployee)"
 					+ "GROUP BY e.SerialNumber");
 
 			ResultSet rs = stmt.getResultSet();
@@ -144,7 +144,7 @@ public class Database {
 			}
 			stmt.executeQuery("SELECT e.* from employes e\r\n"
 					+ "where e.Causal IS NOT NULL and e.SerialNumber not  in(SELECT e.SerialNumber from employes e , locals l, accesses a \r\n"
-					+ "where a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal GROUP BY e.SerialNumber)");
+					+ "where a.IdEmployee=e.SerialNumber and l.Id=a.IdLocal and a.Result = 'true' GROUP BY e.SerialNumber)");
 			rs = stmt.getResultSet();
 			while (rs.next()) {
 				String serial = rs.getString("SerialNumber");
@@ -152,7 +152,7 @@ public class Database {
 				String surname = rs.getString("Surname");
 				String causal = rs.getString("Causal");
 				String expiration = rs.getString("Expiration");
-				String position = "No position found";
+				String position = "Position not found";
 				String authLevel = rs.getString("AuthGrade");
 
 				Visitor temp = new Visitor(name, surname, causal, expiration, authLevel, position);
@@ -213,7 +213,7 @@ public class Database {
 					String name = rs.getString("Name");
 					String surname = rs.getString("Surname");
 					String auth = rs.getString("AuthGrade");
-					String position = "position not found";
+					String position = "Position not found";
 					String photo = rs.getString("photo");
 					String email = rs.getString("Email");
 
@@ -450,7 +450,7 @@ public class Database {
 
 	public VisitorResponseClass createVisitor(Visitor visitor) {
 		VisitorResponseClass vr = new VisitorResponseClass(visitor, null);
-		vr.getVisitor().setCurrentPosition("position not found");
+		vr.getVisitor().setCurrentPosition("Position not found");
 		Integer visitorId = null;
 		PreparedStatement ps = null;
 		String serial = null;
@@ -465,7 +465,7 @@ public class Database {
 			ps.setString(2, visitor.getSurname());
 			ps.setString(3, visitor.getCausal());
 			ps.setString(4, visitor.getExpiration());
-
+			ps.executeUpdate();
 			try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
 				if (generatedKeys.next()) {
 					visitorId = generatedKeys.getInt(1);
@@ -544,7 +544,7 @@ public class Database {
 		} catch (AddressException ex) {
 			return null;
 		}
-		temp.getEmployee().setCurrentPosition("position not found");
+		temp.getEmployee().setCurrentPosition("Position not found");
 		String employeeId = null;
 		PreparedStatement ps = null;
 		String code = null, qrCode;

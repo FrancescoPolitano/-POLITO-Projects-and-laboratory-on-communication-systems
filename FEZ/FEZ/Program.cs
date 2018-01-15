@@ -21,8 +21,6 @@ namespace FEZ
         void ProgramStarted()
         {
             remoteEP = new IPEndPoint(IPAddress.Parse(Constants.STATIC_IP_SERVER), Constants.PORT_TCP);
-            camera.CameraConnected += Camera_CameraConnected;
-            camera.CameraDisconnected += Camera_CameraDisconnected;
             camera.PictureCaptured += Camera_PictureCaptured;
             camera.CurrentPictureResolution = Camera.PictureResolution.Resolution176x144;
             wifiRS21.NetworkDown += WifiRS21_NetworkDown;
@@ -47,13 +45,18 @@ namespace FEZ
                     if (info != null && info.Length != 0)
                     {
                         wifiRS21.NetworkInterface.Join(info[0].Ssid, Constants.WIFI_PASSWORD);
-                        joinSuccess = false;
+                        joinSuccess = true;
                     }
                 }
                 catch (GHI.Networking.WiFiRS9110.JoinException je)
                 {
                     Debug.Print(je.StackTrace);
-                    joinSuccess = true;
+                    joinSuccess = false;
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Debug.Print(ex.StackTrace);
+                    break;
                 }
             }
             while (wifiRS21.NetworkInterface.IPAddress == "0.0.0.0")
@@ -89,12 +92,6 @@ namespace FEZ
                 sent = sockSender.Send(BitConverter.GetBytes(pictureSize), 0, sizeof(int), SocketFlags.None);
                 sent = 0;
                 Debug.Print("MANDO FOTO");
-                //while (sent < pictureSize)
-                //{
-                //    if (pictureSize - sent > Constants.PACKET_SIZE)
-                //        sent += sockSender.Send(image, sent, Constants.PACKET_SIZE, SocketFlags.None);
-                //    else sent += sockSender.Send(image, sent, pictureSize - sent, SocketFlags.None);
-                //}
                 sockSender.Send(image);
                 Debug.Print("FOTO FINITA");
 
@@ -124,12 +121,23 @@ namespace FEZ
                 sockSender.Close();
                 connectionChecking();
             }
+            catch (Exception exc)
+            {
+                Debug.Print("EXCEPTION");
+                Debug.Print(exc.StackTrace);
+                sockSender.Close();
+                connectionChecking();
+            }
             finally
             {
                 //TODO TUNING SLEEP
-                //Thread.Sleep(400);
-                if (camera.CameraReady)
-                    camera.TakePicture();
+                Thread.Sleep(300);
+                while (!camera.CameraReady)
+                {
+                    Debug.Print("NOT READY");
+                    Thread.Sleep(100);
+                }
+                camera.TakePicture();
             }
         }
 
@@ -141,29 +149,20 @@ namespace FEZ
                 ledStrip.SetBitmask(28);
                 Thread.Sleep(1000);
             }
-
-            while (true)
+            bool isConnected = false;
+            while (!isConnected)
             {
-                bool isConnected = true;
                 try
                 {
                     sockSender = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     ledStrip.SetBitmask(28);
                     sockSender.Connect(remoteEP);
+                    isConnected = true;
                 }
                 catch (SocketException e)
                 {
-                    isConnected = false;
                     Debug.Print("ECCEZIONE DURANTE CONNECT");
-                    //if (e.ErrorCode == 11003)
-                    //{
-                    //    //succede solo se stacco il wifi e poi nn riparte
-                    //}
-                    ////TODO Risolvere error code 11003
-                    ////TODO aggiungere più controlli in initializeWifi
                 }
-                if (isConnected)
-                    break;
             }
             ledStrip.TurnAllLedsOff();
 
@@ -173,17 +172,6 @@ namespace FEZ
                 Thread.Sleep(100);
             }
             camera.TakePicture();
-        }
-
-
-        private void Camera_CameraConnected(Camera sender, EventArgs e)
-        {
-            Debug.Print("Camera connessa");
-        }
-
-        private void Camera_CameraDisconnected(Camera sender, EventArgs e)
-        {
-            Debug.Print("Camera disconnessa");
         }
     }
 }

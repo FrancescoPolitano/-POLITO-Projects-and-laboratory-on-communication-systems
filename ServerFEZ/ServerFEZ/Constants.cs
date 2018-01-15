@@ -2,7 +2,6 @@
 {
     public static class Constants
     {
-        public const int PACKET_SIZE = 10000;
         public const int PORT_TCP = 8989;
         public const string DOOR_ID = "OFFICE4H";
         public const string STATIC_IP_SERVER = "192.168.1.133";

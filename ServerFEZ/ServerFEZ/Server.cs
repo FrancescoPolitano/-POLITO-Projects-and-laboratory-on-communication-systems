@@ -7,6 +7,7 @@ using ZXing;
 using System.Text;
 using System.IO;
 using System.Net.Http;
+using System.Diagnostics;
 
 namespace ServerFEZ
 {
@@ -19,8 +20,13 @@ namespace ServerFEZ
 
         public Server()
         {
+            //TODO Utilizzare sent e received sia qui che nella FEZ
             localEndPoint = new IPEndPoint(IPAddress.Parse(Constants.STATIC_IP_SERVER), Constants.PORT_TCP);
             listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            client = new HttpClient()
+            {
+                Timeout = TimeSpan.FromSeconds(5)
+            };
             startServer();
         }
 
@@ -44,7 +50,7 @@ namespace ServerFEZ
                 //TODO change
                 byte[] pictureData;
                 byte[] responseToFEZ = new byte[Constants.EVALUATION.ACCEPT.ToString().Length];
-                int pictureSize = 0, received = 0, sent = 0; ;
+                int pictureSize = 0, received = 0, sent = 0;
                 SocketError error;
                 try
                 {
@@ -54,7 +60,7 @@ namespace ServerFEZ
                     byte[] pictureByteSize = new byte[sizeof(int)];
 
                     received = handler.Receive(pictureByteSize, 0, sizeof(int), SocketFlags.None, out error);
-                    if (error != SocketError.Success)
+                    if (error != SocketError.Success || received != sizeof(int))
                     {
                         Console.WriteLine("errore " + error.ToString());
                         handler.Close();
@@ -63,12 +69,10 @@ namespace ServerFEZ
                     pictureSize = BitConverter.ToInt32(pictureByteSize, 0);
                     pictureData = new byte[pictureSize];
                     received = 0;
+
                     while (received < pictureSize)
                     {
-                        if (pictureSize - received > Constants.PACKET_SIZE)
-                            received += handler.Receive(pictureData, received, Constants.PACKET_SIZE, SocketFlags.None, out error);
-                        else received += handler.Receive(pictureData, received, pictureSize - received, SocketFlags.None, out error);
-
+                        received += handler.Receive(pictureData, received, pictureSize - received, SocketFlags.None, out error);
                         if (error != SocketError.Success)
                         {
                             Console.WriteLine("errore " + error.ToString());
@@ -76,7 +80,6 @@ namespace ServerFEZ
                             return;
                         }
                     }
-
                     Console.WriteLine("PictureSize: {0},received {1} ", pictureSize, received);
 
                     Bitmap bitmap;
@@ -89,7 +92,6 @@ namespace ServerFEZ
                     var barcodeResult = barcodeReader.Decode(bitmap);
                     if (barcodeResult != null && barcodeResult.BarcodeFormat == BarcodeFormat.QR_CODE)
                     {
-                        HttpClient client = new HttpClient();
                         HttpResponseMessage response = client.GetAsync(Constants.URI + Constants.DOOR_ID + "/" + barcodeResult.Text).Result;
                         Console.WriteLine("RESPONSE CODE {0} ", response.StatusCode);
                         if (response.IsSuccessStatusCode)
@@ -144,5 +146,6 @@ namespace ServerFEZ
 
         private IPEndPoint localEndPoint = null;
         private Socket listener = null;
+        private HttpClient client = null;
     }
 }

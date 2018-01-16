@@ -101,7 +101,7 @@ namespace GUI
 
             while (true)
             {
-                Thread.Sleep(1000);
+                Thread.Sleep(10000);
                 List<Employee> temp = RestClient.GetAllUsers();
                 //TODO TESTARE BENE
                 List<Visitor> temp2 = RestClient.GetAllVisitors();

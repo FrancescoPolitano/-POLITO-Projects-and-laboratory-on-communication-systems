@@ -50,14 +50,10 @@ namespace GUI
             }
             catch (AggregateException tk)
             {
-                string message = "Hello, MessageBox!";
-                string caption = "Caption text";
-                MessageBoxButton buttons = MessageBoxButton.OKCancel;
-                MessageBoxImage icon = MessageBoxImage.Information;
-                MessageBoxResult defaultResult = MessageBoxResult.OK;
-                MessageBoxResult result = MessageBox.Show(message, caption, buttons, icon, defaultResult);
+                serviceErrorShow();
 
-                Application.Current.Shutdown();
+
+                //Application.Current.Shutdown();
             }
             catch (Exception e)
             {
@@ -79,12 +75,8 @@ namespace GUI
             }
             catch (AggregateException tk)
             {
-                string message = "Hello, MessageBox!";
-                string caption = "Caption text";
-                MessageBoxButton buttons = MessageBoxButton.OKCancel;
-                MessageBoxImage icon = MessageBoxImage.Information;
-                MessageBoxResult defaultResult = MessageBoxResult.OK;
-                MessageBoxResult result = MessageBox.Show(message, caption, buttons, icon, defaultResult); Application.Current.Shutdown();
+                serviceErrorShow();
+
             }
             catch (Exception e)
             {

@@ -361,6 +361,12 @@ public class Database {
 			ResultSet set = ps.executeQuery();
 			set.first();
 			email = set.getString("Email");
+			try {
+				InternetAddress emailAddr = new InternetAddress(email);
+				emailAddr.validate();
+			} catch (AddressException ex) {
+				return null;
+			}
 			do {
 				newCode = Utils.randomCodeGen();
 				String sql2 = "SELECT COUNT(*) as total FROM auth WHERE Code= ? ";

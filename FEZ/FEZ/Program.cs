@@ -85,27 +85,35 @@ namespace FEZ
                 byte[] image = e.PictureData;
                 int pictureSize = image.Length;
 
-                //TODO CHANGE
                 sockSender.ReceiveTimeout = 8000;
                 sockSender.SendTimeout = 8000;
                 int sent = 0, received = 0;
                 sent = sockSender.Send(BitConverter.GetBytes(pictureSize), 0, sizeof(int), SocketFlags.None);
+                if (sent != sizeof(int))
+                    throw new Exception();
                 sent = 0;
                 Debug.Print("MANDO FOTO");
-                sockSender.Send(image);
+                sent = sockSender.Send(image);
+                if (sent != pictureSize)
+                    throw new Exception();
                 Debug.Print("FOTO FINITA");
 
                 byte[] responseFromServer = new byte[Constants.ACCEPT.Length];
                 received = sockSender.Receive(responseFromServer, 0, responseFromServer.Length, SocketFlags.None);
+                if (received != responseFromServer.Length)
+                    throw new Exception();
                 Debug.Print("RECEIVED FROM SERVER");
                 string responseString = new string(Encoding.UTF8.GetChars(responseFromServer));
                 if (String.Compare(responseString, Constants.ACCEPT) == 0)
                 {
-                    //TODO CHANGE LED BEHAVIOUR
+                    //TODO LED BEHAVIOUR
                     ledStrip.SetBitmask(3);
+                    Thread.Sleep(5000);
                 }
                 else if (String.Compare(responseString, Constants.REJECT) == 0)
                 {
+                    ledStrip.SetBitmask(96);
+                    Thread.Sleep(1000);
                 }
                 else if (String.Compare(responseString, Constants.NOCODE) == 0)
                 {
@@ -113,13 +121,7 @@ namespace FEZ
                     //Thread.Sleep(100);
                     ledStrip.TurnAllLedsOff();
                 }
-            }
-            catch (SocketException ex)
-            {
-                Debug.Print("SOCKET EXCEPTION DURANTE LA RICEZIONE");
-                Debug.Print(ex.StackTrace);
-                sockSender.Close();
-                connectionChecking();
+                ledStrip.TurnAllLedsOff();
             }
             catch (Exception exc)
             {
@@ -131,12 +133,9 @@ namespace FEZ
             finally
             {
                 //TODO TUNING SLEEP
-                Thread.Sleep(300);
+                Thread.Sleep(200);
                 while (!camera.CameraReady)
-                {
-                    Debug.Print("NOT READY");
                     Thread.Sleep(100);
-                }
                 camera.TakePicture();
             }
         }
@@ -167,10 +166,7 @@ namespace FEZ
             ledStrip.TurnAllLedsOff();
 
             while (!camera.CameraReady)
-            {
-                Debug.Print("CAMERA NOT READY");
                 Thread.Sleep(100);
-            }
             camera.TakePicture();
         }
     }

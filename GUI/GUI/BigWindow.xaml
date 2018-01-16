@@ -10,7 +10,7 @@
         Height="450" Width="600" 
         BorderThickness="0" GlowBrush="Black"
         WindowState="Maximized"
-        ResizeMode="NoResize" >
+        ResizeMode="NoResize" WindowStartupLocation="CenterScreen" >
 
     <Controls:MetroWindow.Resources>
         <local:UriConverter x:Key="UriConverter" />
@@ -26,7 +26,7 @@
                         <Setter Property="VerticalAlignment" Value="Center" />
                     </Style>
                 </Grid.Resources>
-              
+
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
@@ -43,7 +43,7 @@
                     </Grid.RowDefinitions>
                     <TextBlock Name="NomeStanza1" />
 
-					
+
                     <ListView Grid.Row="1" Name="ListaStanza1">
                         <ListView.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -74,7 +74,7 @@
                         </ListView.ItemContainerStyle>
                     </ListView>
                 </Grid>
-                
+
                 <Grid Grid.Row="0" Grid.Column="1" Background="AliceBlue" Name="Grid2">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -119,17 +119,17 @@
                     <TextBlock Name="NomeStanza3" />
                     <ListView Grid.Row="1" Name="ListaStanza3" >
                         <ListView.ItemsPanel>
-							<ItemsPanelTemplate>
-							  <UniformGrid   Columns="3"   />
-							</ItemsPanelTemplate>
+                            <ItemsPanelTemplate>
+                                <UniformGrid   Columns="3"   />
+                            </ItemsPanelTemplate>
                         </ListView.ItemsPanel>
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <Grid Background="Aquamarine">
                                     <Grid.RowDefinitions>
-										<RowDefinition Height="*" />
-										<RowDefinition Height="*" />
-									</Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
                                     <Ellipse Width="128" Height="128" HorizontalAlignment="Center" Margin="0,3,0,0" >
                                         <Ellipse.Fill>
                                             <ImageBrush ImageSource="{Binding PathPhoto, Converter={StaticResource UriConverter}}" />
@@ -137,7 +137,7 @@
                                     </Ellipse>
                                     <TextBlock Grid.Row="1" Text="{Binding Serial}" FontSize="18" HorizontalAlignment="Center" />
                                 </Grid>
-							</DataTemplate>
+                            </DataTemplate>
                         </ListView.ItemTemplate>
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem">
@@ -147,13 +147,13 @@
                         </ListView.ItemContainerStyle>
                     </ListView>
                 </Grid>
-				<Grid Grid.Row="1" Grid.Column="1" Background="AliceBlue" Name="Grid4">
-					<Grid.RowDefinitions>
-						<RowDefinition Height="Auto" />
-						<RowDefinition Height="*" />
-					</Grid.RowDefinitions>
-					<TextBlock Name="NomeStanza4" />
-					<ListView Grid.Row="1" Name="ListaStanza4" >
+                <Grid Grid.Row="1" Grid.Column="1" Background="AliceBlue" Name="Grid4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Name="NomeStanza4" />
+                    <ListView Grid.Row="1" Name="ListaStanza4" >
                         <ListView.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <UniformGrid   Columns="3"   />
@@ -185,7 +185,7 @@
                 </Grid>
 
 
-				<Rectangle Grid.Row="0" Grid.Column="0" StrokeThickness="4" Stroke="Black"/>
+                <Rectangle Grid.Row="0" Grid.Column="0" StrokeThickness="4" Stroke="Black"/>
                 <Rectangle Grid.Row="1" Grid.Column="0" StrokeThickness="4" Stroke="Black" />
                 <Rectangle Grid.Row="0" Grid.Column="1" StrokeThickness="4" Stroke="Black" />
                 <Rectangle Grid.Row="1" Grid.Column="1" StrokeThickness="4" Stroke="Black" />
@@ -202,7 +202,7 @@
                     <RowDefinition Height="*" />
                     <RowDefinition Height="7*" />
                 </Grid.RowDefinitions>
-				<Button Grid.Row="0" Name="newUser" Content="New Employee" Margin="20" HorizontalAlignment="Right" Click="newUser_Click" FontSize="16" Background="CornflowerBlue" Foreground="White"/>
+                <Button Grid.Row="0" Name="newUser" Content="New Employee" Margin="20" HorizontalAlignment="Right" Click="newUser_Click" FontSize="16" Background="CornflowerBlue" Foreground="White"/>
                 <Grid Background="AliceBlue" Grid.Row="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -255,7 +255,7 @@
                             </GridView>
                         </ListView.View>
                     </ListView>-->
-                                
+
                     <ListView Grid.Row="1"  Name="Users" ItemsSource="{Binding UserList}" Width="Auto" Height="Auto" BorderThickness="0" AlternationCount="2" >
                         <ListView.ItemTemplate>
                             <DataTemplate>
@@ -277,7 +277,7 @@
                                     <TextBlock Text="{Binding Serial}" Grid.Column="3"  VerticalAlignment="Center" />
                                     <TextBlock Text="{Binding CurrentPosition}" Grid.Column="4"  VerticalAlignment="Center" />
                                 </Grid>
-                                
+
                             </DataTemplate>
                         </ListView.ItemTemplate>
                         <ListView.ItemContainerStyle>
@@ -297,7 +297,7 @@
                             </Style>
 
                         </ListView.ItemContainerStyle>
-                        
+
                     </ListView>
                 </Grid>
             </Grid>
@@ -329,7 +329,7 @@
                         <TextBlock Grid.Column="3"  Text="EXPIRATION"/>
                         <TextBlock Grid.Column="4" Text="CURRENT POSITION" />
                     </Grid>
-                   
+
                     <ListView Grid.Row="1" Name="Visitors" ItemsSource="{Binding VisitorList}" Width="Auto" Height="Auto" BorderThickness="0">
                         <ListView.ItemTemplate>
                             <DataTemplate>
@@ -482,8 +482,21 @@
                                     <TextBlock Text="{Binding EmployeeSurname}" Grid.Column="2" HorizontalAlignment="Center"/>
                                     <TextBlock Text="{Binding LocalName}" Grid.Column="3" HorizontalAlignment="Center"/>
                                     <TextBlock Text="{Binding Time}" Grid.Column="4" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="{Binding Result}" Grid.Column="5" HorizontalAlignment="Center"/>
-                                   
+                                    <TextBlock Text="{Binding Result}" Grid.Column="5" HorizontalAlignment="Center">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock" >
+                                                <Style.Triggers>
+                                                    <Trigger Property="Text" Value="False">
+                                                        <Setter Property="Foreground" Value="Red" />
+                                                    </Trigger>
+                                                    <Trigger Property="Text" Value="True">
+                                                        <Setter Property="Foreground" Value="Green" />
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+
                                 </Grid>
                             </DataTemplate>
 

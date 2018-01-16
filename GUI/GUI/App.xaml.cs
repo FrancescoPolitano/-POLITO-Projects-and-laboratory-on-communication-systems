@@ -73,10 +73,13 @@ namespace GUI
                     t.Start();
             userType = UserType;
             if (mw == null)
+            {
                 mw = new BigWindow(UserType);
-            createRooms();
-
-            mw.Show();
+                createRooms();
+                mw.Show();
+            }
+            else
+                mw.History.Visibility = Visibility.Visible;
         }
 
         private void CreateUser(bool temporary)
@@ -115,7 +118,7 @@ namespace GUI
                                 exists = true;
                                 if (String.Compare(e.CurrentPosition, user.CurrentPosition) != 0)
                                 {
-                                    changeRooms(user, e.CurrentPosition);
+                                  changeRooms(user, e.CurrentPosition);
                                     user.CurrentPosition = e.CurrentPosition;
                                 }
                                 break;

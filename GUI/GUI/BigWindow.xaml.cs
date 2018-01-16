@@ -15,6 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using MahApps.Metro.Controls.Dialogs;
 using System.Collections.ObjectModel;
+using System.Windows.Interop;
 
 namespace GUI
 {
@@ -39,7 +40,7 @@ namespace GUI
         public static ObservableCollection<Employee> UserList { get => userList; set => userList = value; }
         internal static ObservableCollection<Visitor> VisitorList { get => visitorList; set => visitorList = value; }
         public ObservableCollection<Access> Contenuto { get => contenuto; set => contenuto = value; }
-   
+
         public static ObservableCollection<Employee> Room1 { get => room1; set => room1 = value; }
         public static ObservableCollection<Employee> Room2 { get => room2; set => room2 = value; }
         public static ObservableCollection<Employee> Room3 { get => room3; set => room3 = value; }
@@ -48,12 +49,13 @@ namespace GUI
         public BigWindow(string UserType)
         {
             InitializeComponent();
-            if (String.Compare(UserType,Constants.ADMIN) != 0)
+            this.SourceInitialized += Window1_SourceInitialized;
+            if (String.Compare(UserType, Constants.ADMIN) != 0)
             {
-                VisitorTab.Visibility = Visibility.Collapsed;
-                UserTab.Visibility = Visibility.Collapsed;
                 History.Visibility = Visibility.Collapsed;
             }
+            else
+                History.Visibility = Visibility.Visible;
 
             users.Add("Tutti");
             rooms.Add(new Room
@@ -67,19 +69,19 @@ namespace GUI
                 foreach (Employee user in UserList)
                     users.Add(user.Name + " " + user.Surname + " " + user.Serial);
             }
-            else 
-            UserList = new ObservableCollection<Employee>();
+            else
+                UserList = new ObservableCollection<Employee>();
             if (App.visitorList != null)
                 VisitorList = new ObservableCollection<Visitor>(App.visitorList);
             else
-            VisitorList = new ObservableCollection<Visitor>();
+                VisitorList = new ObservableCollection<Visitor>();
             CalendarDateRange cdr = new CalendarDateRange(DateTime.Today.AddDays(1), DateTime.MaxValue);
             fromDate.BlackoutDates.Add(cdr);
             toDate.BlackoutDates.Add(cdr);
             if (App.roomList != null)
                 foreach (Room room in App.roomList)
                     rooms.Add(room);
-           
+
             Users.ItemsSource = UserList;
             Visitors.ItemsSource = VisitorList;
 
@@ -92,7 +94,7 @@ namespace GUI
             ListaStanza2.ItemsSource = Room2;
             ListaStanza3.ItemsSource = Room3;
             ListaStanza4.ItemsSource = Room4;
-            
+
             Utenti.ItemsSource = users;
             Rooms.ItemsSource = rooms;
             SelectedEmployees.ItemsSource = listUsers;
@@ -100,6 +102,33 @@ namespace GUI
             listContent.ItemsSource = Contenuto;
         }
 
+        private void Window1_SourceInitialized(object sender, EventArgs e)
+        {
+            WindowInteropHelper helper = new WindowInteropHelper(this);
+            HwndSource source = HwndSource.FromHwnd(helper.Handle);
+            source.AddHook(WndProc);
+        }
+
+        const int WM_SYSCOMMAND = 0x0112;
+        const int SC_MOVE = 0xF010;
+
+        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+
+            switch (msg)
+            {
+                case WM_SYSCOMMAND:
+                    int command = wParam.ToInt32() & 0xfff0;
+                    if (command == SC_MOVE)
+                    {
+                        handled = true;
+                    }
+                    break;
+                default:
+                    break;
+            }
+            return IntPtr.Zero;
+        }
 
         private void newUser_Click(object sender, RoutedEventArgs e)
         {
@@ -268,7 +297,7 @@ namespace GUI
         }
 
 
-        private  void requestData()
+        private void requestData()
         {
             List<Access> result;
             if (listRooms.Count == 0)
@@ -300,22 +329,22 @@ namespace GUI
                     //qua ho cambiato, ora si manda vuoto se c'è solo TUTTI
                     continue;
                 }
-                temp.Add(st.Substring(st.LastIndexOf(" ")+1));
+                temp.Add(st.Substring(st.LastIndexOf(" ") + 1));
             }
             qr.Employees = temp;
             List<String> temp2 = new List<string>();
-            foreach(string st in listRooms)
+            foreach (string st in listRooms)
             {
                 //uguale a quello degli utenti, per non mandare TUTTE
                 if (String.Compare("Tutte", st) == 0)
                     continue;
                 else
                 {
-                    foreach(Room r in rooms)
-                        if (String.Compare(r.Name,st) == 0 )
+                    foreach (Room r in rooms)
+                        if (String.Compare(r.Name, st) == 0)
                             temp2.Add(r.IdLocal);
                 }
-                  //  temp2.Add(st);
+                //  temp2.Add(st);
             }
             qr.Rooms = temp2;
             //if (t != null)
@@ -327,7 +356,7 @@ namespace GUI
             return qr;
         }
 
-        private void ListViewItem_VisitorClick (object sender, MouseButtonEventArgs e)
+        private void ListViewItem_VisitorClick(object sender, MouseButtonEventArgs e)
         {
             var item = sender as ListViewItem;
             if (item != null)

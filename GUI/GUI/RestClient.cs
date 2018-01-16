@@ -14,6 +14,7 @@ namespace GUI
 {
     class RestClient
     {
+        public static bool loggedIn = false;
         private static string myRest = Constants.myRest;
         private static CookieContainer cookies = new CookieContainer();
         private static HttpClientHandler handler = new HttpClientHandler()
@@ -23,7 +24,7 @@ namespace GUI
 
         private static readonly HttpClient client = new HttpClient(handler)
         {
-            //Timeout = TimeSpan.FromSeconds(30)
+            Timeout = TimeSpan.FromSeconds(30)
         };
 
         //Login, saves a "cookie"
@@ -39,8 +40,12 @@ namespace GUI
                     CookieCollection responseCookies = cookies.GetCookies(new Uri(myRest + "/login"));
                     if (responseCookies["Token"] == null)
                         return false;
+
                     else
+                    {
+                        loggedIn = true;
                         return true;
+                    }
                 }
             }
             catch (AggregateException tk)
@@ -61,9 +66,15 @@ namespace GUI
         {
             try
             {
+                loggedIn = false;
                 HttpResponseMessage response = client.GetAsync(myRest + "/logout").Result;
                 if (!response.IsSuccessStatusCode)
                     throw new Exception();
+            }
+            catch (AggregateException tk)
+            {
+                MessageBox.Show("Il service è offline");
+                Application.Current.Shutdown();
             }
             catch (Exception e)
             {
@@ -90,8 +101,16 @@ namespace GUI
                 {
                     LoginWindow lw = new LoginWindow();
                     lw.ShowDialog();
-                    return GetAllUsers();
+                    if (loggedIn)
+                        return GetAllUsers();
+                    else
+                        return null;
                 }
+            }
+            catch (AggregateException tk)
+            {
+                MessageBox.Show("Il service è offline");
+                Application.Current.Shutdown();
             }
             catch (Exception e)
             {
@@ -120,8 +139,16 @@ namespace GUI
                 {
                     LoginWindow lw = new LoginWindow();
                     lw.ShowDialog();
-                    return GetAllVisitors();
+                    if (loggedIn)
+                        return GetAllVisitors();
+                    else
+                        return null;
                 }
+            }
+            catch (AggregateException tk)
+            {
+                MessageBox.Show("Il service è offline");
+                Application.Current.Shutdown();
             }
             catch (Exception e)
             {
@@ -146,8 +173,15 @@ namespace GUI
                 {
                     LoginWindow lw = new LoginWindow();
                     lw.ShowDialog();
-                    return GetAllRooms();
+                    if (loggedIn)
+                        return GetAllRooms();
+                    else return null;
                 }
+            }
+            catch (AggregateException tk)
+            {
+                MessageBox.Show("Il service è offline");
+                Application.Current.Shutdown();
             }
             catch (Exception e)
             {
@@ -177,8 +211,15 @@ namespace GUI
                 {
                     LoginWindow lw = new LoginWindow();
                     lw.ShowDialog();
-                    return CreateUser(u);
+                    if (loggedIn)
+                        return CreateUser(u);
+                    else return null;
                 }
+            }
+            catch (AggregateException tk)
+            {
+                MessageBox.Show("Il service è offline");
+                Application.Current.Shutdown();
             }
             catch (Exception e)
             {
@@ -204,8 +245,15 @@ namespace GUI
                 {
                     LoginWindow lw = new LoginWindow();
                     lw.ShowDialog();
-                    return CreateVisitor(v);
+                    if (loggedIn)
+                        return CreateVisitor(v);
+                    else return null;
                 }
+            }
+            catch (AggregateException tk)
+            {
+                MessageBox.Show("Il service è offline");
+                Application.Current.Shutdown();
             }
             catch (Exception e)
             {
@@ -240,8 +288,15 @@ namespace GUI
                 {
                     LoginWindow lw = new LoginWindow();
                     lw.ShowDialog();
-                    return BlockAccess(serial);
+                    if (loggedIn)
+                        return BlockAccess(serial);
+                    else return false;
                 }
+            }
+            catch (AggregateException tk)
+            {
+                MessageBox.Show("Il service è offline");
+                Application.Current.Shutdown();
             }
             catch (Exception e)
             {
@@ -266,8 +321,15 @@ namespace GUI
                 {
                     LoginWindow lw = new LoginWindow();
                     lw.ShowDialog();
-                    return RoleChange(auth);
+                    if (loggedIn)
+                        return RoleChange(auth);
+                    else return false;
                 }
+            }
+            catch (AggregateException tk)
+            {
+                MessageBox.Show("Il service è offline");
+                Application.Current.Shutdown();
             }
             catch (Exception e)
             {
@@ -291,8 +353,16 @@ namespace GUI
                 {
                     LoginWindow lw = new LoginWindow();
                     lw.ShowDialog();
-                    return QRCodeChange(id);
+                    if (loggedIn)
+                        return QRCodeChange(id);
+                    else
+                        return String.Empty;
                 }
+            }
+            catch (AggregateException tk)
+            {
+                MessageBox.Show("Il service è offline");
+                Application.Current.Shutdown();
             }
             catch (Exception e)
             {
@@ -318,8 +388,15 @@ namespace GUI
                 {
                     LoginWindow lw = new LoginWindow();
                     lw.ShowDialog();
-                    return GetHistory(q);
+                    if (loggedIn)
+                        return GetHistory(q);
+                    else return null;
                 }
+            }
+            catch (AggregateException tk)
+            {
+                MessageBox.Show("Il service è offline");
+                Application.Current.Shutdown();
             }
             catch (Exception e)
             {
@@ -342,8 +419,16 @@ namespace GUI
                 {
                     LoginWindow lw = new LoginWindow();
                     lw.ShowDialog();
-                    return ModifyUser(e);
+                    if (loggedIn)
+                        return ModifyUser(e);
+                    else
+                        return false;
                 }
+            }
+            catch (AggregateException tk)
+            {
+                MessageBox.Show("Il service è offline");
+                Application.Current.Shutdown();
             }
             catch (Exception ex)
             {

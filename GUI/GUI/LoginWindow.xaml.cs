@@ -27,7 +27,7 @@ namespace GUI
         {
             InitializeComponent();
             myGrid.DataContext = myLoginData;
-          
+
         }
 
         private void Confirm_Click(object sender, RoutedEventArgs e)
@@ -65,11 +65,7 @@ namespace GUI
 
         private void Enter_Click(object sender, RoutedEventArgs e)
         {
-            //TODO non è proprio cosi nella versione finale, #imbroglio
-            myLoginData.Username = "admin";
-            myLoginData.Password = "admin";
-            if (RestClient.Login(myLoginData))
-                PageChange(Constants.ADMIN);
+            PageChange(Constants.DOORMAN);
             Close();
         }
 
@@ -79,11 +75,11 @@ namespace GUI
 
         private void MetroWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (restart)
+            if (!RestClient.loggedIn && restart)
             {
-                MessageDialogResult mr = this.ShowModalMessageExternal("Ops", "è necessario effettuare l'accesso per continuare, il programma verrà terminato cliccando ok", MessageDialogStyle.AffirmativeAndNegative);
-                if (mr == MessageDialogResult.Affirmative)
-                    Application.Current.Shutdown();
+                MessageDialogResult mr = this.ShowModalMessageExternal("Ops", "è necessario effettuare l'accesso per eseguire questa operazione", MessageDialogStyle.AffirmativeAndNegative);
+                if (mr != MessageDialogResult.Affirmative)
+                    e.Cancel = false;
                 else
                     e.Cancel = true;
             }

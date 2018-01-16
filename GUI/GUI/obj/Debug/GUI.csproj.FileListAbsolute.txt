@@ -107,3 +107,5 @@ C:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-
 C:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\obj\Debug\GUI.pdb
 C:\Users\Gianmaria\Documents\GitKraken\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\obj\Debug\VisitorDetails.g.cs
 C:\Users\Gianmaria\Documents\GitKraken\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\obj\Debug\VisitorDetails.baml
+C:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\obj\Debug\VisitorDetails.g.cs
+C:\Users\franc\Documents\GitKraken\ProjectsAndLaboratories\-POLITO-Projects-and-laboratory-on-communication-systems\GUI\GUI\obj\Debug\VisitorDetails.baml

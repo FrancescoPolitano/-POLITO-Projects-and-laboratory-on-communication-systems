@@ -50,7 +50,13 @@ namespace GUI
             }
             catch (AggregateException tk)
             {
-                MessageBox.Show("Il service è offline");
+                string message = "Hello, MessageBox!";
+                string caption = "Caption text";
+                MessageBoxButton buttons = MessageBoxButton.OKCancel;
+                MessageBoxImage icon = MessageBoxImage.Information;
+                MessageBoxResult defaultResult = MessageBoxResult.OK;
+                MessageBoxResult result = MessageBox.Show(message, caption, buttons, icon, defaultResult);
+
                 Application.Current.Shutdown();
             }
             catch (Exception e)
@@ -73,8 +79,12 @@ namespace GUI
             }
             catch (AggregateException tk)
             {
-                MessageBox.Show("Il service è offline");
-                Application.Current.Shutdown();
+                string message = "Hello, MessageBox!";
+                string caption = "Caption text";
+                MessageBoxButton buttons = MessageBoxButton.OKCancel;
+                MessageBoxImage icon = MessageBoxImage.Information;
+                MessageBoxResult defaultResult = MessageBoxResult.OK;
+                MessageBoxResult result = MessageBox.Show(message, caption, buttons, icon, defaultResult); Application.Current.Shutdown();
             }
             catch (Exception e)
             {
@@ -109,7 +119,7 @@ namespace GUI
             }
             catch (AggregateException tk)
             {
-                MessageBox.Show("Il service è offline");
+                serviceErrorShow();
                 Application.Current.Shutdown();
             }
             catch (Exception e)
@@ -147,7 +157,7 @@ namespace GUI
             }
             catch (AggregateException tk)
             {
-                MessageBox.Show("Il service è offline");
+                serviceErrorShow();
                 Application.Current.Shutdown();
             }
             catch (Exception e)
@@ -180,7 +190,7 @@ namespace GUI
             }
             catch (AggregateException tk)
             {
-                MessageBox.Show("Il service è offline");
+                serviceErrorShow();
                 Application.Current.Shutdown();
             }
             catch (Exception e)
@@ -218,7 +228,7 @@ namespace GUI
             }
             catch (AggregateException tk)
             {
-                MessageBox.Show("Il service è offline");
+                serviceErrorShow();
                 Application.Current.Shutdown();
             }
             catch (Exception e)
@@ -252,7 +262,7 @@ namespace GUI
             }
             catch (AggregateException tk)
             {
-                MessageBox.Show("Il service è offline");
+                serviceErrorShow();
                 Application.Current.Shutdown();
             }
             catch (Exception e)
@@ -295,7 +305,7 @@ namespace GUI
             }
             catch (AggregateException tk)
             {
-                MessageBox.Show("Il service è offline");
+                serviceErrorShow();
                 Application.Current.Shutdown();
             }
             catch (Exception e)
@@ -328,7 +338,7 @@ namespace GUI
             }
             catch (AggregateException tk)
             {
-                MessageBox.Show("Il service è offline");
+                serviceErrorShow();
                 Application.Current.Shutdown();
             }
             catch (Exception e)
@@ -361,7 +371,7 @@ namespace GUI
             }
             catch (AggregateException tk)
             {
-                MessageBox.Show("Il service è offline");
+                serviceErrorShow();
                 Application.Current.Shutdown();
             }
             catch (Exception e)
@@ -395,7 +405,7 @@ namespace GUI
             }
             catch (AggregateException tk)
             {
-                MessageBox.Show("Il service è offline");
+                serviceErrorShow();
                 Application.Current.Shutdown();
             }
             catch (Exception e)
@@ -427,7 +437,7 @@ namespace GUI
             }
             catch (AggregateException tk)
             {
-                MessageBox.Show("Il service è offline");
+                serviceErrorShow();
                 Application.Current.Shutdown();
             }
             catch (Exception ex)
@@ -438,9 +448,14 @@ namespace GUI
             return false;
 
         }
-
-        //PER TUTTE LE RICHIEST REST
-        //if(response.StatusCode == 804)
-        //richiedere login ed eventualmente scheramata che avvisa
+        static private void serviceErrorShow()
+        {
+            string message = "Cannot connect to the service.";
+            string caption = "Connection error";
+            MessageBoxButton buttons = MessageBoxButton.OK;
+            MessageBoxImage icon = MessageBoxImage.Error;
+            MessageBoxResult defaultResult = MessageBoxResult.OK;
+            MessageBoxResult result = MessageBox.Show(message, caption, buttons, icon, defaultResult);
+        }
     }
 }

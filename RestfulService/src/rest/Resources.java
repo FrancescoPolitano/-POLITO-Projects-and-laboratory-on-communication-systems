@@ -40,6 +40,7 @@ public class Resources {
 		return Response.ok(Json, MediaType.APPLICATION_JSON).build();
 	}
 
+	// return all the visitors
 	@GET
 	@Path("users/visitors")
 	@Produces(MediaType.TEXT_PLAIN)
@@ -68,7 +69,7 @@ public class Resources {
 		return Response.ok(Json, MediaType.APPLICATION_JSON).build();
 	}
 
-	// create a new employee and return the user and the QRcode (not working)
+	// create a new employee and return the user and the QRcode
 	@POST
 	@Path("users/employees")
 	@Produces(MediaType.TEXT_PLAIN)
@@ -134,8 +135,7 @@ public class Resources {
 		return Response.ok().build();
 	}
 
-	// create a temporary user and grant him the lowest level of permission, returns
-	// the user as a json
+	// create a temporary user (visitor)
 	@POST
 	@Path("users/visitors")
 	public Response newVisitor(String request, @CookieParam("Token") String token) {
@@ -156,7 +156,6 @@ public class Resources {
 	}
 
 	// revoke a user QRCode and obtain a new one
-	// MUST FIX THE ERROR MANAGMENT
 	@POST
 	@Path("users/new_code")
 	@Produces(MediaType.TEXT_PLAIN)
@@ -224,7 +223,7 @@ public class Resources {
 		return Response.ok(new Gson().toJson(local.getIdLocal())).build();
 	}
 
-	// gestire meglio
+	// return parametrized query
 	@POST
 	@Path("query")
 	@Produces(MediaType.TEXT_PLAIN)
@@ -274,7 +273,7 @@ public class Resources {
 		return Response.ok(token).cookie(tokenCookie).build();
 	}
 
-	// login Admin
+	// logout Admin
 	@GET
 	@Path("logout")
 	@Produces(MediaType.TEXT_PLAIN)
@@ -288,6 +287,7 @@ public class Resources {
 			return Response.ok().build();
 	}
 
+	// Revoke authorization level
 	@POST
 	@Path("users/block")
 	public Response blockUser(String request, @CookieParam("Token") String token) {

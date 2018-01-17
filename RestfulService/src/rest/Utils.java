@@ -96,6 +96,7 @@ public class Utils {
 		return URL;
 	}
 
+	// Save the employee photo into the file system
 	public static String StoreEmployeePhoto(byte[] fileContent, String id) {
 		BufferedImage img;
 		String URL = "/images/profiles/" + id + ".jpg";
@@ -113,6 +114,7 @@ public class Utils {
 		return URL;
 	}
 
+	// Create hash for admin password
 	public static String hashString(String message) {
 
 		MessageDigest digest = null;
@@ -138,11 +140,13 @@ public class Utils {
 		return stringBuffer.toString();
 	}
 
+	// Create token used for the cookie
 	public static String createToken(String string) {
 		String token = randomCodeGen();
 		return token;
 	}
 
+	// Send email to the employee's address
 	public static int sendEmail(String sendTo, String employeeId) {
 
 		Properties props = new Properties();
@@ -171,7 +175,8 @@ public class Utils {
 			multipart.addBodyPart(messageBodyPart);
 
 			messageBodyPart = new MimeBodyPart();
-			DataSource fds = new FileDataSource("C:\\Users\\Administrator\\Desktop\\ServerData\\" + employeeId + ".jpg");
+			DataSource fds = new FileDataSource(
+					"C:\\Users\\Administrator\\Desktop\\ServerData\\" + employeeId + ".jpg");
 			messageBodyPart.setDataHandler(new DataHandler(fds));
 			messageBodyPart.setHeader("Content-ID", "<image>");
 
@@ -184,6 +189,8 @@ public class Utils {
 		}
 		return 0;
 	}
+
+	// Send confirmation mail to the employee
 	public static int sendConfirmationEmail(String sendTo, String employeeId) {
 
 		Properties props = new Properties();
@@ -205,18 +212,18 @@ public class Utils {
 			message.setSubject("EasyAccess: Please confirm your email address");
 			MimeMultipart multipart = new MimeMultipart("related");
 
+			// TODO CAMBIARE IP con localhost
 			BodyPart messageBodyPart = new MimeBodyPart();
 			String htmlText = "If you don't know the origin of this email please ignore it.<br>"
-					+ "<a href=\"http://13.59.45.212:8080/RestfulService/resources/confirm/"+employeeId+"\">Click here to confirm</a>";
+					+ "<a href=\"http://13.59.45.212:8080/RestfulService/resources/confirm/" + employeeId
+					+ "\">Click here to confirm</a>";
 			messageBodyPart.setContent(htmlText, "text/html");
 			multipart.addBodyPart(messageBodyPart);
 			message.setContent(multipart);
 			Transport.send(message);
 		} catch (Exception e) {
-			e.printStackTrace();
 			return -1;
 		}
 		return 0;
 	}
-
 }

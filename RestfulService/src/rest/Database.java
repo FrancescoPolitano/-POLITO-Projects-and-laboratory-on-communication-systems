@@ -20,6 +20,7 @@ public class Database {
 	private static Connection conn = null;
 	private static Object lock = new Object();
 
+	//Initialize the jdbc driver
 	private Database() {
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
@@ -32,6 +33,7 @@ public class Database {
 		}
 	}
 
+	//Create thread safe Singleton
 	public static Database getInstance() {
 		if (instance == null) {
 			synchronized (lock) {
@@ -42,6 +44,7 @@ public class Database {
 		return instance;
 	}
 
+	//Return the connection to the database
 	public Connection connect() {
 		String user = "root";
 		String password = user;
@@ -55,6 +58,7 @@ public class Database {
 		return conn;
 	}
 
+	
 	public ArrayList<Employee> getAllEmployes() {
 		ArrayList<Employee> list = new ArrayList<Employee>();
 		Statement stmt = null;
@@ -103,13 +107,11 @@ public class Database {
 			}
 			return list;
 		} catch (SQLException ex) {
-			System.out.println("111 " + ex.getMessage());
 		} finally {
 			try {
 				if (stmt != null)
 					stmt.close();
 			} catch (SQLException e) {
-				System.out.println("Error closing " + e.getMessage());
 			}
 		}
 		return list;
@@ -160,13 +162,11 @@ public class Database {
 				list.add(temp);
 			}
 		} catch (SQLException ex) {
-			System.out.println("222 " + ex.getMessage());
 		} finally {
 			try {
 				if (stmt != null)
 					stmt.close();
 			} catch (SQLException e) {
-				System.out.println("Error closing " + e.getMessage());
 			}
 		}
 		return list;
@@ -224,7 +224,6 @@ public class Database {
 				}
 			}
 		} catch (SQLException ex) {
-			System.out.println("333 " + ex.getMessage());
 			return null;
 		} catch (Exception e) {
 			return null;
@@ -233,7 +232,6 @@ public class Database {
 				if (ps != null)
 					ps.close();
 			} catch (SQLException e) {
-				System.out.println("Error closing " + e.getMessage());
 			}
 		}
 		return temp;
@@ -249,6 +247,7 @@ public class Database {
 		String causal = null, expiration = null;
 		PreparedStatement ps = null;
 		try {
+			//Disable autoCommit in order to create a Transaction
 			conn.setAutoCommit(false);
 			String sql1 = "select SerialNumber, e.AuthGrade , l.AuthGrade, Causal, Expiration from employes e , auth a , locals l"
 					+ " where a.Code = ? and a.IdEmployee= e.SerialNumber and l.Id= ?";
@@ -286,7 +285,6 @@ public class Database {
 			conn.commit();
 			return result;
 		} catch (SQLException ex) {
-			System.out.println("444 " + ex.getMessage());
 			try {
 				conn.rollback();
 			} catch (SQLException e) {
@@ -294,7 +292,6 @@ public class Database {
 			}
 			return false;
 		} catch (ParseException e) {
-			System.out.println("444 " + e.getMessage());
 			try {
 				conn.rollback();
 			} catch (SQLException ex) {
@@ -306,7 +303,6 @@ public class Database {
 				if (ps != null)
 					ps.close();
 			} catch (SQLException e) {
-				System.out.println("Error closing " + e.getMessage());
 			}
 		}
 	}
@@ -323,14 +319,12 @@ public class Database {
 			ps.executeUpdate();
 			return true;
 		} catch (SQLException ex) {
-			System.out.println("555 " + ex.getMessage());
 			return false;
 		} finally {
 			try {
 				if (ps != null)
 					ps.close();
 			} catch (SQLException e) {
-				System.out.println("Error closing " + e.getMessage());
 			}
 		}
 	}
@@ -412,13 +406,11 @@ public class Database {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			System.out.println("666 " + ex.getMessage());
 		} finally {
 			try {
 				if (ps != null)
 					ps.close();
 			} catch (SQLException e) {
-				System.out.println("Error closing " + e.getMessage());
 			}
 		}
 		return image;
@@ -441,14 +433,12 @@ public class Database {
 				locals.add(new Local(id, name, authGrade));
 			}
 		} catch (SQLException ex) {
-			System.out.println("777 " + ex.getMessage());
 			return null;
 		} finally {
 			try {
 				if (stmt != null)
 					stmt.close();
 			} catch (SQLException e) {
-				System.out.println("Error closing " + e.getMessage());
 			}
 		}
 		return locals;
@@ -465,12 +455,14 @@ public class Database {
 			return null;
 		try {
 			conn.setAutoCommit(false);
-			ps = conn.prepareStatement("INSERT into employes (Name, Surname, Causal, Expiration) values (?,?,?,?)",
+			ps = conn.prepareStatement(
+					"INSERT into employes (Name, Surname, Causal, Expiration,AuthGrade) values (?,?,?,?,?)",
 					Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, visitor.getName());
 			ps.setString(2, visitor.getSurname());
 			ps.setString(3, visitor.getCausal());
 			ps.setString(4, visitor.getExpiration());
+			ps.setString(5, visitor.getAuthLevel());
 			ps.executeUpdate();
 			try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
 				if (generatedKeys.next()) {
@@ -502,14 +494,12 @@ public class Database {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			System.out.println("888" + ex.getMessage());
 			return null;
 		} finally {
 			try {
 				if (ps != null)
 					ps.close();
 			} catch (SQLException e) {
-				System.out.println("Error closing " + e.getMessage());
 			}
 		}
 		return vr;
@@ -530,14 +520,12 @@ public class Database {
 			ex.printStackTrace();
 			return -1;
 		} catch (SQLException ex) {
-			System.out.println("999 " + ex.getMessage());
 			return -2;
 		} finally {
 			try {
 				if (ps != null)
 					ps.close();
 			} catch (SQLException e) {
-				System.out.println("Error closing " + e.getMessage());
 			}
 		}
 		return 0;
@@ -612,14 +600,12 @@ public class Database {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			System.out.println("101010 " + ex.getMessage());
 			return null;
 		} finally {
 			try {
 				if (ps != null)
 					ps.close();
 			} catch (SQLException e) {
-				System.out.println("Error closing " + e.getMessage());
 			}
 		}
 		return new EmployeeResponseClass(temp.getEmployee(), qrCode);
@@ -655,7 +641,6 @@ public class Database {
 				if (ps != null)
 					ps.close();
 			} catch (SQLException e) {
-				System.out.println("Error closing: " + e.getMessage());
 			}
 		}
 		return true;
@@ -670,7 +655,7 @@ public class Database {
 		ArrayList<Access> accessResults = new ArrayList<Access>();
 		try {
 			stmt = (Statement) conn.createStatement();
-			System.out.println("QUERYYYYY " + query.toValidSQLQuery());
+			System.out.println("Complex Query " + query.toValidSQLQuery());
 			stmt.executeQuery(query.toValidSQLQuery());
 			results = stmt.getResultSet();
 
@@ -686,14 +671,12 @@ public class Database {
 				accessResults.add(temp);
 			}
 		} catch (SQLException ex) {
-			System.out.println("111111 " + ex.getMessage());
 			return null;
 		} finally {
 			try {
 				if (stmt != null)
 					stmt.close();
 			} catch (SQLException e) {
-				System.out.println("Error closing " + e.getMessage());
 			}
 		}
 		return accessResults;
@@ -740,14 +723,12 @@ public class Database {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			System.out.println("999 " + ex.getMessage());
 			return null;
 		} finally {
 			try {
 				if (ps != null)
 					ps.close();
 			} catch (SQLException e) {
-				System.out.println("Error closing " + e.getMessage());
 			}
 		}
 		return temp;
@@ -764,14 +745,12 @@ public class Database {
 			ps.setString(1, token);
 			ps.executeUpdate();
 		} catch (SQLException ex) {
-			System.out.println("LOGOUT " + ex.getMessage());
 			return false;
 		} finally {
 			try {
 				if (ps != null)
 					ps.close();
 			} catch (SQLException e) {
-				System.out.println("Error closing " + e.getMessage());
 			}
 		}
 		return true;
@@ -815,7 +794,6 @@ public class Database {
 				if (ps1 != null)
 					ps1.close();
 			} catch (SQLException e) {
-				System.out.println("Error closing");
 			}
 		}
 		return affectedRows;
@@ -841,7 +819,6 @@ public class Database {
 				if (ps != null)
 					ps.close();
 			} catch (SQLException e) {
-				System.out.println("Error closing " + e.getMessage());
 			}
 		}
 		return true;
@@ -875,7 +852,6 @@ public class Database {
 				if (ps != null)
 					ps.close();
 			} catch (SQLException e) {
-				System.out.println("Error closing " + e.getMessage());
 			}
 		}
 		return false;
@@ -907,7 +883,6 @@ public class Database {
 				if (ps != null)
 					ps.close();
 			} catch (SQLException e) {
-				System.out.println("Error closing " + e.getMessage());
 			}
 		}
 		return false;
@@ -956,7 +931,6 @@ public class Database {
 				if (ps1 != null)
 					ps1.close();
 			} catch (SQLException e) {
-				System.out.println("Error closing " + e.getMessage());
 			}
 		}
 		return false;

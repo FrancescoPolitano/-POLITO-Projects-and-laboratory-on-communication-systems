@@ -20,9 +20,10 @@ namespace FEZ
 
         void ProgramStarted()
         {
+            //TODO CAMBIARE IP
             remoteEP = new IPEndPoint(IPAddress.Parse(Constants.STATIC_IP_SERVER), Constants.PORT_TCP);
             camera.PictureCaptured += Camera_PictureCaptured;
-            camera.CurrentPictureResolution = Camera.PictureResolution.Resolution176x144;
+            camera.CurrentPictureResolution = Camera.PictureResolution.Resolution160x120;
             wifiRS21.NetworkDown += WifiRS21_NetworkDown;
             wifiRS21.NetworkUp += WifiRS21_NetworkUp;
             new Thread(connectionChecking).Start();
@@ -85,7 +86,7 @@ namespace FEZ
                 byte[] image = e.PictureData;
                 int pictureSize = image.Length;
 
-                sockSender.ReceiveTimeout = 8000;
+                sockSender.ReceiveTimeout = 10000;
                 sockSender.SendTimeout = 8000;
                 int sent = 0, received = 0;
                 sent = sockSender.Send(BitConverter.GetBytes(pictureSize), 0, sizeof(int), SocketFlags.None);
@@ -106,7 +107,6 @@ namespace FEZ
                 string responseString = new string(Encoding.UTF8.GetChars(responseFromServer));
                 if (String.Compare(responseString, Constants.ACCEPT) == 0)
                 {
-                    //TODO LED BEHAVIOUR
                     ledStrip.SetBitmask(3);
                     Thread.Sleep(5000);
                 }
@@ -117,9 +117,6 @@ namespace FEZ
                 }
                 else if (String.Compare(responseString, Constants.NOCODE) == 0)
                 {
-                    ledStrip.SetBitmask(96);
-                    //Thread.Sleep(100);
-                    ledStrip.TurnAllLedsOff();
                 }
                 ledStrip.TurnAllLedsOff();
             }
@@ -132,8 +129,7 @@ namespace FEZ
             }
             finally
             {
-                //TODO TUNING SLEEP
-                Thread.Sleep(200);
+                Thread.Sleep(300);
                 while (!camera.CameraReady)
                     Thread.Sleep(100);
                 camera.TakePicture();
@@ -154,7 +150,6 @@ namespace FEZ
                 try
                 {
                     sockSender = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    ledStrip.SetBitmask(28);
                     sockSender.Connect(remoteEP);
                     isConnected = true;
                 }

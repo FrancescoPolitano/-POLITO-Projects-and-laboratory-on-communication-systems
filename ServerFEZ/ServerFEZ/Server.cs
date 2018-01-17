@@ -19,7 +19,6 @@ namespace ServerFEZ
 
         public Server()
         {
-            //TODO Utilizzare sent e received sia qui che nella FEZ
             localEndPoint = new IPEndPoint(IPAddress.Parse(Constants.STATIC_IP_SERVER), Constants.PORT_TCP);
             listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             client = new HttpClient()
@@ -84,6 +83,7 @@ namespace ServerFEZ
                     bitmap = new Bitmap(ms);
 
                     var barcodeResult = new BarcodeReader().Decode(bitmap);
+                    Console.WriteLine("BARCODE {0} ", barcodeResult);
                     if (barcodeResult != null && barcodeResult.BarcodeFormat == BarcodeFormat.QR_CODE)
                     {
                         HttpResponseMessage response = client.GetAsync(Constants.URI + Constants.DOOR_ID + "/" + barcodeResult.Text).Result;
@@ -106,7 +106,7 @@ namespace ServerFEZ
                         throw new SocketException();
                     }
 
-                    bitmap.Save(@"C:\Users\Cristiano\Desktop\image.jpeg", ImageFormat.Jpeg);
+                    //bitmap.Save(@"C:\Users\Cristiano\Desktop\image.jpeg", ImageFormat.Jpeg);
                 }
                 catch (Exception e)
                 {

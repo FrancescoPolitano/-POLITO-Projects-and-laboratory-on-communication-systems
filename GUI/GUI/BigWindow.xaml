@@ -7,10 +7,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GUI"
         mc:Ignorable="d"
-        Height="450" Width="600" 
         BorderThickness="0" GlowBrush="Black"
         WindowState="Maximized"
-        ResizeMode="NoResize" WindowStartupLocation="CenterScreen" >
+        ResizeMode="NoResize" WindowStartupLocation="CenterScreen" 
+        IgnoreTaskbarOnMaximize="True"
+    >
 
     <Controls:MetroWindow.Resources>
         <local:UriConverter x:Key="UriConverter" />

@@ -32,7 +32,7 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Content="Enter as Doorkeeper" Name="Enter"  Click="Enter_Click" Background="Violet" />
+            <Button Grid.Column="0" Content="Enter as Guest" Name="Enter"  Click="Enter_Click" Background="Violet" />
             <Button Grid.Column="1" Content="Confirm" Name="Confirm"  Click="Confirm_Click"  IsDefault="True"/>
             <Button Grid.Column="2" Content="Cancel" Name="Cancel"  Click="Cancel_Click" />
         </Grid>

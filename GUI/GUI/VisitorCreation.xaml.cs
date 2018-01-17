@@ -33,6 +33,9 @@ namespace GUI
             myGrid.DataContext = MyVisitor;
             CalendarDateRange cdr = new CalendarDateRange(DateTime.MinValue, DateTime.Today);
             DatePick.BlackoutDates.Add(cdr);
+            VisitorLevels.Items.Add("1");
+            VisitorLevels.Items.Add("2");
+            VisitorLevels.Items.Add("3");
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
@@ -55,29 +58,42 @@ namespace GUI
                 this.ShowModalMessageExternal("Ops", "Insert a valid surname");
                 return;
             }
+            if (String.IsNullOrEmpty(MotivationBox.Text))
+            {
+                //errore Cognome
+                this.ShowModalMessageExternal("Ops", "Insert a valid motivation");
+                return;
+            }
             if (String.IsNullOrEmpty(DatePick.Text))
             {
                 //errore data
-                this.ShowModalMessageExternal("Ops", "Insert a valid expiryDate");
+                this.ShowModalMessageExternal("Ops", "Insert a valid expiration date");
+                return;
+            }
+            if (String.IsNullOrEmpty(VisitorLevels.Text))
+            {
+                //errore AuthLevel
+                this.ShowModalMessageExternal("Ops", "Insert a valid authentication level");
                 return;
             }
 
 
             
             myVisitor.Expiration = String.Format("{0:yyyy-MM-dd HH:mm:ss}", DatePick.SelectedDate);
-            //TODO CHANGE : cambiare valore di ritorno, per prendere il path del QR code nuovo
-            string QRcodeNew = await RestClient.CreateVisitor(myVisitor);
-            if (!String.IsNullOrEmpty(QRcodeNew))
+            myVisitor.AuthLevel = VisitorLevels.Text;
+
+            
+            VisitorResponseClass vrc =  RestClient.CreateVisitor(myVisitor);
+            if (vrc != null)
             {
-                QRCode qr = new QRCode(Constants.IPREMOTE + QRcodeNew);
+                QRCode qr = new QRCode(Constants.IPREMOTE + vrc.QrCodeURL);
                 qr.ShowDialog();
-                App.visitorList.Add(MyVisitor);
-                BigWindow.VisitorList.Add(MyVisitor);
+                App.visitorList.Add(vrc.Visitor);
+                BigWindow.VisitorList.Add(vrc.Visitor);
                 Close();
             }
             else
             {
-                //stampare fallimento
                 this.ShowModalMessageExternal("Ops", "Error while creating this visitor");
                 Close();
             }

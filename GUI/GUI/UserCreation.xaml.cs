@@ -31,9 +31,10 @@ namespace GUI
         public UserCreation()
         {
             InitializeComponent();
-            //TODO mettere un placeholder vero
-            //User.PathPhoto = "F:\\Downloads\\farmer.png";
             myGrid.DataContext = User;
+            Role.Items.Add("1");
+            Role.Items.Add("2");
+            Role.Items.Add("3");
         }
 
         private void Confirm_Click(object sender, RoutedEventArgs e)
@@ -56,14 +57,24 @@ namespace GUI
                 this.ShowModalMessageExternal("Ops", "Insert a valid Authorization Level");
                 return;
             }
-            if (String.IsNullOrEmpty(Email.Text))
+            if (String.IsNullOrEmpty(user.PathPhoto))
+            {
+                //errore photo
+                this.ShowModalMessageExternal("Ops", "Insert a valid photo");
+                return;
+            }
+            if (String.IsNullOrEmpty(Email.Text) ||!ValidatorExtensions.IsValidEmailAddress(Email.Text))
             {
                 //errore ruolo
                 this.ShowModalMessageExternal("Ops", "Insert a valid Email");
                 return;
             }
-
-            EmployeeResponseClass erc = RestClient.CreateUser(user);
+            EmployeeResponseClass erc=null;
+            try
+            {
+                 erc = RestClient.CreateUser(user);
+            }
+            catch { }
             if (erc == null)
                 this.ShowModalMessageExternal("Ops", "Error creating the user");
             else
@@ -96,7 +107,15 @@ namespace GUI
             if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 User.PathPhoto = openFileDialog1.FileName;
+                imageBox.Source = new ImageSourceConverter().ConvertFromString(openFileDialog1.FileName) as ImageSource;
+
             }
+        }
+
+        private void Role_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            string auth = Role.SelectedItem as string;
+            User.AuthLevel = Role.SelectedItem as string;
         }
     }
 }

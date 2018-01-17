@@ -6,8 +6,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GUI"
         mc:Ignorable="d"
-        Title="LoginWindow" Height="300" Width="350" FontSize="16" BorderThickness="0" GlowBrush="Black">
-    <Grid Background="AliceBlue" Name="myGrid">
+        Title="LoginWindow" Height="450" Width="550" BorderThickness="0" GlowBrush="Black" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Closing="MetroWindow_Closing" WindowStyle="None"
+                      >
+    <Grid Name="myGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
@@ -15,39 +16,43 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <TextBlock FontWeight="Bold" Grid.Row="0" Text="Welcome!" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-        <TextBlock Name="errors" FontWeight="Bold" Grid.Column="0" Text="Please log in or" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        <Button Grid.Column="1" Content="Enter as Doorkeeper" Name="Enter"  Click="Enter_Click" />
-        </Grid>
-        <StackPanel Grid.Row="2">
-            <TextBlock FontSize="16" FontWeight="Bold" Text="Username"  VerticalAlignment="Center" Margin="5,0" />
+        <Image Source="Resources\logo.png" />
+        <StackPanel Grid.Row="1">
+            <TextBlock Text="Username"  VerticalAlignment="Center"/>
             <TextBox Name="username" Text="{Binding Username}"/>
         </StackPanel>
-        <StackPanel Grid.Row="3">
-            <TextBlock FontSize="16" FontWeight="Bold" Text="Password"  VerticalAlignment="Center" Margin="5,0"/>
-            <PasswordBox Margin="5" Name="password"  />
+        <StackPanel Grid.Row="2">
+            <TextBlock Text="Password" VerticalAlignment="Center"/>
+            <PasswordBox Margin="10" Name="password" FontSize="20"/>
         </StackPanel>
+        <TextBlock Name="errors"  Grid.Row="3"  FontSize="16" VerticalAlignment="Center" Foreground="Red"/>
         <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="1" Content="Confirm" Name="Confirm"  Click="Confirm_Click" />
+            <Button Grid.Column="0" Content="Enter as Guest" Name="Enter"  Click="Enter_Click" Background="Violet" />
+            <Button Grid.Column="1" Content="Confirm" Name="Confirm"  Click="Confirm_Click"  IsDefault="True"/>
             <Button Grid.Column="2" Content="Cancel" Name="Cancel"  Click="Cancel_Click" />
         </Grid>
     </Grid>
     <Controls:MetroWindow.Resources>
         <Style TargetType="Button" BasedOn="{StaticResource MetroButton}">
-            <Setter Property="Margin" Value="5" />
+            <Setter Property="Margin" Value="10,15" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Background" Value="CornflowerBlue" />
         </Style>
         <Style TargetType="TextBox" BasedOn="{StaticResource MetroTextBox}">
-            <Setter Property="Margin" Value="5" />
+            <Setter Property="Margin" Value="10" />
+            <Setter Property="FontSize" Value="20" />
         </Style>
+        <Style TargetType="TextBlock" >
+            <Setter Property="Margin" Value="10,0" />
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+        
     </Controls:MetroWindow.Resources>
 </Controls:MetroWindow>

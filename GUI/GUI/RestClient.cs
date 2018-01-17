@@ -51,13 +51,9 @@ namespace GUI
             catch (AggregateException tk)
             {
                 serviceErrorShow();
-
-
-                //Application.Current.Shutdown();
             }
-            catch (Exception e)
+            catch 
             {
-                //TODO find a way to debug it properly
                 Console.WriteLine("TIMEOUT???");
             }
             return false;
@@ -78,9 +74,8 @@ namespace GUI
                 serviceErrorShow();
 
             }
-            catch (Exception e)
+            catch
             {
-                //TODO find a way to debug it properly
                 Console.WriteLine("TIMEOUT???");
             }
         }
@@ -114,9 +109,8 @@ namespace GUI
                 serviceErrorShow();
                 Application.Current.Shutdown();
             }
-            catch (Exception e)
+            catch
             {
-                //TODO find a way to debug it properly
                 Console.WriteLine("TIMEOUT???");
             }
             return null;
@@ -152,9 +146,8 @@ namespace GUI
                 serviceErrorShow();
                 Application.Current.Shutdown();
             }
-            catch (Exception e)
+            catch
             {
-                //TODO find a way to debug it properly
                 Console.WriteLine("TIMEOUT???");
             }
             return null;
@@ -185,9 +178,8 @@ namespace GUI
                 serviceErrorShow();
                 Application.Current.Shutdown();
             }
-            catch (Exception e)
+            catch
             {
-                //TODO find a way to debug it properly
                 Console.WriteLine("TIMEOUT???");
             }
             return null;
@@ -223,9 +215,8 @@ namespace GUI
                 serviceErrorShow();
                 Application.Current.Shutdown();
             }
-            catch (Exception e)
+           catch 
             {
-                //TODO find a way to debug it properly
                 Console.WriteLine("TIMEOUT???");
             }
             return null;
@@ -235,7 +226,7 @@ namespace GUI
         public static VisitorResponseClass CreateVisitor(Visitor v)
         {
             string json = JsonConvert.SerializeObject(v);
-            Console.WriteLine(json);
+
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             try
             {
@@ -257,9 +248,8 @@ namespace GUI
                 serviceErrorShow();
                 Application.Current.Shutdown();
             }
-            catch (Exception e)
+            catch
             {
-                //TODO find a way to debug it properly
                 Console.WriteLine("TIMEOUT???");
             }
             return null;
@@ -278,7 +268,6 @@ namespace GUI
         //method to block accesses from user 
         public static bool BlockAccess(string serial)
         {
-            //TODO test
             string json = JsonConvert.SerializeObject(serial);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             try
@@ -300,42 +289,8 @@ namespace GUI
                 serviceErrorShow();
                 Application.Current.Shutdown();
             }
-            catch (Exception e)
+            catch
             {
-                //TODO find a way to debug it properly
-                Console.WriteLine("TIMEOUT???");
-            }
-            return false;
-        }
-
-        //TODO CHANGE THIS WITH MODIFY USERS
-        //method to ask for a change of role
-        public static bool RoleChange(AuthLevelClass auth)
-        {
-            string json = JsonConvert.SerializeObject(auth);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-            try
-            {
-                HttpResponseMessage response = client.PostAsync(myRest + "/users/authLevel", content).Result;
-                if (response.IsSuccessStatusCode)
-                    return true;
-                else if (response.StatusCode == (HttpStatusCode)804)
-                {
-                    LoginWindow lw = new LoginWindow();
-                    lw.ShowDialog();
-                    if (loggedIn)
-                        return RoleChange(auth);
-                    else return false;
-                }
-            }
-            catch (AggregateException tk)
-            {
-                serviceErrorShow();
-                Application.Current.Shutdown();
-            }
-            catch (Exception e)
-            {
-                //TODO find a way to debug it properly
                 Console.WriteLine("TIMEOUT???");
             }
             return false;
@@ -366,9 +321,8 @@ namespace GUI
                 serviceErrorShow();
                 Application.Current.Shutdown();
             }
-            catch (Exception e)
+            catch
             {
-                //TODO find a way to debug it properly
                 Console.WriteLine("TIMEOUT???");
             }
             return String.Empty;
@@ -379,7 +333,6 @@ namespace GUI
         public static List<Access> GetHistory(ComplexQuery q)
         {
             string json = JsonConvert.SerializeObject(q);
-            Console.WriteLine(json);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             try
             {
@@ -400,9 +353,8 @@ namespace GUI
                 serviceErrorShow();
                 Application.Current.Shutdown();
             }
-            catch (Exception e)
+            catch
             {
-                //TODO find a way to debug it properly
                 Console.WriteLine("TIMEOUT???");
             }
             return null;
@@ -432,9 +384,8 @@ namespace GUI
                 serviceErrorShow();
                 Application.Current.Shutdown();
             }
-            catch (Exception ex)
+            catch
             {
-                //TODO find a way to debug it properly
                 Console.WriteLine("TIMEOUT???");
             }
             return false;

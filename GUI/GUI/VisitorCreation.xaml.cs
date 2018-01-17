@@ -82,7 +82,7 @@ namespace GUI
             myVisitor.Expiration = String.Format("{0:yyyy-MM-dd HH:mm:ss}", DatePick.SelectedDate);
             myVisitor.AuthLevel = VisitorLevels.Text;
 
-            //TODO cambiare per mettere ance
+            
             VisitorResponseClass vrc =  RestClient.CreateVisitor(myVisitor);
             if (vrc != null)
             {

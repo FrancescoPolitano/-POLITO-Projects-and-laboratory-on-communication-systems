@@ -170,7 +170,6 @@ namespace GUI
 
         private void PlanimetryClick(object sender, MouseButtonEventArgs e)
         {
-            //TODO TESTARE
             var item = sender as ListViewItem;
             if (item != null)
             {
@@ -362,7 +361,6 @@ namespace GUI
             if (item != null)
             {
                 Visitor user = item.DataContext as Visitor;
-                //todo here
                 VisitorDetails vd = new VisitorDetails(user);
                 vd.ShowDialog();
             }

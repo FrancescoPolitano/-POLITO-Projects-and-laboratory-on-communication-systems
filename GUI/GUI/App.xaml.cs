@@ -30,7 +30,6 @@ namespace GUI
             BigWindow.CreateUser += CreateUser;
             LoginWindow.PageChange += LoginWindow_PageChange;
             SystemEvents.SessionEnded += SystemEvents_SessionEnded;
-            //TODO mettere qualcosa per il get del portinaio ( atm se non sei loggato restituisce null)
 
             t = new Thread(UserListUpdate)
             {
@@ -103,7 +102,6 @@ namespace GUI
             {
                 Thread.Sleep(10000);
                 List<Employee> temp = RestClient.GetAllUsers();
-                //TODO TESTARE BENE
                 List<Visitor> temp2 = RestClient.GetAllVisitors();
                 foreach (Visitor v in temp2)
                     temp.Add(v);
@@ -123,14 +121,16 @@ namespace GUI
                                 }
                                 break;
                             }
-                        if (!exists)
-                        {
-                            userList.Add(e);
-                            addToRooms(e);
-                            BigWindow.UserList.Add(e);
-                            BigWindow.users.Add(e.Name + " " + e.Surname + " " + e.Serial);
-
-                        }
+                        //if (!exists)
+                        //{
+                        //    userList.Add(e);
+                        //    addToRooms(e);
+                        //    App.Current.Dispatcher.Invoke(new Action(() =>
+                        //    {
+                        //        BigWindow.UserList.Add(e);
+                        //        BigWindow.users.Add(e.Name + " " + e.Surname + " " + e.Serial);
+                        //    }));
+                        //}
                     }
                     else if (e.GetType() == typeof(Visitor))
                     {
@@ -148,12 +148,16 @@ namespace GUI
                                 break;
                             }
                         }
-                        if (!exists)
-                        {
-                            visitorList.Add(visT);
-                            addToRooms(visT);
-                            BigWindow.VisitorList.Add(visT);
-                        }
+                        //if (!exists)
+                        //{
+                        //    visitorList.Add(visT);
+                        //    addToRooms(visT);
+                        //    App.Current.Dispatcher.Invoke(new Action(() =>
+                        //    {
+                        //        BigWindow.VisitorList.Add(visT);
+                        //    }));
+                          
+                        //}
                     }
                 }
             }

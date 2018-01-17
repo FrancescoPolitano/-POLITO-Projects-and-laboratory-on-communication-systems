@@ -34,11 +34,6 @@ namespace GUI
 
         public Employee User { get => user; set => user = value; }
 
-        private void History_Click(object sender, RoutedEventArgs e)
-        {
-            //TODO
-        }
-
         private void modify_Click(object sender, RoutedEventArgs e)
         {
             Button b = sender as Button;

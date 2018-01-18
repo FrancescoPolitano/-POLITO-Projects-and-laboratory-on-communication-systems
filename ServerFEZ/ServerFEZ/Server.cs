@@ -2,7 +2,6 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Drawing;
-using System.Drawing.Imaging;
 using ZXing;
 using System.Text;
 using System.IO;
@@ -106,7 +105,6 @@ namespace ServerFEZ
                         throw new SocketException();
                     }
 
-                    //bitmap.Save(@"C:\Users\Cristiano\Desktop\image.jpeg", ImageFormat.Jpeg);
                 }
                 catch (Exception e)
                 {

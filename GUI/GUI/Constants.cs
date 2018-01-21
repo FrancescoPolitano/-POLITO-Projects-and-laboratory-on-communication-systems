@@ -8,10 +8,17 @@ namespace GUI
 {
     public static class Constants
     {
-        //public const string IPREMOTE = "http://192.168.1.133:8080";
-        //public const string myRest = "http://192.168.1.133:8080/RestfulService/resources";
+        ////Local server on Francesco's Machine
+        //public const string IPREMOTE = "http://127.0.0.1:8082";
+        //public const string myRest = "http://127.0.0.1:8082/RestfulService/resources";
+
+
+
+        //Amazon AWS
         public const string IPREMOTE = "http://13.59.45.212:8080";
         public const string myRest = "http://13.59.45.212:8080/RestfulService/resources";
+
+
         public const string ADMIN = "ADMINISTRATOR";
         public const string DOORMAN = "DOORKEEPER";
         public const string stanza1 = "Ufficio CEO";

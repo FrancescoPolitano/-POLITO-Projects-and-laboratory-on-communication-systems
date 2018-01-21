@@ -655,8 +655,9 @@ public class Database {
 		ArrayList<Access> accessResults = new ArrayList<Access>();
 		try {
 			stmt = (Statement) conn.createStatement();
-			System.out.println("Complex Query " + query.toValidSQLQuery());
-			stmt.executeQuery(query.toValidSQLQuery());
+			String theQuery= query.toValidSQLQuery().concat(" ORDER BY a.TimeS desc");
+			System.out.println(theQuery);
+			stmt.executeQuery(theQuery);
 			results = stmt.getResultSet();
 
 			Access temp = null;

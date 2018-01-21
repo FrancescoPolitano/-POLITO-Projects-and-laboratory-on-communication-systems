@@ -72,7 +72,11 @@ namespace GUI
             else
                 UserList = new ObservableCollection<Employee>();
             if (App.visitorList != null)
+            {
                 VisitorList = new ObservableCollection<Visitor>(App.visitorList);
+                foreach (Visitor visitor in VisitorList)
+                    users.Add(visitor.Name + " " + visitor.Surname + " " + visitor.Serial);
+            }
             else
                 VisitorList = new ObservableCollection<Visitor>();
             CalendarDateRange cdr = new CalendarDateRange(DateTime.Today.AddDays(1), DateTime.MaxValue);

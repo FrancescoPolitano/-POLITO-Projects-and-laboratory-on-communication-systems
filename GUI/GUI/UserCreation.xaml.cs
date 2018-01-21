@@ -81,7 +81,7 @@ namespace GUI
             {
                 App.userList.Add(erc.Employee);
                 BigWindow.UserList.Add(erc.Employee);
-                BigWindow.users.Add(erc.Employee.Name+" "+erc.Employee.Surname+" "+erc.Employee.Serial);
+                BigWindow.users.Add(erc.Employee.Name + " " + erc.Employee.Surname + " " + erc.Employee.Serial);
                 QRCode qr = new QRCode(Constants.IPREMOTE + erc.QrCodeURL);
                 qr.ShowDialog();
             }

@@ -78,25 +78,25 @@ namespace GUI
             }
 
 
-            
+
             myVisitor.Expiration = String.Format("{0:yyyy-MM-dd HH:mm:ss}", DatePick.SelectedDate);
             myVisitor.AuthLevel = VisitorLevels.Text;
 
-            
-            VisitorResponseClass vrc =  RestClient.CreateVisitor(myVisitor);
+
+            VisitorResponseClass vrc = RestClient.CreateVisitor(myVisitor);
             if (vrc != null)
             {
-                QRCode qr = new QRCode(Constants.IPREMOTE + vrc.QrCodeURL);
-                qr.ShowDialog();
                 App.visitorList.Add(vrc.Visitor);
                 BigWindow.VisitorList.Add(vrc.Visitor);
-                Close();
+                BigWindow.users.Add(vrc.Visitor.Name + " " + vrc.Visitor.Surname + " " + vrc.Visitor.Serial);
+                QRCode qr = new QRCode(Constants.IPREMOTE + vrc.QrCodeURL);
+                qr.ShowDialog();
             }
             else
             {
                 this.ShowModalMessageExternal("Ops", "Error while creating this visitor");
-                Close();
             }
+            Close();
         }
 
         private void Cancel_Click_1(object sender, RoutedEventArgs e)

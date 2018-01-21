@@ -84,7 +84,7 @@ public class Utils {
 
 		// write the image to the output stream
 		FileOutputStream fos = null;
-		String URI = "C:\\Users\\Administrator\\Desktop\\ServerData\\" + UserId + ".jpg";
+		String URI = Constants.mediaPath  + UserId + ".jpg";
 		String URL = "/images/" + UserId + ".jpg";
 		try {
 			fos = new FileOutputStream(URI);
@@ -103,7 +103,7 @@ public class Utils {
 		// Converto il byte array in una buffered image
 		ByteArrayInputStream bais = new ByteArrayInputStream(fileContent);
 		FileOutputStream fos = null;
-		String URI = "C:\\Users\\Administrator\\Desktop\\ServerData\\profiles\\" + id + ".jpg";
+		String URI = Constants.mediaPath + "profiles\\" + id + ".jpg";
 		try {
 			img = ImageIO.read(bais);
 			fos = new FileOutputStream(URI);
@@ -176,7 +176,7 @@ public class Utils {
 
 			messageBodyPart = new MimeBodyPart();
 			DataSource fds = new FileDataSource(
-					"C:\\Users\\Administrator\\Desktop\\ServerData\\" + employeeId + ".jpg");
+					Constants.mediaPath + employeeId + ".jpg");
 			messageBodyPart.setDataHandler(new DataHandler(fds));
 			messageBodyPart.setHeader("Content-ID", "<image>");
 
@@ -215,7 +215,7 @@ public class Utils {
 			// TODO CAMBIARE IP con localhost
 			BodyPart messageBodyPart = new MimeBodyPart();
 			String htmlText = "If you don't know the origin of this email please ignore it.<br>"
-					+ "<a href=\"http://13.59.45.212:8080/RestfulService/resources/confirm/" + employeeId
+					+ "<a href=\""+Constants.address+"/RestfulService/resources/confirm/" + employeeId
 					+ "\">Click here to confirm</a>";
 			messageBodyPart.setContent(htmlText, "text/html");
 			multipart.addBodyPart(messageBodyPart);

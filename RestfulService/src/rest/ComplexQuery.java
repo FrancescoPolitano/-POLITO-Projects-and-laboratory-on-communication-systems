@@ -102,6 +102,7 @@ public class ComplexQuery {
 			else
 				sb.append("( a.TimeS='" + start + "')");
 		}
+
 		return sb.toString();
 	}
 }

@@ -79,7 +79,7 @@ namespace ServerFEZ
 
                     ms = new MemoryStream(pictureData);
                     bitmap = new Bitmap(ms);
-                    bitmap.Save(@"C:\Users\Cristiano\Desktop\image.jpeg");
+                    //bitmap.Save(@"C:\Users\Cristiano\Desktop\image.jpeg");
                     var barcodeResult = new BarcodeReader().Decode(bitmap);
                     if (barcodeResult != null && barcodeResult.BarcodeFormat == BarcodeFormat.QR_CODE)
                     {

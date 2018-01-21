@@ -24,21 +24,21 @@ namespace FEZ
             camera.CurrentPictureResolution = Camera.PictureResolution.Resolution160x120;
             wifiRS21.NetworkDown += WifiRS21_NetworkDown;
             wifiRS21.NetworkUp += WifiRS21_NetworkUp;
+            if (!wifiRS21.NetworkInterface.Opened)
+                wifiRS21.NetworkInterface.Open();
             new Thread(connectionChecking).Start();
             initializeWifi();
         }
 
         private void initializeWifi()
         {
+            ledStrip.SetBitmask(28);
             bool joinSuccess = true;
-            if (!wifiRS21.NetworkInterface.Opened)
-                wifiRS21.NetworkInterface.Open();
-            GHI.Networking.WiFiRS9110.NetworkParameters[] info;
-
             while (joinSuccess)
             {
                 try
                 {
+                    GHI.Networking.WiFiRS9110.NetworkParameters[] info;
                     info = wifiRS21.NetworkInterface.Scan(Constants.WIFI_SSID);
                     if (info != null && info.Length != 0)
                     {
@@ -73,6 +73,7 @@ namespace FEZ
         private void WifiRS21_NetworkDown(GTM.Module.NetworkModule sender, GTM.Module.NetworkModule.NetworkState state)
         {
             Debug.Print("WIFI DOWN");
+            initializeWifi();
         }
 
         private void Camera_PictureCaptured(Camera sender, GT.Picture e)
@@ -121,7 +122,7 @@ namespace FEZ
             }
             catch (Exception exc)
             {
-                Debug.Print(("EXCEPTION "+exc.StackTrace);
+                Debug.Print("EXCEPTION " + exc.StackTrace);
                 sockSender.Close();
                 connectionChecking();
             }

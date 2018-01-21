@@ -14,13 +14,11 @@ namespace FEZ
 {
     public partial class Program
     {
-
         private IPEndPoint remoteEP;
         private Socket sockSender = null;
 
         void ProgramStarted()
         {
-            //TODO CAMBIARE IP
             remoteEP = new IPEndPoint(IPAddress.Parse(Constants.STATIC_IP_SERVER), Constants.PORT_TCP);
             camera.PictureCaptured += Camera_PictureCaptured;
             camera.CurrentPictureResolution = Camera.PictureResolution.Resolution160x120;
@@ -33,11 +31,10 @@ namespace FEZ
         private void initializeWifi()
         {
             bool joinSuccess = true;
-            ledStrip.SetBitmask(28);
             if (!wifiRS21.NetworkInterface.Opened)
                 wifiRS21.NetworkInterface.Open();
-            wifiRS21.UseStaticIP(Constants.STATIC_IP, Constants.MASK, Constants.STATIC_IP);
             GHI.Networking.WiFiRS9110.NetworkParameters[] info;
+
             while (joinSuccess)
             {
                 try
@@ -62,11 +59,10 @@ namespace FEZ
             }
             while (wifiRS21.NetworkInterface.IPAddress == "0.0.0.0")
             {
-                Debug.Print("ASPETTANDO IP");
+                Debug.Print("WAITING FOR IP");
                 Thread.Sleep(100);
             }
             Debug.Print("IP ADDRESS " + wifiRS21.NetworkInterface.IPAddress);
-            ledStrip.TurnAllLedsOff();
         }
 
         private void WifiRS21_NetworkUp(GTM.Module.NetworkModule sender, GTM.Module.NetworkModule.NetworkState state)
@@ -92,12 +88,11 @@ namespace FEZ
                 sent = sockSender.Send(BitConverter.GetBytes(pictureSize), 0, sizeof(int), SocketFlags.None);
                 if (sent != sizeof(int))
                     throw new Exception();
-                sent = 0;
-                Debug.Print("MANDO FOTO");
+                Debug.Print("SEND PHOTO");
                 sent = sockSender.Send(image);
                 if (sent != pictureSize)
                     throw new Exception();
-                Debug.Print("FOTO FINITA");
+                Debug.Print("FINISHED");
 
                 byte[] responseFromServer = new byte[Constants.ACCEPT.Length];
                 received = sockSender.Receive(responseFromServer, 0, responseFromServer.Length, SocketFlags.None);
@@ -119,29 +114,24 @@ namespace FEZ
                 {
                 }
                 ledStrip.TurnAllLedsOff();
-            }
-            catch (Exception exc)
-            {
-                Debug.Print("EXCEPTION");
-                Debug.Print(exc.StackTrace);
-                sockSender.Close();
-                connectionChecking();
-            }
-            finally
-            {
-                Thread.Sleep(300);
+
                 while (!camera.CameraReady)
                     Thread.Sleep(100);
                 camera.TakePicture();
             }
+            catch (Exception exc)
+            {
+                Debug.Print(("EXCEPTION "+exc.StackTrace);
+                sockSender.Close();
+                connectionChecking();
+            }
         }
-
         private void connectionChecking()
         {
+            ledStrip.SetBitmask(28);
             while (wifiRS21.IsNetworkUp == false)
             {
-                Debug.Print("Waiting...");
-                ledStrip.SetBitmask(28);
+                Debug.Print("Waiting wifi...");
                 Thread.Sleep(1000);
             }
             bool isConnected = false;
@@ -155,7 +145,7 @@ namespace FEZ
                 }
                 catch (SocketException e)
                 {
-                    Debug.Print("ECCEZIONE DURANTE CONNECT");
+                    Debug.Print("ECCEZIONE DURANTE CONNECT " + e.StackTrace);
                 }
             }
             ledStrip.TurnAllLedsOff();

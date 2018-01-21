@@ -6,6 +6,7 @@ using ZXing;
 using System.Text;
 using System.IO;
 using System.Net.Http;
+using System.Threading;
 
 namespace ServerFEZ
 {
@@ -56,9 +57,8 @@ namespace ServerFEZ
                     handler.SendTimeout = 8000;
 
                     byte[] pictureByteSize = new byte[sizeof(int)];
-
                     received = handler.Receive(pictureByteSize, 0, sizeof(int), SocketFlags.None, out error);
-                    if (error != SocketError.Success || received != sizeof(int))
+                    if (error != SocketError.Success)
                     {
                         Console.WriteLine("errore " + error.ToString());
                         throw new SocketException();
@@ -66,7 +66,6 @@ namespace ServerFEZ
                     pictureSize = BitConverter.ToInt32(pictureByteSize, 0);
                     pictureData = new byte[pictureSize];
                     received = 0;
-
                     while (received < pictureSize)
                     {
                         received += handler.Receive(pictureData, received, pictureSize - received, SocketFlags.None, out error);
@@ -80,13 +79,11 @@ namespace ServerFEZ
 
                     ms = new MemoryStream(pictureData);
                     bitmap = new Bitmap(ms);
-
+                    bitmap.Save(@"C:\Users\Cristiano\Desktop\image.jpeg");
                     var barcodeResult = new BarcodeReader().Decode(bitmap);
-                    Console.WriteLine("BARCODE {0} ", barcodeResult);
                     if (barcodeResult != null && barcodeResult.BarcodeFormat == BarcodeFormat.QR_CODE)
                     {
                         HttpResponseMessage response = client.GetAsync(Constants.URI + Constants.DOOR_ID + "/" + barcodeResult.Text).Result;
-                        Console.WriteLine("RESPONSE CODE {0} ", response.StatusCode);
                         if (response.IsSuccessStatusCode)
                         {
                             string result = response.Content.ReadAsStringAsync().Result;
@@ -108,7 +105,6 @@ namespace ServerFEZ
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("InnerException: " + e.InnerException);
                     Console.WriteLine("Error: " + e.Message.ToString());
                     handler.Close();
                     return;
